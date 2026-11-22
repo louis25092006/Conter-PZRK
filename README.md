@@ -1,3 +1,8 @@
+# Conter-PZRK
+This is my super project about portable anti-aircraft missile system
+
+---
+
 Lab 1: Event Loop Is the Game Loop
 
 ## Що виконано
