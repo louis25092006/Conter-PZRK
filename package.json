@@ -13,15 +13,22 @@
     "build": "npm run build -w client",
     "start": "npm run start -w server",
     "test": "npm test -w shared && npm test -w client && npm test -w server",
-    "lint": "eslint client/src shared/src shared/test server/src server/test",
-    "format": "prettier --write client/src client/index.html client/scripts client/tests shared server",
-    "assets": "npm run assets -w client"
+    "lint": "eslint client/src client/tests client/scripts client/vite.config.ts shared/src shared/test server/src server/test server/scripts scripts",
+    "format": "prettier --write client/src client/index.html client/scripts client/tests client/vite.config.ts shared server scripts eslint.config.js",
+    "assets": "npm run assets -w client",
+    "typecheck": "npm run typecheck -w shared -w server -w client",
+    "check": "npm run typecheck && npm run lint && npm test",
+    "site": "npm run build:site -w client"
   },
   "devDependencies": {
     "@eslint/js": "^10.0.1",
+    "@types/node": "^26.6.6",
+    "@types/ws": "^8.18.2",
     "eslint": "^10.10.0",
     "eslint-config-prettier": "^10.1.8",
     "globals": "^17.14.0",
-    "prettier": "^3.9.7"
+    "prettier": "^3.9.7",
+    "typescript": "~6.0.0",
+    "typescript-eslint": "^8.73.0"
   }
 }

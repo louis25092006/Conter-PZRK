@@ -8,6 +8,10 @@
     "./*": "./src/*"
   },
   "scripts": {
-    "test": "node --test --test-timeout=20000 test/*.test.js"
+    "test": "node --test --test-timeout=20000 test/*.test.ts",
+    "typecheck": "tsc --noEmit -p ."
+  },
+  "dependencies": {
+    "zod": "^4.6.7"
   }
 }

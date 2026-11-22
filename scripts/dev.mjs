@@ -17,7 +17,7 @@ if (!vite) throw new Error('vite not found — run npm install (or npm.cmd insta
 // Порти фіксовані: сервер 3000 (на нього дивиться проксі Vite), клієнт 5173.
 // Чужу змінну PORT (її може виставити оточення/IDE) навмисно не передаємо, інакше сервер
 // сів би не на той порт і проксі /api, /ws нікуди б не вели.
-const { PORT: _ignored, ...baseEnv } = process.env // eslint-disable-line no-unused-vars
+const { PORT: _ignored, ...baseEnv } = process.env // eslint-disable-line @typescript-eslint/no-unused-vars
 const serverEnv = { ...baseEnv, PORT: process.env.SERVER_PORT ?? '3000' }
 
 const CYAN = '\x1b[36m'
@@ -27,7 +27,7 @@ const RESET = '\x1b[0m'
 const procs = [
   {
     name: 'server',
-    args: ['--watch', '--env-file-if-exists=.env', 'src/index.js'],
+    args: ['--watch', '--env-file-if-exists=.env', 'src/index.ts'],
     cwd: root + 'server',
     color: CYAN,
     env: serverEnv,

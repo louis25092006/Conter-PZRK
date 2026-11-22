@@ -4,16 +4,16 @@
     <meta charset="UTF-8" />
     <title>Conter-PZRK</title>
     <!--
-      Гра живе в client/. Ця сторінка лише переадресовує туди, щоб гра відкривалась
+      Зібрана гра (npm run site) живе в site/. Ця сторінка лише переадресовує туди, щоб гра відкривалась
       з кореня репозиторію: Live Server у VS Code, GitHub Pages, будь-який статичний сервер.
       Повна версія з сервером, кімнатами і чатом: npm run dev → http://localhost:5173
     -->
-    <meta http-equiv="refresh" content="0; url=client/index.html" />
+    <meta http-equiv="refresh" content="0; url=site/index.html" />
     <script>
-      location.replace('client/index.html' + location.search)
+      location.replace('site/index.html' + location.search)
     </script>
   </head>
   <body style="background: #000; color: #ddd; font-family: monospace">
-    <p>Відкриваю гру… Якщо не відкрилась: <a href="client/index.html" style="color: #93c5fd">client/index.html</a></p>
+    <p>Відкриваю гру… Якщо не відкрилась: <a href="site/index.html" style="color: #93c5fd">site/index.html</a></p>
   </body>
 </html>

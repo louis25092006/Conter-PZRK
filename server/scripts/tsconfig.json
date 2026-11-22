@@ -1,0 +1,6 @@
+{
+  // демо-скрипти запускають і клієнтський код (NetGame) у Node — тож їм потрібні типи DOM
+  "extends": "../../tsconfig.base.json",
+  "compilerOptions": { "lib": ["ES2023", "DOM", "DOM.Iterable"], "types": ["node"] },
+  "include": ["."]
+}

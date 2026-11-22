@@ -1,0 +1,23 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="256" height="128" viewBox="0 0 256 128">
+  <defs>
+    <linearGradient id="body-player" x1="0" y1="0" x2="0" y2="1">
+      <stop offset="0" stop-color="#ffffff"/><stop offset="1" stop-color="#c9c9c9"/>
+    </linearGradient>
+    <linearGradient id="body-enemy" x1="0" y1="0" x2="0" y2="1">
+      <stop offset="0" stop-color="#e0503f"/><stop offset="1" stop-color="#8e2a1f"/>
+    </linearGradient></defs>
+  <g transform="translate(64 64) scale(3)" stroke="#777" stroke-width="0.6" stroke-linejoin="round">
+    <path d="M3 3 L-16 17 L-10 5 Z M3 -3 L-16 -17 L-10 -5 Z" fill="#cfcfcf"/>
+    <path d="M20 0 L5 4 L-15 3 L-19 0 L-15 -3 L5 -4 Z" fill="url(#body-player)"/>
+    <path d="M-12 3 L-19 9 L-15 2 Z M-12 -3 L-19 -9 L-15 -2 Z" fill="#b5b5b5"/>
+    <ellipse cx="9" cy="0" rx="4" ry="2" fill="#4a90d9" stroke="none"/>
+    <ellipse cx="10" cy="-0.6" rx="1.6" ry="0.6" fill="#ffffff" opacity="0.6" stroke="none"/>
+  </g>
+  <g transform="translate(192 64) scale(3)" stroke="#3a0f0b" stroke-width="0.6" stroke-linejoin="round">
+    <path d="M3 3 L-16 17 L-10 5 Z M3 -3 L-16 -17 L-10 -5 Z" fill="#962d22"/>
+    <path d="M20 0 L5 4 L-15 3 L-19 0 L-15 -3 L5 -4 Z" fill="url(#body-enemy)"/>
+    <path d="M-12 3 L-19 9 L-15 2 Z M-12 -3 L-19 -9 L-15 -2 Z" fill="#7b241c"/>
+    <ellipse cx="9" cy="0" rx="4" ry="2" fill="#f5b041" stroke="none"/>
+    <ellipse cx="10" cy="-0.6" rx="1.6" ry="0.6" fill="#ffffff" opacity="0.6" stroke="none"/>
+  </g>
+</svg>

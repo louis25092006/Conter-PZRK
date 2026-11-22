@@ -4,9 +4,10 @@
   "private": true,
   "type": "module",
   "scripts": {
-    "dev": "node --watch --env-file-if-exists=.env src/index.js",
-    "start": "node --env-file-if-exists=.env src/index.js",
-    "test": "node --test --test-timeout=20000 test/*.test.js"
+    "dev": "node --watch --env-file-if-exists=.env src/index.ts",
+    "start": "node --env-file-if-exists=.env src/index.ts",
+    "test": "node --test --test-timeout=20000 test/*.test.ts",
+    "typecheck": "tsc --noEmit -p . && tsc --noEmit -p scripts"
   },
   "dependencies": {
     "ws": "^8.18.0",

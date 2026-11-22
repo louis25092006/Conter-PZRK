@@ -1,0 +1,44 @@
+{
+  "classic": {
+    "name": "Classic Sky",
+    "seed": 2026,
+    "sky": "#000000",
+    "startAsteroids": 2,
+    "asteroidEvery": 7,
+    "asteroidsBase": 2,
+    "asteroidsCap": 5,
+    "homingChance": 0.1,
+    "enemyEvery": 6,
+    "enemiesBase": 1,
+    "enemiesCap": 5,
+    "pickupEvery": 9
+  },
+  "training": {
+    "name": "Training Ground",
+    "seed": 7,
+    "sky": "#04101c",
+    "startAsteroids": 1,
+    "asteroidEvery": 9,
+    "asteroidsBase": 1,
+    "asteroidsCap": 3,
+    "homingChance": 0,
+    "enemyEvery": 10,
+    "enemiesBase": 0,
+    "enemiesCap": 2,
+    "pickupEvery": 6
+  },
+  "dogfight": {
+    "name": "Dogfight",
+    "seed": 1337,
+    "sky": "#12050a",
+    "startAsteroids": 0,
+    "asteroidEvery": 999,
+    "asteroidsBase": 0,
+    "asteroidsCap": 0,
+    "homingChance": 0,
+    "enemyEvery": 4,
+    "enemiesBase": 2,
+    "enemiesCap": 6,
+    "pickupEvery": 6
+  }
+}
