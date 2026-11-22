@@ -1,7 +1,7 @@
 export function createLoop({ step = 1 / 60, simulate, render }) {
-  let accumulator = 0        
-  let lasttime = 0                
-  let rafId = null            
+  let accumulator = 0
+  let lasttime = 0
+  let rafId = null
 
   //HUD
   let stepsThisSecond = 0
@@ -12,18 +12,18 @@ export function createLoop({ step = 1 / 60, simulate, render }) {
   function frame(now) {
     const frameStart = performance.now()
 
-    if (lasttime === 0) lasttime = now   
-    const delta = Math.min((now - lasttime) / 1000, 0.25)  
+    if (lasttime === 0) lasttime = now
+    const delta = Math.min((now - lasttime) / 1000, 0.25) //защита от "спирали смерти"
     lasttime = now
     accumulator += delta
 
     while (accumulator >= step) {
-      simulate(step)            
+      simulate(step)
       accumulator -= step
       stepsThisSecond++
     }
 
-    render(accumulator / step)   // alpha
+    render(accumulator / step) // alpha
     framesThisSecond++
 
     // обнов стат
@@ -37,12 +37,16 @@ export function createLoop({ step = 1 / 60, simulate, render }) {
     }
     stats.frameMs = performance.now() - frameStart
 
-    rafId = requestAnimationFrame(frame)
+    rafId = requestAnimationFrame(frame) //бесконечный цикл, синхронизированный с частотой обновления экрана
   }
 
   return {
-    start() { rafId = requestAnimationFrame(frame) },
-    stop() { cancelAnimationFrame(rafId) },
-    stats  
+    start() {
+      rafId = requestAnimationFrame(frame)
+    },
+    stop() {
+      cancelAnimationFrame(rafId)
+    },
+    stats,
   }
 }

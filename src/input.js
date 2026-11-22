@@ -1,22 +1,27 @@
-export function createInput(target) {
-  const down = new Set()
-  const pressed = new Set()
+// Клавіші, які браузер інакше використав би сам (прокрутка сторінки пробілом/стрілками)
+const GAME_KEYS = new Set(['Space', 'ArrowUp', 'ArrowDown', 'ArrowLeft', 'ArrowRight'])
 
-  target.addEventListener('keydown', e => {
-    if (!down.has(e.code)) pressed.add(e.code)
+export function createInput(target) {
+  const down = new Set() // клавіші, затиснуті зараз
+  const pressed = new Set() // клавіші, натиснуті з моменту останнього consume()
+
+  target.addEventListener('keydown', (e) => {
+    if (GAME_KEYS.has(e.code)) e.preventDefault()
+    if (!down.has(e.code)) pressed.add(e.code) // автоповтор клавіші не рахуємо як нове натискання
     down.add(e.code)
   })
 
-  target.addEventListener('keyup', e => {
+  target.addEventListener('keyup', (e) => {
     down.delete(e.code)
   })
 
+  // якщо вкладка втратила фокус, keyup може не прийти — "залипла" б тяга
+  target.addEventListener('blur', () => down.clear())
+
   return {
-    isDown: code => down.has(code),
-    justPressed: code => {
-      const result = pressed.has(code)
-      pressed.delete(code)
-      return result
-    }
+    isDown: (code) => down.has(code),
+    justPressed: (code) => pressed.has(code),
+    // викликається в кінці кожного кроку симуляції: "натискання" живе рівно один крок
+    consume: () => pressed.clear(),
   }
 }

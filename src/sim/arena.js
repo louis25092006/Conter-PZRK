@@ -1,11 +1,58 @@
-export function wrapAround(ship, width, height) {
-  let wrappedX = false
-  let wrappedY = false
+import { Vector2 } from './vector.js'
 
-  if (ship.x < 0)     { ship.x = width;  wrappedX = true }
-  if (ship.x > width) { ship.x = 0;      wrappedX = true }
-  if (ship.y < 0)      { ship.y = height; wrappedY = true }
-  if (ship.y > height) { ship.y = 0;      wrappedY = true }
+// Переносить сутність на протилежний край, якщо вона вилетіла за межі.
+// Повертає true, якщо був перенос, — тоді треба скинути інтерполяцію,
+// інакше рендер на один кадр "протягне" сутність через увесь екран
+// (той самий фікс, що й у Lab 1, тільки тепер для будь-якої сутності).
+export function wrapAround(entity, width, height) {
+  let { x, y } = entity.pos
+  let wrapped = false
 
-  return { wrappedX, wrappedY }
+  if (x < 0) {
+    x += width
+    wrapped = true
+  } else if (x > width) {
+    x -= width
+    wrapped = true
+  }
+  if (y < 0) {
+    y += height
+    wrapped = true
+  } else if (y > height) {
+    y -= height
+    wrapped = true
+  }
+
+  if (wrapped) {
+    entity.pos = new Vector2(x, y)
+    entity.snapPrevious()
+  }
+  return wrapped
+}
+
+// Відбиває сутність від країв арени (для астероїдів).
+export function bounceOffEdges(entity, width, height) {
+  const r = entity.radius
+  let { x, y } = entity.pos
+  let { x: vx, y: vy } = entity.vel
+
+  if (x < r && vx < 0) {
+    x = r
+    vx = -vx
+  }
+  if (x > width - r && vx > 0) {
+    x = width - r
+    vx = -vx
+  }
+  if (y < r && vy < 0) {
+    y = r
+    vy = -vy
+  }
+  if (y > height - r && vy > 0) {
+    y = height - r
+    vy = -vy
+  }
+
+  entity.pos = new Vector2(x, y)
+  entity.vel = new Vector2(vx, vy)
 }
