@@ -2,6 +2,7 @@ export function createLoop({ step = 1 / 60, simulate, render }) {
   let accumulator = 0
   let lasttime = 0
   let rafId = null
+  let running = false // stop() можуть викликати зсередини кадру (Esc → лобі)
 
   //HUD
   let stepsThisSecond = 0
@@ -17,12 +18,13 @@ export function createLoop({ step = 1 / 60, simulate, render }) {
     lasttime = now
     accumulator += delta
 
-    while (accumulator >= step) {
+    while (running && accumulator >= step) {
       simulate(step)
       accumulator -= step
       stepsThisSecond++
     }
 
+    if (!running) return // зупинили під час simulate — не малюємо і не плануємо наступний кадр
     render(accumulator / step) // alpha
     framesThisSecond++
 
@@ -42,9 +44,14 @@ export function createLoop({ step = 1 / 60, simulate, render }) {
 
   return {
     start() {
+      if (running) return
+      running = true
+      lasttime = 0 // інакше після паузи в лобі перший кадр "наздоганяв" би весь час простою
+      accumulator = 0
       rafId = requestAnimationFrame(frame)
     },
     stop() {
+      running = false
       cancelAnimationFrame(rafId)
     },
     stats,

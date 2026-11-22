@@ -1,24 +1,143 @@
 <!doctype html>
-<html lang="en">
+<html lang="uk">
   <head>
     <meta charset="UTF-8" />
     <link rel="icon" href="data:," />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-    <title>Conter — dogfight</title>
+    <title>Conter-PZRK</title>
     <style>
       body {
         margin: 0;
         overflow: hidden;
         background: black;
+        font-family: ui-monospace, Consolas, monospace;
+        color: #e5e7eb;
       }
       canvas {
         display: block;
         background: black;
       }
+      #ui {
+        position: fixed;
+        inset: 0;
+        pointer-events: none;
+      }
+      #ui > * {
+        pointer-events: auto;
+      }
+      #ui.overlay {
+        display: grid;
+        place-items: center;
+        background: rgba(0, 0, 0, 0.35);
+      }
+      .loading-actions {
+        position: absolute;
+        left: 50%;
+        top: calc(50% + 160px);
+        transform: translateX(-50%);
+      }
+      button {
+        font: inherit;
+        padding: 8px 18px;
+        border-radius: 6px;
+        border: 1px solid #4b5563;
+        background: #111827;
+        color: #e5e7eb;
+        cursor: pointer;
+      }
+      button:hover:not(:disabled) {
+        border-color: #9ca3af;
+      }
+      button:disabled {
+        opacity: 0.4;
+        cursor: default;
+      }
+      button.primary {
+        background: #1d4ed8;
+        border-color: #3b82f6;
+      }
+      .panel {
+        width: min(440px, calc(100vw - 40px));
+        padding: 22px 26px;
+        border-radius: 10px;
+        background: rgba(10, 14, 24, 0.92);
+        border: 1px solid #1f2937;
+        box-shadow: 0 10px 40px rgba(0, 0, 0, 0.6);
+      }
+      .panel h1 {
+        margin: 0 0 16px;
+        font-size: 26px;
+        text-align: center;
+      }
+      .panel h2 {
+        margin: 18px 0 8px;
+        font-size: 15px;
+        color: #9ca3af;
+      }
+      .panel label {
+        display: grid;
+        gap: 6px;
+        font-size: 13px;
+        color: #9ca3af;
+      }
+      .panel input {
+        font: inherit;
+        padding: 8px 10px;
+        border-radius: 6px;
+        border: 1px solid #374151;
+        background: #030712;
+        color: white;
+      }
+      .rooms {
+        list-style: none;
+        margin: 0;
+        padding: 0;
+        display: grid;
+        gap: 6px;
+      }
+      .rooms li {
+        display: flex;
+        justify-content: space-between;
+        gap: 10px;
+        padding: 9px 12px;
+        border-radius: 6px;
+        border: 1px solid #1f2937;
+        background: #0b1220;
+        cursor: pointer;
+      }
+      .rooms li:hover {
+        border-color: #4b5563;
+      }
+      .rooms li.selected {
+        border-color: #3b82f6;
+        background: #10213f;
+      }
+      .rooms li.full {
+        opacity: 0.45;
+        cursor: not-allowed;
+      }
+      .room-meta {
+        color: #9ca3af;
+        font-size: 13px;
+      }
+      .status {
+        min-height: 18px;
+        font-size: 12px;
+        color: #6b7280;
+      }
+      .status.error {
+        color: #f87171;
+      }
+      .row {
+        display: flex;
+        justify-content: flex-end;
+        gap: 8px;
+      }
     </style>
   </head>
   <body>
     <canvas id="game"></canvas>
+    <div id="ui"></div>
     <script type="module" src="/src/main.js"></script>
   </body>
 </html>

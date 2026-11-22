@@ -114,7 +114,7 @@ function drawFlame(ctx, time) {
 
 // ---------- сущности ----------
 
-function drawShip(ctx, ship, alpha, time) {
+function drawShip(ctx, ship, alpha, time, sprites) {
   if (ship.isWaitingRespawn) return // сбит — ждёт респауна
   // после респауна мигает, пока неуязвим
   if (ship.invulnerable > 0 && Math.floor(time * 10) % 2 === 0) return
@@ -137,10 +137,18 @@ function drawShip(ctx, ship, alpha, time) {
 
   ctx.rotate(angle)
   if (ship.thrust) drawFlame(ctx, time + ship.id) // + id — чтобы пламя у разных самолётов не дрожало синхронно
-  drawWings(ctx, palette)
-  drawFuselage(ctx, palette)
-  drawTailFins(ctx, palette)
-  drawCockpit(ctx, palette)
+  const sheet = sprites?.images.ships
+  if (sheet) {
+    // Lab 3: самолёт из спрайт-листа (кадр 128×128 рисуем в 44×44)
+    const [sx, sy, sw, sh] = sprites.frames.ships[ship.team === 'enemy' ? 'enemy' : 'player']
+    ctx.drawImage(sheet, sx, sy, sw, sh, -22, -22, 44, 44)
+  } else {
+    // запасной вариант (спрайт не загрузился) — векторный самолёт из Lab 1
+    drawWings(ctx, palette)
+    drawFuselage(ctx, palette)
+    drawTailFins(ctx, palette)
+    drawCockpit(ctx, palette)
+  }
   ctx.restore()
 
   // полоска HP над вражеским самолётом
@@ -153,7 +161,7 @@ function drawShip(ctx, ship, alpha, time) {
   }
 }
 
-function drawBullet(ctx, bullet, alpha) {
+function drawBullet(ctx, bullet, alpha, sprites) {
   const { x, y } = interpolate(bullet, alpha)
   const color = bullet.homing ? EFFECTS.homing.color : bullet.team === 'enemy' ? '#ff6b6b' : '#fff3b0'
 
@@ -168,13 +176,72 @@ function drawBullet(ctx, bullet, alpha) {
   ctx.stroke()
   ctx.globalAlpha = 1
 
+  const sheet = sprites?.images.bullets
+  if (sheet) {
+    const frame = bullet.homing ? 'homing' : bullet.team === 'enemy' ? 'enemy' : 'player'
+    const [sx, sy, sw, sh] = sprites.frames.bullets[frame]
+    const size = bullet.homing ? 16 : 13
+    ctx.drawImage(sheet, sx, sy, sw, sh, x - size / 2, y - size / 2, size, size)
+    return
+  }
   ctx.beginPath()
   ctx.arc(x, y, bullet.radius, 0, Math.PI * 2)
   ctx.fillStyle = color
   ctx.fill()
 }
 
-function drawAsteroid(ctx, asteroid, alpha) {
+// ---------- астероид из спрайт-листа ----------
+// Камень с кратерами вращается, а освещение (свет сверху слева) — нет.
+// Для этого собираем астероид на маленьком вспомогательном canvas:
+// 1) рисуем повёрнутый кадр, 2) поверх, режимом 'source-atop' (только там, где уже есть камень),
+// кладём неповёрнутый градиент тени, 3) копируем результат на основной экран.
+
+let scratch = null
+function getScratch(size) {
+  if (!scratch) scratch = document.createElement('canvas').getContext('2d')
+  if (scratch.canvas.width < size || scratch.canvas.height < size) {
+    scratch.canvas.width = Math.max(size, scratch.canvas.width)
+    scratch.canvas.height = Math.max(size, scratch.canvas.height)
+  }
+  return scratch
+}
+
+const SPRITE_ROCK_RADIUS = 56 // номинальный радиус камня в клетке 128×128 (см. scripts/make-sprites.mjs)
+
+function drawAsteroidSprite(ctx, asteroid, alpha, sheet, frames) {
+  const { x, y, angle } = interpolate(asteroid, alpha)
+  const r = asteroid.radius
+  const half = (r * 64) / SPRITE_ROCK_RADIUS
+  const dpr = window.devicePixelRatio || 1
+  const size = Math.ceil(half * 2 * dpr)
+  const [sx, sy, sw, sh] = frames[asteroid.homing ? 'homing' : 'normal'][asteroid.variant ?? 0]
+
+  const s = getScratch(size)
+  s.setTransform(1, 0, 0, 1, 0, 0)
+  s.globalCompositeOperation = 'source-over'
+  s.clearRect(0, 0, size, size)
+  s.setTransform(dpr, 0, 0, dpr, size / 2, size / 2)
+  s.rotate(angle)
+  s.drawImage(sheet, sx, sy, sw, sh, -half, -half, half * 2, half * 2)
+
+  s.setTransform(dpr, 0, 0, dpr, size / 2, size / 2)
+  s.globalCompositeOperation = 'source-atop'
+  const shade = s.createRadialGradient(-r * 0.45, -r * 0.45, r * 0.1, -r * 0.2, -r * 0.2, r * 1.35)
+  shade.addColorStop(0, 'rgba(255, 240, 220, 0.25)')
+  shade.addColorStop(0.45, 'rgba(0, 0, 0, 0)')
+  shade.addColorStop(1, 'rgba(0, 0, 0, 0.75)')
+  s.fillStyle = shade
+  s.fillRect(-half, -half, half * 2, half * 2)
+  s.globalCompositeOperation = 'source-over'
+
+  ctx.drawImage(s.canvas, 0, 0, size, size, x - half, y - half, half * 2, half * 2)
+}
+
+function drawAsteroid(ctx, asteroid, alpha, sprites) {
+  const sheet = sprites?.images.asteroids
+  if (sheet) return drawAsteroidSprite(ctx, asteroid, alpha, sheet, sprites.frames.asteroids)
+
+  // запасной вариант — процедурный астероид из Lab 2
   const { x, y, angle } = interpolate(asteroid, alpha)
   const r = asteroid.radius
   const colors = asteroid.homing ? ASTEROID_COLORS.homing : ASTEROID_COLORS.normal
@@ -356,60 +423,12 @@ export function drawStarfield(ctx, stars) {
 
 // ---------- весь мир ----------
 
-export function drawWorld(ctx, world, alpha, time) {
+// sprites = { images, frames } из загрузчика; null/отсутствующий кадр → векторная графика
+export function drawWorld(ctx, world, alpha, time, sprites = null) {
   // порядок слоёв: бонусы → астероиды → пули → самолёты → вспышки поверх всего
   for (const p of world.ofKind('pickup')) drawPickup(ctx, p, time)
-  for (const a of world.ofKind('asteroid')) drawAsteroid(ctx, a, alpha)
-  for (const b of world.ofKind('bullet')) drawBullet(ctx, b, alpha)
-  for (const s of world.ofKind('ship')) drawShip(ctx, s, alpha, time)
+  for (const a of world.ofKind('asteroid')) drawAsteroid(ctx, a, alpha, sprites)
+  for (const b of world.ofKind('bullet')) drawBullet(ctx, b, alpha, sprites)
+  for (const s of world.ofKind('ship')) drawShip(ctx, s, alpha, time, sprites)
   for (const e of world.ofKind('explosion')) drawExplosion(ctx, e)
-}
-
-// ---------- HUD ----------
-
-export function drawHud(ctx, stats, world, player, paused) {
-  ctx.textAlign = 'left'
-  ctx.textBaseline = 'alphabetic'
-  ctx.fillStyle = 'white'
-  ctx.font = '14px monospace'
-  ctx.fillText(`steps/s: ${stats.stepsPerSec}`, 10, 20)
-  ctx.fillText(`frames/s: ${stats.framesPerSec}`, 10, 40)
-  ctx.fillText(`frame ms: ${stats.frameMs.toFixed(2)}`, 10, 60)
-  ctx.fillStyle = '#9ca3af'
-  ctx.fillText(`entities: ${world.size}`, 10, 80)
-
-  // справа: счёт, здоровье, активные бонусы
-  const right = ctx.canvas.clientWidth - 10
-  ctx.textAlign = 'right'
-  ctx.fillStyle = 'white'
-  ctx.font = 'bold 20px monospace'
-  ctx.fillText(`SCORE ${world.score}`, right, 26)
-  ctx.font = '16px monospace'
-  ctx.fillStyle = '#ff5c5c'
-  ctx.fillText('♥'.repeat(player.hp) + '♡'.repeat(player.maxHp - player.hp), right, 48)
-  ctx.fillStyle = '#9ca3af'
-  ctx.font = '13px monospace'
-  ctx.fillText(`deaths: ${world.deaths}`, right, 66)
-
-  let y = 88
-  for (const [name, left] of player.effects) {
-    ctx.fillStyle = EFFECTS[name].color
-    ctx.fillText(`${EFFECTS[name].label} ${left.toFixed(1)}s`, right, y)
-    y += 18
-  }
-
-  // подсказка по управлению
-  ctx.textAlign = 'left'
-  ctx.fillStyle = '#6b7280'
-  ctx.font = '13px monospace'
-  ctx.fillText('WASD / стрілки — літати · Пробіл — стріляти · P — пауза', 10, ctx.canvas.clientHeight - 12)
-
-  // по центру: респаун / пауза
-  const cx = ctx.canvas.clientWidth / 2
-  const cy = ctx.canvas.clientHeight / 2
-  ctx.textAlign = 'center'
-  ctx.font = 'bold 28px monospace'
-  ctx.fillStyle = 'white'
-  if (player.isWaitingRespawn) ctx.fillText(`RESPAWN ${player.respawnIn.toFixed(1)}`, cx, cy)
-  if (paused) ctx.fillText('PAUSED', cx, cy - 40)
 }

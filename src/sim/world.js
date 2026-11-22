@@ -1,27 +1,48 @@
 import { createRng } from './random.js'
 import { findCollisions, resolveCollisions } from './collision.js'
 import { homingSystem } from './components.js'
-import { spawnerSystem } from './spawner.js'
+import { spawnerSystem, DEFAULT_ARENA } from './spawner.js'
 import { Vector2 } from './vector.js'
 
 // Менеджер сутностей: тримає всі "речі у світі" в Map<id, Entity>
 // і раз за крок симуляції оновлює їх, рахує колізії, прибирає мертвих.
-export class World {
+//
+// Lab 3: World — це ще й EventTarget (шина подій). Симуляція НЕ імпортує
+// ні звук, ні HUD: вона лише оголошує "fired", "hit", "exploded", "pickup", "score",
+// а хто захоче — підпишеться (audio.js, hud.js). EventTarget є і в браузері, і в Node.
+export class World extends EventTarget {
   #entities = new Map()
   #pending = [] // народжені під час кроку — додамо після нього
   #stepping = false
 
-  constructor({ width, height, seed = 1, detectCollisions = findCollisions } = {}) {
+  constructor({
+    width,
+    height,
+    arena = DEFAULT_ARENA,
+    seed = arena.seed ?? 1,
+    detectCollisions = findCollisions,
+  } = {}) {
+    super()
     this.width = width
     this.height = height
+    this.arena = arena // параметри арени з arenas.json (скільки ворогів, астероїдів, колір неба)
     this.rng = createRng(seed)
     this.detectCollisions = detectCollisions // систему колізій можна підмінити
     this.time = 0
     this.score = 0
     this.deaths = 0
-    this.events = []
     this.input = null
     this.director = { asteroid: 5, enemy: 4, pickup: 7 } // таймери спавнера
+  }
+
+  // оголосити подію для всіх підписників (звук, HUD...)
+  emit(type, detail) {
+    this.dispatchEvent(new CustomEvent(type, { detail }))
+  }
+
+  addScore(delta, pos) {
+    this.score += delta
+    this.emit('score', { delta, total: this.score, x: pos.x, y: pos.y })
   }
 
   spawn(entity) {

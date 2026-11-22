@@ -17,6 +17,7 @@ export class Asteroid extends Entity {
     this.#hp = HP[size]
     this.spin = rng.range(-1.2, 1.2)
     this.homing = null
+    this.variant = rng.int(0, 3) // який із 4 кадрів спрайт-листа малювати
 
     // нерівний контур — набір радіусів по колу (дані для рендера)
     const points = 9 + size * 2

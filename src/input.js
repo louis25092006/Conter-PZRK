@@ -5,7 +5,11 @@ export function createInput(target) {
   const down = new Set() // клавіші, затиснуті зараз
   const pressed = new Set() // клавіші, натиснуті з моменту останнього consume()
 
+  // у полі вводу (ім'я пілота в лобі) клавіші належать полю, а не грі
+  const isTyping = (e) => e.target instanceof Element && e.target.closest('input, textarea, button')
+
   target.addEventListener('keydown', (e) => {
+    if (isTyping(e)) return
     if (GAME_KEYS.has(e.code)) e.preventDefault()
     if (!down.has(e.code)) pressed.add(e.code) // автоповтор клавіші не рахуємо як нове натискання
     down.add(e.code)

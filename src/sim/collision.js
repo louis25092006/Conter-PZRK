@@ -28,7 +28,10 @@ const rules = {
   'asteroid:bullet'(world, asteroid, bullet) {
     bullet.kill()
     if (asteroid.damage(bullet.damage)) destroyAsteroid(world, asteroid, bullet.team)
-    else sparks(world, bullet.pos, '#aaa')
+    else {
+      sparks(world, bullet.pos, '#aaa')
+      world.emit('hit', { target: 'asteroid', team: asteroid.team, x: bullet.pos.x, y: bullet.pos.y })
+    }
   },
 
   'bullet:ship'(world, bullet, ship) {
@@ -57,7 +60,7 @@ const rules = {
     if (ship.team !== 'player') return // вороги бонуси не підбирають
     ship.applyEffect(pickup.effect)
     pickup.kill()
-    world.events.push({ type: 'pickup', effect: pickup.effect })
+    world.emit('pickup', { effect: pickup.effect, x: pickup.pos.x, y: pickup.pos.y })
   },
 }
 
@@ -81,8 +84,10 @@ function hitShip(world, ship, amount, attackerTeam) {
   const killed = ship.damage(amount)
   if (!killed) {
     sparks(world, ship.pos, '#ffe066')
+    world.emit('hit', { target: 'ship', team: ship.team, x: ship.pos.x, y: ship.pos.y })
     return
   }
+  world.emit('exploded', { kind: 'ship', team: ship.team, size: 3, x: ship.pos.x, y: ship.pos.y })
 
   world.spawn(
     new Explosion({
@@ -100,7 +105,7 @@ function hitShip(world, ship, amount, attackerTeam) {
     world.deaths++
   } else {
     ship.kill()
-    if (attackerTeam === 'player') world.score += 150
+    if (attackerTeam === 'player') world.addScore(150, ship.pos)
   }
 }
 
@@ -117,5 +122,12 @@ function destroyAsteroid(world, asteroid, attackerTeam) {
       color: '#c9b79c',
     }),
   )
-  if (attackerTeam === 'player') world.score += ASTEROID_SCORE[asteroid.size]
+  world.emit('exploded', {
+    kind: 'asteroid',
+    team: asteroid.team,
+    size: asteroid.size,
+    x: asteroid.pos.x,
+    y: asteroid.pos.y,
+  })
+  if (attackerTeam === 'player') world.addScore(ASTEROID_SCORE[asteroid.size], asteroid.pos)
 }

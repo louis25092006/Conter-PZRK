@@ -134,6 +134,7 @@ export class Ship extends Entity {
       })
       bullet.ttl = 1.8
     }
+    world.emit('fired', { team: this.team, homing: !!bullet.homing, x: muzzle.x, y: muzzle.y })
     return world.spawn(bullet)
   }
 }
