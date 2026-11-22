@@ -1,8 +1,0 @@
-{
-  "rooms": [
-    { "id": "r-classic", "name": "Classic Sky #1", "arena": "classic", "players": 3, "maxPlayers": 8 },
-    { "id": "r-training", "name": "Training Ground", "arena": "training", "players": 1, "maxPlayers": 4 },
-    { "id": "r-dogfight", "name": "Dogfight Night", "arena": "dogfight", "players": 5, "maxPlayers": 6 },
-    { "id": "r-full", "name": "Classic Sky #2", "arena": "classic", "players": 8, "maxPlayers": 8 }
-  ]
-}

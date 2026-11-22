@@ -4,32 +4,32 @@
     {
       "key": "ships",
       "type": "image",
-      "url": "/assets/sprites/ships.svg",
+      "url": "sprites/ships.svg",
       "optional": true,
       "frames": { "player": [0, 0, 128, 128], "enemy": [128, 0, 128, 128] }
     },
     {
       "key": "bullets",
       "type": "image",
-      "url": "/assets/sprites/bullets.svg",
+      "url": "sprites/bullets.svg",
       "optional": true,
       "frames": { "player": [0, 0, 32, 32], "enemy": [32, 0, 32, 32], "homing": [64, 0, 32, 32] }
     },
     {
       "key": "asteroids",
       "type": "image",
-      "url": "/assets/sprites/asteroids.svg",
+      "url": "sprites/asteroids.svg",
       "optional": true,
       "frames": {
         "normal": [[0, 0, 128, 128], [128, 0, 128, 128], [256, 0, 128, 128], [384, 0, 128, 128]],
         "homing": [[0, 128, 128, 128], [128, 128, 128, 128], [256, 128, 128, 128], [384, 128, 128, 128]]
       }
     },
-    { "key": "shoot", "type": "audio", "url": "/assets/sounds/shoot.wav", "optional": true },
-    { "key": "enemy-shoot", "type": "audio", "url": "/assets/sounds/enemy-shoot.wav", "optional": true },
-    { "key": "hit", "type": "audio", "url": "/assets/sounds/hit.wav", "optional": true },
-    { "key": "explosion", "type": "audio", "url": "/assets/sounds/explosion.wav", "optional": true },
-    { "key": "pickup", "type": "audio", "url": "/assets/sounds/pickup.wav", "optional": true },
-    { "key": "arenas", "type": "json", "url": "/assets/arenas.json" }
+    { "key": "shoot", "type": "audio", "url": "sounds/shoot.wav", "optional": true },
+    { "key": "enemy-shoot", "type": "audio", "url": "sounds/enemy-shoot.wav", "optional": true },
+    { "key": "hit", "type": "audio", "url": "sounds/hit.wav", "optional": true },
+    { "key": "explosion", "type": "audio", "url": "sounds/explosion.wav", "optional": true },
+    { "key": "pickup", "type": "audio", "url": "sounds/pickup.wav", "optional": true },
+    { "key": "arenas", "type": "json", "url": "arenas.json" }
   ]
 }

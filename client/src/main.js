@@ -8,20 +8,26 @@ import { populateArena } from './sim/spawner.js'
 import { setupCanvas } from './render/canvas.js'
 import { createStarfield, drawStarfield, drawWorld } from './render/draw.js'
 import { drawLoadingScreen } from './render/loading.js'
+import { createLobbyBackground } from './render/lobby-bg.js'
 import { fetchJson, withRetry, loadAll, loadAllSequential, isAbort } from './assets/loader.js'
 import { readTestFlags, applyTestFlags } from './assets/test-flags.js'
 import { Lobby } from './lobby/lobby.js'
 import { mountLobbyView } from './lobby/lobby-view.js'
+import { Connection, socketUrl } from './net/connection.js'
+import { mountRoomView } from './net/room-view.js'
 
 // Сценарій гри:  завантаження → лобі → гра → (Esc) → лобі → …
 
 const canvas = document.getElementById('game')
 const ctx = setupCanvas(canvas)
 const ui = document.getElementById('ui')
+const gameUi = document.getElementById('game-ui')
 const input = createInput(window)
 const audio = createAudio()
 const hud = createHud()
 const flags = readTestFlags(location.search)
+// import.meta.env існує лише під Vite; у Live Server / GitHub Pages його немає
+const DEV = import.meta.env?.DEV ?? false
 
 // браузер дозволяє звук лише після жесту користувача
 for (const type of ['pointerdown', 'keydown']) window.addEventListener(type, () => audio.unlock())
@@ -77,10 +83,13 @@ async function boot(activeFlags) {
   if (activeFlags.has('abort')) setTimeout(() => controller.abort(), 1000)
 
   try {
-    const raw = await withRetry(() => fetchJson('/assets/manifest.json', { signal, timeoutMs: 4000 }), {
-      signal,
-    })
-    const manifest = applyTestFlags(raw, activeFlags)
+    const { url: manifestUrl, data: raw } = await findManifest(signal)
+    // адреси в маніфесті відносні (sprites/ships.svg) — рахуємо їх від папки, де знайшли маніфест
+    const flagged = applyTestFlags(raw, activeFlags)
+    const manifest = {
+      ...flagged,
+      items: flagged.items.map((item) => ({ ...item, url: new URL(item.url, manifestUrl).href })),
+    }
     screen.phase = 'loading'
     screen.total = manifest.items.length
 
@@ -130,27 +139,56 @@ async function boot(activeFlags) {
   }
 }
 
+// Де лежать ассети, залежить від того, ЯК запущено гру:
+//   Vite (npm run dev), наш Node-сервер, збірка dist  → /assets/manifest.json (public/ стає коренем сайту)
+//   Live Server у VS Code, GitHub Pages, будь-який статичний сервер → ./public/assets/manifest.json
+// Пробуємо по черзі; 404 означає "не тут", інші помилки — справжні.
+async function findManifest(signal) {
+  const candidates = ['assets/manifest.json', 'public/assets/manifest.json'].map(
+    (p) => new URL(p, document.baseURI),
+  )
+  for (const [i, url] of candidates.entries()) {
+    try {
+      const data = await withRetry(() => fetchJson(url.href, { signal, timeoutMs: 4000 }), { signal })
+      return { url, data }
+    } catch (error) {
+      const notHere = error.name === 'HttpError' && error.status === 404
+      // статичний сервер на невідому адресу інколи віддає HTML-сторінку — теж "не тут"
+      const htmlInsteadOfJson = error.name === 'AssetFormatError'
+      if (i === candidates.length - 1 || !(notHere || htmlInsteadOfJson)) throw error
+    }
+  }
+}
+
 // ---------- 2. Лобі ----------
 
 const lobby = new Lobby({
-  url: flags.has('lobbyslow') ? '/api/rooms.json?delay=5000' : '/api/rooms.json',
+  url: flags.has('lobbyslow') ? '/api/rooms?delay=5000' : '/api/rooms',
   intervalMs: 4000,
   timeoutMs: 3000,
 })
 let unmountLobby = null
+const lobbyBg = createLobbyBackground(ctx) // живе небо з літаками за панеллю лобі
 
 function showLobby() {
   stopGame()
   ui.className = 'overlay'
+  lobby.offlineRooms = Object.entries(assets.json.arenas).map(([id, arena]) => ({
+    id: `offline-${id}`,
+    name: arena.name,
+    arena: id,
+    players: 0,
+    maxPlayers: 1,
+    offline: true,
+  }))
   unmountLobby = mountLobbyView(ui, lobby, { arenas: assets.json.arenas })
   lobby.open()
-  ctx.fillStyle = '#000'
-  ctx.fillRect(0, 0, window.innerWidth, window.innerHeight)
-  drawStarfield(ctx, stars)
-  if (import.meta.env.DEV) window.game = { lobby, assets, audio }
+  lobbyBg.start()
+  if (DEV) window.game = { lobby, assets, audio }
 }
 
 lobby.addEventListener('close', () => {
+  lobbyBg.stop()
   unmountLobby?.()
   unmountLobby = null
   ui.className = ''
@@ -182,19 +220,45 @@ function startGame(room, name) {
   // підписники подій світу: звук і HUD. Самому світу про них знати не треба.
   const detachAudio = audio.attach(world)
   const detachHud = hud.attach(world)
+
+  // Lab 4: справжнє з'єднання з кімнатою на сервері (поки що лише склад кімнати і чат;
+  // сама гра лишається локальною — синхронізація світу буде в Lab 5).
+  // join надсилаємо в onOpen, тому після перепідключення гравець сам повертається в кімнату.
+  // В офлайн-режимі (немає сервера) з'єднання не відкриваємо: на Live Server за адресою /ws
+  // взагалі живе його власний сокет автоперезавантаження, а не наш сервер.
+  let conn = null
+  let unmountRoom
+  if (room.offline) {
+    const note = Object.assign(document.createElement('div'), {
+      className: 'net-status closed',
+      textContent: '● офлайн: одиночна гра (чат працює з npm run dev)',
+    })
+    gameUi.replaceChildren(note)
+    unmountRoom = () => gameUi.replaceChildren()
+  } else {
+    conn = new Connection(socketUrl('/ws'), {
+      onOpen: (c) => c.send({ type: 'join', v: 0, roomId: room.id, name }),
+    })
+    unmountRoom = mountRoomView(gameUi, conn, { room })
+    conn.connect()
+  }
+
   game = {
     world,
     player,
     name,
     room,
+    conn,
     detach: () => {
       detachAudio()
       detachHud()
+      unmountRoom()
+      conn?.close(1000, 'left the game')
     },
   }
   paused = false
   loop.start()
-  if (import.meta.env.DEV) window.game = { ...game, loop, lobby, assets, audio }
+  if (DEV) window.game = { ...game, loop, lobby, assets, audio }
 }
 
 function stopGame() {

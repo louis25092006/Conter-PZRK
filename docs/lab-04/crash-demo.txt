@@ -1,0 +1,46 @@
+$ node scripts/crash-demo.js emitter-no-listener
+18:18:24.471 game tick 1: alice is still playing
+18:18:24.580 game tick 2: alice is still playing
+18:18:24.581 bob's connection dropped → bob.emit('error')
+18:18:24.581 process exit, code 1
+      throw er; // Unhandled 'error' event
+      ^
+Error: read ECONNRESET
+Emitted 'error' event on FakeSocket instance at:
+  code: 'ECONNRESET'
+}
+(exit code 1)
+
+$ node scripts/crash-demo.js emitter-with-listener
+18:18:25.898 game tick 1: alice is still playing
+18:18:26.006 game tick 2: alice is still playing
+18:18:26.007 bob's connection dropped → bob.emit('error')
+18:18:26.007 socket error handled: ECONNRESET — closing this socket only
+18:18:26.115 game tick 3: alice is still playing
+18:18:26.223 game tick 4: alice is still playing
+18:18:26.223 server survived, alice finished the match
+18:18:26.224 process exit, code 0
+(exit code 0)
+
+$ node scripts/crash-demo.js rejection
+18:18:27.286 game tick 1: alice is still playing
+18:18:27.395 game tick 2: alice is still playing
+18:18:27.395 loading bob replay from a broken file…
+18:18:27.395 process exit, code 1
+file:///C:/Users/%D0%86%D1%80%D0%B0/Desktop/Conter/server/scripts/crash-demo.js:37
+      const p = Promise.reject(new Error('ENOENT: replay file missing'))
+                               ^
+Error: ENOENT: replay file missing
+(exit code 1)
+
+$ node scripts/crash-demo.js rejection-handled
+18:18:28.207 game tick 1: alice is still playing
+18:18:28.315 game tick 2: alice is still playing
+18:18:28.315 loading bob replay from a broken file…
+18:18:28.316 handled: ENOENT: replay file missing
+18:18:28.425 game tick 3: alice is still playing
+18:18:28.535 game tick 4: alice is still playing
+18:18:28.535 server survived, alice finished the match
+18:18:28.535 process exit, code 0
+(exit code 0)
+

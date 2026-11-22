@@ -30,7 +30,7 @@ export function applyTestFlags(manifest, flags) {
   const items = manifest.items.map((item) => {
     let { url } = item
     const extra = {}
-    if (flags.has('missing') && item.key === 'ships') url = '/assets/sprites/does-not-exist.svg'
+    if (flags.has('missing') && item.key === 'ships') url = 'sprites/does-not-exist.svg'
     if (flags.has('slow') && item.key === 'asteroids') url = addQuery(url, { delay: 2500 })
     if (flags.has('slowall')) url = addQuery(url, { delay: 400 })
     if (flags.has('timeout') && item.key === 'explosion') {
@@ -38,7 +38,7 @@ export function applyTestFlags(manifest, flags) {
       extra.timeoutMs = 1500
     }
     if (flags.has('flaky') && item.key === 'shoot') url = addQuery(url, { fail: 2, run })
-    if (flags.has('badjson') && item.key === 'arenas') url = '/assets/broken.json'
+    if (flags.has('badjson') && item.key === 'arenas') url = 'broken.json'
     return { ...item, ...extra, url }
   })
   return { ...manifest, items }

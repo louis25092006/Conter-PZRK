@@ -5,19 +5,25 @@ import { fetchJson, isAbort } from '../assets/loader.js'
 //   'error'   — запит не вдався          (detail: { error })
 //   'loading' — пішов запит
 //   'join'    — гравець заходить у кімнату (detail: { room, name })
+//   'created' — кімнату створено (detail: { room })
 //   'close'   — лобі закрилось
 // Малює все це окремий модуль lobby-view.js, який просто слухає події.
 export class Lobby extends EventTarget {
   #controller = null // живе, поки лобі відкрите; abort() = прибрати все
   #timer = null
 
-  constructor({ url = '/api/rooms.json', intervalMs = 4000, timeoutMs = 3000 } = {}) {
+  constructor({ url = '/api/rooms', intervalMs = 4000, timeoutMs = 3000 } = {}) {
     super()
     this.url = url
     this.intervalMs = intervalMs
     this.timeoutMs = timeoutMs
     this.rooms = []
     this.stats = { requests: 0, ok: 0, failed: 0, aborted: 0 }
+    // Офлайн-режим: якщо сервера немає зовсім (Live Server у VS Code, GitHub Pages, статичний хостинг),
+    // лобі показує ці кімнати для одиночної гри. Інтервал далі перевіряє, чи не з'явився сервер.
+    this.offlineRooms = []
+    this.offline = false
+    this.everOnline = false
   }
 
   get isOpen() {
@@ -48,16 +54,55 @@ export class Lobby extends EventTarget {
     try {
       const data = await fetchJson(this.url, { signal })
       if (leave.aborted) return
+      if (!Array.isArray(data?.rooms)) throw new Error('unexpected /api/rooms response')
       this.rooms = data.rooms
+      this.offline = false
+      this.everOnline = true
       this.stats.ok++
-      this.#emit('rooms', { rooms: this.rooms, at: new Date() })
+      this.#emit('rooms', { rooms: this.rooms, at: new Date(), offline: false })
     } catch (error) {
       if (leave.aborted && isAbort(error)) {
         this.stats.aborted++ // гравець пішов — це не помилка, просто тихо виходимо
         return
       }
       this.stats.failed++
+      // Сервер жодного разу не відповів, і це не "повільно", а "його тут немає"
+      // (404 від статичного сервера, 5xx від проксі, мережева помилка) → офлайн
+      const noServer =
+        error.name === 'HttpError' || error.name === 'AssetFormatError' || error instanceof TypeError
+      if (!this.everOnline && noServer && this.offlineRooms.length) {
+        this.offline = true
+        this.rooms = this.offlineRooms
+        this.#emit('rooms', { rooms: this.rooms, at: new Date(), offline: true })
+        return
+      }
       this.#emit('error', { error })
+    }
+  }
+
+  // Lab 4: POST /api/rooms на справжньому сервері
+  async createRoom(name, arena) {
+    if (this.offline) {
+      this.#emit('error', {
+        error: new Error('Сервер недоступний — створювати кімнати можна лише з npm run dev'),
+      })
+      return null
+    }
+    try {
+      const res = await fetch(this.url, {
+        method: 'POST',
+        headers: { 'content-type': 'application/json' },
+        body: JSON.stringify({ name, arena }),
+        signal: AbortSignal.timeout(this.timeoutMs),
+      })
+      const data = await res.json().catch(() => ({}))
+      if (!res.ok) throw new Error(data.error ?? `HTTP ${res.status}`)
+      this.#emit('created', { room: data })
+      await this.refresh()
+      return data
+    } catch (error) {
+      this.#emit('error', { error })
+      return null
     }
   }
 

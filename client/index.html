@@ -1,0 +1,524 @@
+<!doctype html>
+<html lang="uk">
+  <head>
+    <meta charset="UTF-8" />
+    <link rel="icon" href="data:," />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Conter-PZRK</title>
+    <style>
+      body {
+        margin: 0;
+        overflow: hidden;
+        background: black;
+        font-family: ui-monospace, Consolas, monospace;
+        color: #e5e7eb;
+      }
+      canvas {
+        display: block;
+        background: black;
+      }
+      #ui {
+        position: fixed;
+        inset: 0;
+        pointer-events: none;
+      }
+      #ui > * {
+        pointer-events: auto;
+      }
+      .loading-actions {
+        position: absolute;
+        left: 50%;
+        top: calc(50% + 160px);
+        transform: translateX(-50%);
+      }
+      /* ---------- лобі: тема ППО / авіація ---------- */
+      :root {
+        --amber: #f5b83d;
+        --amber-hi: #ffd57a;
+        --ink: #f3efe0;
+        --muted: #b9b09a;
+        --line: rgba(245, 184, 61, 0.28);
+        --head-font: Impact, Haettenschweiler, 'Arial Narrow Bold', 'Franklin Gothic Bold', sans-serif;
+        --ui-font: 'Segoe UI', 'Trebuchet MS', system-ui, sans-serif;
+      }
+      #ui.overlay {
+        display: grid;
+        place-items: center;
+        background: transparent;
+        overflow-y: auto; /* маленький екран — панель прокручується, а не обрізається */
+        padding: 16px 0;
+        box-sizing: border-box;
+      }
+      button {
+        font: 600 14px var(--ui-font);
+        padding: 9px 18px;
+        border-radius: 4px;
+        border: 1px solid var(--line);
+        background: rgba(20, 18, 12, 0.85);
+        color: var(--ink);
+        cursor: pointer;
+        transition:
+          border-color 0.15s,
+          background 0.15s,
+          transform 0.1s;
+      }
+      button:hover:not(:disabled) {
+        border-color: var(--amber);
+      }
+      button:active:not(:disabled) {
+        transform: translateY(1px);
+      }
+      button:disabled {
+        opacity: 0.4;
+        cursor: default;
+      }
+      button.primary {
+        background: linear-gradient(180deg, var(--amber-hi), var(--amber));
+        border-color: var(--amber-hi);
+        color: #1a1405;
+      }
+      .panel {
+        position: relative;
+        width: min(460px, calc(100vw - 32px));
+        padding: 24px 26px 22px;
+        font-family: var(--ui-font);
+        color: var(--ink);
+        background:
+          linear-gradient(180deg, rgba(36, 32, 22, 0.9), rgba(14, 12, 9, 0.93)),
+          repeating-linear-gradient(135deg, rgba(255, 255, 255, 0.025) 0 2px, transparent 2px 8px);
+        border: 1px solid var(--line);
+        /* зрізані кути — як табличка на приладовій панелі */
+        clip-path: polygon(18px 0, 100% 0, 100% calc(100% - 18px), calc(100% - 18px) 100%, 0 100%, 0 18px);
+        box-shadow: 0 20px 60px rgba(0, 0, 0, 0.6);
+        backdrop-filter: blur(6px);
+        animation: panel-in 0.45s ease-out;
+      }
+      .panel::before {
+        /* жовта смужка-акцент угорі */
+        content: '';
+        position: absolute;
+        left: 18px;
+        right: 0;
+        top: 0;
+        height: 3px;
+        background: linear-gradient(90deg, var(--amber), transparent);
+      }
+      @keyframes panel-in {
+        from {
+          opacity: 0;
+          transform: translateY(14px);
+        }
+      }
+      .lobby-head {
+        display: flex;
+        align-items: center;
+        gap: 14px;
+        margin-bottom: 20px;
+      }
+      .emblem {
+        width: 58px;
+        height: 58px;
+        flex: none;
+        filter: drop-shadow(0 0 10px rgba(245, 184, 61, 0.35));
+      }
+      .emblem svg {
+        width: 100%;
+        height: 100%;
+        animation: emblem-spin 24s linear infinite;
+      }
+      @keyframes emblem-spin {
+        to {
+          transform: rotate(360deg);
+        }
+      }
+      .panel h1 {
+        margin: 0;
+        font: 400 34px/1 var(--head-font);
+        letter-spacing: 0.05em;
+        text-transform: uppercase;
+        color: var(--ink);
+        text-shadow: 0 2px 0 rgba(0, 0, 0, 0.6);
+      }
+      .tagline {
+        margin: 6px 0 0;
+        font-size: 12px;
+        letter-spacing: 0.12em;
+        text-transform: uppercase;
+        color: var(--amber);
+      }
+      .field-label {
+        display: block;
+        font-size: 11px;
+        font-weight: 700;
+        letter-spacing: 0.2em;
+        text-transform: uppercase;
+        color: var(--muted);
+      }
+      .field {
+        display: grid;
+        gap: 7px;
+        margin-bottom: 18px;
+      }
+      .input-wrap {
+        display: flex;
+        align-items: center;
+        gap: 8px;
+        padding: 0 12px;
+        border: 1px solid var(--line);
+        border-radius: 4px;
+        background: rgba(0, 0, 0, 0.45);
+        transition: border-color 0.15s;
+      }
+      .input-wrap:focus-within {
+        border-color: var(--amber);
+        box-shadow: 0 0 0 3px rgba(245, 184, 61, 0.15);
+      }
+      .input-wrap .icon {
+        color: var(--amber);
+      }
+      .panel input,
+      .panel select {
+        font: 500 15px var(--ui-font);
+        color: var(--ink);
+        background: transparent;
+        border: none;
+        outline: none;
+        padding: 10px 0;
+        min-width: 0;
+      }
+      .input-wrap input {
+        flex: 1;
+      }
+      .panel select {
+        padding: 9px 8px;
+        border: 1px solid var(--line);
+        border-radius: 4px;
+        background: rgba(0, 0, 0, 0.45);
+      }
+      .panel select option {
+        background: #1a1710;
+      }
+      .icon {
+        display: inline-flex;
+        width: 18px;
+        height: 18px;
+        flex: none;
+      }
+      .icon svg {
+        width: 100%;
+        height: 100%;
+      }
+      .section-head {
+        display: flex;
+        align-items: center;
+        justify-content: space-between;
+        margin-bottom: 8px;
+      }
+      .section-tools {
+        display: flex;
+        gap: 6px;
+      }
+      button.ghost {
+        display: inline-flex;
+        align-items: center;
+        gap: 6px;
+        padding: 6px 10px;
+        font-size: 12px;
+        background: transparent;
+        color: var(--muted);
+      }
+      button.ghost:hover {
+        color: var(--amber);
+      }
+      button.icon-btn {
+        padding: 6px 8px;
+      }
+      .create-row {
+        display: none;
+        gap: 6px;
+        margin-bottom: 10px;
+      }
+      .create-row.open {
+        display: flex;
+      }
+      .create-row input {
+        flex: 1;
+        padding: 9px 10px;
+        border: 1px solid var(--line);
+        border-radius: 4px;
+        background: rgba(0, 0, 0, 0.45);
+      }
+      .rooms {
+        list-style: none;
+        margin: 0;
+        padding: 0;
+        display: grid;
+        gap: 8px;
+      }
+      .room {
+        --accent: var(--amber);
+        display: grid;
+        grid-template-columns: auto 1fr auto;
+        align-items: center;
+        gap: 12px;
+        padding: 11px 14px 11px 12px;
+        border: 1px solid rgba(255, 255, 255, 0.07);
+        border-left: 3px solid var(--accent);
+        border-radius: 4px;
+        background: linear-gradient(90deg, rgba(255, 255, 255, 0.05), rgba(255, 255, 255, 0.015));
+        cursor: pointer;
+        outline: none;
+        transition:
+          background 0.15s,
+          border-color 0.15s,
+          transform 0.15s;
+      }
+      .room.arena-training {
+        --accent: #6ee7a8;
+      }
+      .room.arena-dogfight {
+        --accent: #ff6b5b;
+      }
+      .room:hover,
+      .room:focus-visible {
+        background: linear-gradient(90deg, rgba(255, 255, 255, 0.1), rgba(255, 255, 255, 0.03));
+        transform: translateX(2px);
+      }
+      .room.selected {
+        border-color: var(--accent);
+        background: linear-gradient(
+          90deg,
+          color-mix(in srgb, var(--accent) 22%, transparent),
+          rgba(255, 255, 255, 0.02)
+        );
+        box-shadow: 0 0 18px color-mix(in srgb, var(--accent) 25%, transparent);
+      }
+      .room.full {
+        opacity: 0.4;
+        cursor: not-allowed;
+        transform: none;
+      }
+      .room-icon {
+        display: grid;
+        place-items: center;
+        width: 36px;
+        height: 36px;
+        border-radius: 50%;
+        color: var(--accent);
+        background: color-mix(in srgb, var(--accent) 14%, transparent);
+      }
+      .room-icon svg {
+        width: 20px;
+        height: 20px;
+      }
+      .room-info {
+        display: grid;
+        gap: 2px;
+        min-width: 0;
+      }
+      .room-name {
+        font-size: 15px;
+        font-weight: 700;
+        white-space: nowrap;
+        overflow: hidden;
+        text-overflow: ellipsis;
+      }
+      .room-tag {
+        font-size: 12px;
+        color: var(--muted);
+      }
+      .room-players {
+        display: grid;
+        justify-items: end;
+        gap: 4px;
+        font:
+          600 12px ui-monospace,
+          Consolas,
+          monospace;
+        color: var(--ink);
+      }
+      .room-players .bar {
+        width: 54px;
+        height: 4px;
+        border-radius: 2px;
+        background: rgba(255, 255, 255, 0.12);
+        overflow: hidden;
+      }
+      .room-players .bar i {
+        display: block;
+        height: 100%;
+        background: var(--accent);
+      }
+      .status {
+        display: flex;
+        align-items: center;
+        gap: 8px;
+        min-height: 18px;
+        margin: 14px 0 16px;
+        font-size: 12px;
+        color: var(--muted);
+      }
+      .radar {
+        position: relative;
+        width: 8px;
+        height: 8px;
+        flex: none;
+        border-radius: 50%;
+        background: var(--muted);
+      }
+      .radar::after {
+        content: '';
+        position: absolute;
+        inset: -4px;
+        border-radius: 50%;
+        border: 1px solid currentColor;
+        animation: ping 1.6s ease-out infinite;
+      }
+      @keyframes ping {
+        from {
+          transform: scale(0.5);
+          opacity: 0.9;
+        }
+        to {
+          transform: scale(2);
+          opacity: 0;
+        }
+      }
+      .status.online {
+        color: #9be8b8;
+      }
+      .status.online .radar {
+        background: #4ade80;
+      }
+      .status.offline {
+        color: #fbd38d;
+      }
+      .status.offline .radar {
+        background: var(--amber);
+      }
+      .status.error {
+        color: #fca5a5;
+      }
+      .status.error .radar {
+        background: #f87171;
+      }
+      button.join {
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        gap: 10px;
+        width: 100%;
+        padding: 13px;
+        font: 400 22px/1 var(--head-font);
+        letter-spacing: 0.12em;
+        text-transform: uppercase;
+        clip-path: polygon(12px 0, 100% 0, calc(100% - 12px) 100%, 0 100%);
+      }
+      button.join .icon {
+        width: 22px;
+        height: 22px;
+        transform: rotate(90deg);
+        transition: transform 0.2s;
+      }
+      button.join:hover:not(:disabled) {
+        filter: brightness(1.08);
+        box-shadow: 0 0 24px rgba(245, 184, 61, 0.45);
+      }
+      button.join:hover:not(:disabled) .icon {
+        transform: rotate(90deg) translateY(-4px);
+      }
+      /* ---------- Lab 4: кімната поверх гри ---------- */
+      #game-ui {
+        position: fixed;
+        inset: 0;
+        pointer-events: none;
+        font-size: 13px;
+      }
+      .net-status {
+        position: absolute;
+        left: 10px;
+        top: 112px;
+        color: #9ca3af;
+      }
+      .net-status.open {
+        color: #4ade80;
+      }
+      .net-status.reconnecting {
+        color: #fbbf24;
+      }
+      .net-status.closed {
+        color: #f87171;
+      }
+      .roster {
+        position: absolute;
+        right: 10px;
+        top: 150px;
+        min-width: 140px;
+        padding: 8px 10px;
+        border-radius: 8px;
+        background: rgba(10, 14, 24, 0.6);
+        border: 1px solid #1f2937;
+      }
+      .roster h3 {
+        margin: 0 0 6px;
+        font-size: 12px;
+        color: #9ca3af;
+      }
+      .roster ul {
+        margin: 0;
+        padding-left: 16px;
+      }
+      .roster li.me {
+        color: #93c5fd;
+      }
+      .chat {
+        position: absolute;
+        left: 10px;
+        bottom: 34px;
+        width: min(420px, calc(100vw - 20px));
+      }
+      .chat-log .line {
+        padding: 2px 6px;
+        margin-top: 2px;
+        border-radius: 4px;
+        background: rgba(0, 0, 0, 0.45);
+        transition: opacity 1s;
+      }
+      .chat-log .line.old {
+        opacity: 0.35;
+      }
+      .chat-log .line.mine b {
+        color: #93c5fd;
+      }
+      .chat-log .line.system {
+        color: #9ca3af;
+        font-style: italic;
+      }
+      .chat-log .line.error {
+        color: #f87171;
+      }
+      .chat-input {
+        display: none;
+        width: 100%;
+        box-sizing: border-box;
+        margin-top: 6px;
+        font: inherit;
+        padding: 7px 9px;
+        border-radius: 6px;
+        border: 1px solid #3b82f6;
+        background: rgba(3, 7, 18, 0.9);
+        color: white;
+        pointer-events: auto;
+      }
+      .chat-input.open {
+        display: block;
+      }
+    </style>
+  </head>
+  <body>
+    <canvas id="game"></canvas>
+    <div id="game-ui"></div>
+    <div id="ui"></div>
+    <script type="module" src="./src/main.js"></script>
+  </body>
+</html>

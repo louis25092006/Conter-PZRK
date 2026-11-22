@@ -3,21 +3,24 @@
   "version": "0.0.0",
   "private": true,
   "type": "module",
+  "workspaces": [
+    "client",
+    "server"
+  ],
   "scripts": {
-    "dev": "vite",
-    "build": "vite build",
-    "preview": "vite preview",
-    "lint": "eslint src",
-    "format": "prettier --write src index.html",
-    "assets": "node scripts/make-sprites.mjs && node scripts/make-sounds.mjs",
-    "test": "node --test tests/*.test.js"
+    "dev": "node scripts/dev.mjs",
+    "build": "npm run build -w client",
+    "start": "npm run start -w server",
+    "test": "npm test -w client && npm test -w server",
+    "lint": "eslint client/src server/src server/test",
+    "format": "prettier --write client/src client/index.html client/scripts client/tests server",
+    "assets": "npm run assets -w client"
   },
   "devDependencies": {
     "@eslint/js": "^10.0.1",
     "eslint": "^10.10.0",
     "eslint-config-prettier": "^10.1.8",
     "globals": "^17.14.0",
-    "prettier": "^3.9.7",
-    "vite": "^8.3.0"
+    "prettier": "^3.9.7"
   }
 }
