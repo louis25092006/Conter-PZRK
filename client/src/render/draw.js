@@ -1,4 +1,4 @@
-import { EFFECTS } from '../sim/components.js'
+import { EFFECTS } from '../../../shared/src/sim/components.js'
 
 // ---------- вспомогательные функции интерполяции ----------
 

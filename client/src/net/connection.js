@@ -24,6 +24,9 @@ export class Connection extends EventTarget {
     this.maxMs = maxMs
     this.maxAttempts = maxAttempts
     this.state = 'idle'
+    // Lab 5: трафік для нетграфа (байти в обидва боки)
+    this.bytesIn = 0
+    this.bytesOut = 0
   }
 
   #status(state, extra = {}) {
@@ -36,16 +39,24 @@ export class Connection extends EventTarget {
     this.#status(this.#attempt === 0 ? 'connecting' : 'reconnecting')
     const socket = new WebSocket(this.url)
     this.#socket = socket
+    socket.binaryType = 'arraybuffer' // Lab 5: бінарні знімки приходять як ArrayBuffer
 
     socket.addEventListener('open', () => {
       this.#attempt = 0
       this.#status('open')
       this.onOpen?.(this)
       // черга: усе, що намагались надіслати, поки з'єднання відкривалось
-      for (const message of this.#queue.splice(0)) socket.send(JSON.stringify(message))
+      for (const message of this.#queue.splice(0)) this.#write(socket, JSON.stringify(message))
     })
 
     socket.addEventListener('message', (e) => {
+      if (e.data instanceof ArrayBuffer) {
+        // бінарний кадр — знімок світу; розбирає NetGame (codec/binary.js)
+        this.bytesIn += e.data.byteLength
+        this.dispatchEvent(new CustomEvent('binary', { detail: e.data }))
+        return
+      }
+      this.bytesIn += e.data.length
       let message
       try {
         message = JSON.parse(e.data)
@@ -74,9 +85,24 @@ export class Connection extends EventTarget {
     // 'error' у браузерному WebSocket завжди супроводжується 'close' — обробляємо там
   }
 
+  #write(socket, data) {
+    this.bytesOut += typeof data === 'string' ? data.length : data.byteLength
+    socket.send(data)
+  }
+
+  get isOpen() {
+    return this.#socket?.readyState === WebSocket.OPEN
+  }
+
   send(message) {
-    if (this.#socket?.readyState === WebSocket.OPEN) this.#socket.send(JSON.stringify(message))
+    if (this.isOpen) this.#write(this.#socket, JSON.stringify(message))
     else if (!this.#closedByUs) this.#queue.push(message)
+  }
+
+  // вже закодоване (рядок JSON або ArrayBuffer) — для команд гравця 60/с; без черги:
+  // застарілі команди після перепідключення нікому не потрібні
+  sendRaw(data) {
+    if (this.isOpen) this.#write(this.#socket, data)
   }
 
   close(code = 1000, reason = 'bye') {

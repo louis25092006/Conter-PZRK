@@ -31,7 +31,7 @@ export class World extends EventTarget {
     this.time = 0
     this.score = 0
     this.deaths = 0
-    this.input = null
+    this.inputs = new Map() // Lab 5: команди гравців на цей крок: shipId -> { turn, thrust, fire, seq }
     this.director = { asteroid: 5, enemy: 4, pickup: 7 } // таймери спавнера
   }
 
@@ -40,9 +40,12 @@ export class World extends EventTarget {
     this.dispatchEvent(new CustomEvent(type, { detail }))
   }
 
-  addScore(delta, pos) {
+  // очки отримує конкретний гравець (shipId — хто збив); world.score — сума для статистики
+  addScore(delta, pos, shipId) {
     this.score += delta
-    this.emit('score', { delta, total: this.score, x: pos.x, y: pos.y })
+    const ship = this.get(shipId)
+    if (ship) ship.score += delta
+    this.emit('score', { delta, shipId, total: ship?.score ?? this.score, x: pos.x, y: pos.y })
   }
 
   spawn(entity) {
@@ -117,8 +120,8 @@ export class World extends EventTarget {
     return spot
   }
 
-  step(dt, input) {
-    this.input = input
+  step(dt, inputs) {
+    this.inputs = inputs instanceof Map ? inputs : new Map()
     this.time += dt
     this.#stepping = true
 

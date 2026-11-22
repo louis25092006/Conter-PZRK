@@ -6,9 +6,10 @@
   "scripts": {
     "dev": "node --watch --env-file-if-exists=.env src/index.js",
     "start": "node --env-file-if-exists=.env src/index.js",
-    "test": "node --test test/*.test.js"
+    "test": "node --test --test-timeout=20000 test/*.test.js"
   },
   "dependencies": {
-    "ws": "^8.18.0"
+    "ws": "^8.18.0",
+    "@conter/shared": "0.0.0"
   }
 }

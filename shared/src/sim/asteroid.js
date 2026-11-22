@@ -4,7 +4,7 @@ import { Vector2 } from './vector.js'
 import { homing } from './components.js'
 
 // розмір 3 — великий, 2 — середній, 1 — маленький
-const RADIUS = { 3: 38, 2: 24, 1: 14 }
+export const RADIUS = { 3: 38, 2: 24, 1: 14 }
 const HP = { 3: 3, 2: 2, 1: 1 }
 export const ASTEROID_SCORE = { 3: 20, 2: 50, 1: 100 }
 

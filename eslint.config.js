@@ -12,9 +12,20 @@ export default [
     files: ['client/**/*.js'],
     languageOptions: { globals: globals.browser },
   },
-  // сервер і скрипти — Node
+  // спільний пакет — лише те, що є І в браузері, І в Node (EventTarget, URL, TextEncoder…)
   {
-    files: ['server/**/*.js', 'scripts/**/*.mjs', 'client/scripts/**/*.mjs', 'client/tests/**/*.js'],
+    files: ['shared/src/**/*.js'],
+    languageOptions: { globals: globals['shared-node-browser'] },
+  },
+  // сервер, тести і скрипти — Node
+  {
+    files: [
+      'server/**/*.js',
+      'shared/test/**/*.js',
+      'scripts/**/*.mjs',
+      'client/scripts/**/*.mjs',
+      'client/tests/**/*.js',
+    ],
     languageOptions: { globals: globals.node },
   },
   prettier,

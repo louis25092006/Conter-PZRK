@@ -2,9 +2,6 @@ import { createLoop } from './loop.js'
 import { createInput } from './input.js'
 import { createAudio } from './audio.js'
 import { createHud } from './hud.js'
-import { World } from './sim/world.js'
-import { Ship } from './sim/ship.js'
-import { populateArena } from './sim/spawner.js'
 import { setupCanvas } from './render/canvas.js'
 import { createStarfield, drawStarfield, drawWorld } from './render/draw.js'
 import { drawLoadingScreen } from './render/loading.js'
@@ -13,8 +10,14 @@ import { fetchJson, withRetry, loadAll, loadAllSequential, isAbort } from './ass
 import { readTestFlags, applyTestFlags } from './assets/test-flags.js'
 import { Lobby } from './lobby/lobby.js'
 import { mountLobbyView } from './lobby/lobby-view.js'
-import { Connection, socketUrl } from './net/connection.js'
 import { mountRoomView } from './net/room-view.js'
+import { NetGame } from './net/net-game.js'
+import { drawNetgraph, mountNetControls } from './net/netgraph.js'
+import { OfflineGame } from './game/offline-game.js'
+import { keyboardCommand } from './game/commands.js'
+import { computeCamera, drawArenaBackground, drawArenaBorder } from './game/camera.js'
+import { ARENA_SIZE } from '../../shared/src/sim/arena.js'
+import { debug as simDebug } from '../../shared/src/sim/ship-physics.js'
 
 // Сценарій гри:  завантаження → лобі → гра → (Esc) → лобі → …
 
@@ -26,23 +29,20 @@ const input = createInput(window)
 const audio = createAudio()
 const hud = createHud()
 const flags = readTestFlags(location.search)
+const params = new URLSearchParams(location.search)
+// Lab 5, дослід M2: ?test=nondet — навмисно зламати детермінізм передбачення (лише на клієнті)
+if (flags.has('nondet')) simDebug.breakDeterminism = true
 // import.meta.env існує лише під Vite; у Live Server / GitHub Pages його немає
 const DEV = import.meta.env?.DEV ?? false
 
 // браузер дозволяє звук лише після жесту користувача
 for (const type of ['pointerdown', 'keydown']) window.addEventListener(type, () => audio.unlock())
 
-let stars = createStarfield(window.innerWidth, window.innerHeight)
-window.addEventListener('resize', () => {
-  stars = createStarfield(window.innerWidth, window.innerHeight)
-  if (game) {
-    game.world.width = window.innerWidth
-    game.world.height = window.innerHeight
-  }
-})
+// зорі — у координатах арени (вона тепер фіксована), камера масштабує їх разом зі світом
+const stars = createStarfield(ARENA_SIZE.width, ARENA_SIZE.height, 260)
 
 let assets = null // { images, sounds, json, frames, failed }
-let game = null // { world, player, name, room, detach }
+let game = null // OfflineGame | NetGame
 
 function button(text, onClick, className = '') {
   const b = Object.assign(document.createElement('button'), { textContent: text, className })
@@ -200,65 +200,67 @@ lobby.addEventListener('join', (e) => {
 })
 
 // ---------- 3. Гра ----------
+//
+// Два режими з однаковим інтерфейсом { step(cmd), view(alpha), me, hudWorld, events, close() }:
+//   OfflineGame — світ крутиться локально (немає сервера: Live Server, GitHub Pages);
+//   NetGame     — сервер авторитетний; клієнт передбачає, звіряється, інтерполює (Lab 5).
+// Параметри адреси для досліджень:
+//   ?codec=json|binary  ?lag=100&jitter=30&drop=0.02  ?interp=100  ?predict=0  ?test=nondet
+//   ?bot=1 — літає сам;  ?autojoin=r-classic&name=Ira — одразу в кімнату (для duo.html)
 
 let paused = false
+// Нетграф — інструмент розробника: у звичайній грі схований (N — показати),
+// а відкритий одразу лише при досліді з мережею (?lag=…) або з ?netgraph=1
+let showNet = params.has('lag') || params.has('netgraph')
+gameUi.classList.toggle('hide-net', !showNet)
+let detachNet = () => {}
+
+function netOptions() {
+  const num = (k, d) => (params.has(k) ? Number(params.get(k)) : d)
+  return {
+    codec: params.get('codec') ?? 'binary',
+    lag: num('lag', 0),
+    jitter: num('jitter', 0),
+    drop: num('drop', 0),
+    interpMs: num('interp', 100),
+    predict: params.get('predict') !== '0',
+  }
+}
 
 function startGame(room, name) {
   const arena = assets.json.arenas[room.arena] ?? Object.values(assets.json.arenas)[0]
-  const world = new World({ width: window.innerWidth, height: window.innerHeight, arena })
-  const player = world.spawn(
-    new Ship({
-      team: 'player',
-      controller: 'keyboard',
-      x: world.width / 2,
-      y: world.height / 2,
-      angle: -Math.PI / 2,
-    }),
-  )
-  populateArena(world)
-
-  // підписники подій світу: звук і HUD. Самому світу про них знати не треба.
-  const detachAudio = audio.attach(world)
-  const detachHud = hud.attach(world)
-
-  // Lab 4: справжнє з'єднання з кімнатою на сервері (поки що лише склад кімнати і чат;
-  // сама гра лишається локальною — синхронізація світу буде в Lab 5).
-  // join надсилаємо в onOpen, тому після перепідключення гравець сам повертається в кімнату.
-  // В офлайн-режимі (немає сервера) з'єднання не відкриваємо: на Live Server за адресою /ws
-  // взагалі живе його власний сокет автоперезавантаження, а не наш сервер.
-  let conn = null
+  const bot = params.get('bot') === '1'
   let unmountRoom
   if (room.offline) {
+    game = new OfflineGame({ arena, bot })
     const note = Object.assign(document.createElement('div'), {
       className: 'net-status closed',
-      textContent: '● офлайн: одиночна гра (чат працює з npm run dev)',
+      textContent: '● офлайн: одиночна гра (мультиплеєр працює з npm run dev)',
     })
     gameUi.replaceChildren(note)
     unmountRoom = () => gameUi.replaceChildren()
   } else {
-    conn = new Connection(socketUrl('/ws'), {
-      onOpen: (c) => c.send({ type: 'join', v: 0, roomId: room.id, name }),
-    })
-    unmountRoom = mountRoomView(gameUi, conn, { room })
-    conn.connect()
+    game = new NetGame({ room: { ...room, arenaConfig: arena }, name, net: netOptions(), bot })
+    unmountRoom = mountRoomView(gameUi, game.conn, { room })
+    detachNet = mountNetControls(gameUi, game)
   }
+  game.name = name
+  game.arena = arena
 
-  game = {
-    world,
-    player,
-    name,
-    room,
-    conn,
-    detach: () => {
-      detachAudio()
-      detachHud()
-      unmountRoom()
-      conn?.close(1000, 'left the game')
-    },
+  // підписники подій гри: звук і HUD (офлайн — сам світ, онлайн — події зі знімків сервера)
+  const detachAudio = audio.attach(game.events)
+  const detachHud = hud.attach(game.events)
+  game.detach = () => {
+    detachAudio()
+    detachHud()
+    unmountRoom()
+    detachNet()
+    detachNet = () => {}
+    game.close()
   }
   paused = false
   loop.start()
-  if (DEV) window.game = { ...game, loop, lobby, assets, audio }
+  if (DEV) window.game = { game, loop, lobby, assets, audio }
 }
 
 function stopGame() {
@@ -268,28 +270,71 @@ function stopGame() {
   game = null
 }
 
-function simulate(dt) {
+function simulate() {
   if (input.justPressed('Escape')) {
     input.consume()
     showLobby()
     return
   }
   if (input.justPressed('KeyM')) audio.toggleMute()
-  if (input.justPressed('KeyP')) paused = !paused // edge-triggered: одне натискання = одне перемикання
-  if (!paused) game.world.step(dt, input)
+  if (input.justPressed('KeyN')) {
+    showNet = !showNet
+    gameUi.classList.toggle('hide-net', !showNet)
+  }
+  // пауза — лише офлайн: сервер не зупиниш заради одного гравця
+  if (input.justPressed('KeyP') && !game.online) paused = !paused
+  if (!paused) game.step(keyboardCommand(input))
   input.consume()
+}
+
+function drawNames(ctx, scene) {
+  ctx.font = '12px monospace'
+  ctx.textAlign = 'center'
+  for (const s of scene.ofKind('ship')) {
+    if (!s.name || s.isWaitingRespawn) continue
+    ctx.fillStyle = s.isMe ? '#93c5fd' : '#f3efe0'
+    ctx.fillText(s.name, s.pos.x, s.pos.y - 26)
+  }
 }
 
 function render(alpha) {
   if (!game) return
-  const { world, player } = game
-  ctx.fillStyle = world.arena.sky ?? '#000'
-  ctx.fillRect(0, 0, window.innerWidth, window.innerHeight)
+  const cam = computeCamera(window.innerWidth, window.innerHeight)
+  const now = performance.now()
+  const scene = game.view(alpha, now)
+
+  drawArenaBackground(ctx, cam, game.arena.sky ?? '#000')
+  ctx.save()
+  cam.apply(ctx)
   drawStarfield(ctx, stars)
-  drawWorld(ctx, world, paused ? 1 : alpha, performance.now() / 1000, assets)
-  hud.draw(ctx, { stats: loop.stats, world, player, paused, playerName: game.name, soundState: audio.state })
+  // офлайн: сутності мають prevPos/pos — інтерполяція між кроками через alpha;
+  // онлайн: NetGame уже порахував позиції на "зараз", тож alpha = 1
+  drawWorld(ctx, scene, game.online ? 1 : paused ? 1 : alpha, now / 1000, assets)
+  if (game.online) drawNames(ctx, scene)
+  ctx.restore()
+  drawArenaBorder(ctx, cam)
+
+  hud.draw(ctx, {
+    stats: loop.stats,
+    world: game.hudWorld,
+    player: game.me,
+    paused,
+    playerName: game.name,
+    soundState: audio.state,
+    toScreen: cam.toScreen,
+  })
+  if (game.online && showNet) drawNetgraph(ctx, game)
 }
 
 const loop = createLoop({ simulate, render })
+
+// ?autojoin=<roomId>&name=<ім'я> — одразу зайти в кімнату, щойно лобі отримає список (duo.html)
+if (params.has('autojoin')) {
+  lobby.addEventListener('rooms', function once(e) {
+    if (e.detail.offline) return
+    lobby.removeEventListener('rooms', once)
+    lobby.join(params.get('autojoin'), params.get('name') ?? 'Pilot')
+  })
+}
 
 boot(flags)

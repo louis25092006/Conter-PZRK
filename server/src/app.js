@@ -1,4 +1,5 @@
 import { createServer } from 'node:http'
+import { readFileSync } from 'node:fs'
 import { WebSocketServer } from 'ws'
 import { RoomManager } from './rooms.js'
 import { createHttpHandler } from './http.js'
@@ -37,10 +38,20 @@ export function createGameServer(config, { log = createLogger(config) } = {}) {
     matchLog.done.finally(() => logs.delete(matchLog.done))
   })
 
-  const httpServer = createServer(createHttpHandler({ config, manager, log, stats: () => ({ ...counters }) }))
+  const arenas = JSON.parse(readFileSync(config.arenasFile, 'utf8'))
+  let sockets = null
+  const httpServer = createServer(
+    createHttpHandler({
+      config,
+      manager,
+      log,
+      stats: () => ({ ...counters }),
+      matchStats: () => sockets.stats(),
+    }),
+  )
   const wss = new WebSocketServer({ server: httpServer, path: '/ws', maxPayload: config.maxPayloadBytes })
   wss.on('error', (err) => log.error('websocket server error', { error: err.message }))
-  const sockets = attachWebSockets({ wss, manager, config, log, counters })
+  sockets = attachWebSockets({ wss, manager, config, log, counters, arenas })
 
   function seedRooms() {
     for (const r of DEFAULT_ROOMS) manager.create({ ...r, persistent: true })

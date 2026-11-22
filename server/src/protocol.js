@@ -1,8 +1,10 @@
-// Протокол v0: JSON-повідомлення через WebSocket. Кожне має поле `type`.
-// Сервер НІКОЛИ не довіряє клієнту: кожне вхідне повідомлення проходить validate().
-// У Lab 6 цей файл стане typed discriminated union, у Lab 5 — бінарним.
+// Протокол v1 (Lab 5). Рідкісні повідомлення — JSON-текст з полем `type` (тут).
+// Часті — команди гравця і знімки світу — бінарні кадри (shared/src/codec/binary.js),
+// або JSON, якщо клієнт підключився з ?codec=json (для порівняння розмірів).
+// Сервер НІКОЛИ не довіряє клієнту: кожне вхідне повідомлення проходить перевірку.
+// v0 (Lab 4): join/chat/leave. v1: + input, ping, netsim; roster містить shipId.
 
-export const PROTOCOL_VERSION = 0
+export const PROTOCOL_VERSION = 1
 export const MAX_MESSAGE_BYTES = 2048
 export const MAX_NAME = 16
 export const MAX_CHAT = 200
@@ -27,10 +29,27 @@ export const CLOSE = Object.freeze({
 const isStr = (v, min, max) => typeof v === 'string' && v.trim().length >= min && v.length <= max
 
 // Схеми повідомлень від клієнта: тип -> перевірка полів
+const isNum = (v, min, max) => typeof v === 'number' && Number.isFinite(v) && v >= min && v <= max
+
+// Команда гравця: лише -1/0/1 і true/false. turn: 1000 або thrust: "yes" — це чит → закриваємо.
+export function isValidInput(m) {
+  return (
+    Number.isInteger(m.seq) &&
+    m.seq >= 1 &&
+    m.seq <= 0xffffffff &&
+    [-1, 0, 1].includes(m.turn) &&
+    typeof m.thrust === 'boolean' &&
+    typeof m.fire === 'boolean'
+  )
+}
+
 const clientMessages = {
   join: (m) => m.v === PROTOCOL_VERSION && isStr(m.roomId, 1, 64) && isStr(m.name, 1, MAX_NAME),
   chat: (m) => isStr(m.text, 1, MAX_CHAT),
   leave: () => true,
+  input: isValidInput, // JSON-варіант команди (?codec=json)
+  ping: (m) => isNum(m.t, 0, Number.MAX_SAFE_INTEGER),
+  netsim: (m) => isNum(m.lag, 0, 1000) && isNum(m.jitter, 0, 500) && isNum(m.drop, 0, 0.5),
 }
 
 // Повертає { ok: true, msg } або { ok: false, code, reason }
@@ -63,7 +82,13 @@ export function validate(raw) {
 
 // Повідомлення сервер -> клієнт (конструктори, щоб форма була в одному місці)
 export const server = {
-  welcome: (player, room) => ({ type: 'welcome', v: PROTOCOL_VERSION, you: player, room }),
+  welcome: (player, room, extra = {}) => ({
+    type: 'welcome',
+    v: PROTOCOL_VERSION,
+    you: player,
+    room,
+    ...extra,
+  }),
   roster: (players) => ({ type: 'roster', players }),
   chat: (from, text, t) => ({ type: 'chat', from, text, t }),
   system: (text) => ({ type: 'system', text }),

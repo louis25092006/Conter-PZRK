@@ -1,4 +1,4 @@
-import { EFFECTS } from './sim/components.js'
+import { EFFECTS } from '../../shared/src/sim/components.js'
 
 // HUD — теж підписник подій світу, як і звук. Сам світ про HUD не знає.
 // Спливаючі "+50" і банер бонусу живуть у реальному часі (performance.now),
@@ -33,7 +33,10 @@ export function createHud() {
     }
   }
 
-  function draw(ctx, { stats, world, player, paused, playerName, soundState }) {
+  function draw(
+    ctx,
+    { stats, world, player, paused, playerName, soundState, toScreen = (x, y) => ({ x, y }) },
+  ) {
     const now = performance.now()
     const w = ctx.canvas.clientWidth
     const h = ctx.canvas.clientHeight
@@ -46,7 +49,8 @@ export function createHud() {
       const t = (now - p.born) / POPUP_MS
       ctx.globalAlpha = 1 - t
       ctx.fillStyle = '#ffe066'
-      ctx.fillText(p.text, p.x, p.y - 20 - t * 30)
+      const sp = toScreen(p.x, p.y) // очки "спливають" над місцем у світі, а світ масштабовано камерою
+      ctx.fillText(p.text, sp.x, sp.y - 20 - t * 30)
     }
     ctx.globalAlpha = 1
 
@@ -68,13 +72,13 @@ export function createHud() {
     ctx.textAlign = 'right'
     ctx.font = `bold ${20 + Math.round(flash * 4)}px monospace`
     ctx.fillStyle = flash > 0 ? '#ffe066' : 'white'
-    ctx.fillText(`SCORE ${world.score}`, right, 26)
+    ctx.fillText(`SCORE ${player.score ?? world.score}`, right, 26)
     ctx.font = '16px monospace'
     ctx.fillStyle = '#ff5c5c'
     ctx.fillText('♥'.repeat(player.hp) + '♡'.repeat(player.maxHp - player.hp), right, 48)
     ctx.fillStyle = '#9ca3af'
     ctx.font = '13px monospace'
-    ctx.fillText(`deaths: ${world.deaths}`, right, 66)
+    ctx.fillText(`deaths: ${player.deaths ?? world.deaths}`, right, 66)
     let y = 88
     for (const [name, left] of player.effects) {
       ctx.fillStyle = EFFECTS[name].color
@@ -88,7 +92,7 @@ export function createHud() {
     ctx.fillStyle = '#6b7280'
     ctx.font = '13px monospace'
     ctx.fillText(
-      `WASD / стрілки — літати · Пробіл — стріляти · P — пауза · M — звук (${sound[soundState] ?? soundState}) · Esc — лобі`,
+      `WASD / стрілки — літати · Пробіл — стріляти · P — пауза · M — звук (${sound[soundState] ?? soundState}) · N — нетграф · Esc — лобі`,
       10,
       h - 12,
     )

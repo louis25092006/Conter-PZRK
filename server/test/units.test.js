@@ -13,7 +13,7 @@ import { loadConfig } from '../src/config.js'
 // ---------- протокол ----------
 
 test('protocol: валідні повідомлення проходять', () => {
-  assert.equal(validate(JSON.stringify({ type: 'join', v: 0, roomId: 'r1', name: 'Ira' })).ok, true)
+  assert.equal(validate(JSON.stringify({ type: 'join', v: 1, roomId: 'r1', name: 'Ira' })).ok, true)
   assert.equal(validate(JSON.stringify({ type: 'chat', text: 'привіт' })).ok, true)
 })
 
@@ -24,8 +24,8 @@ test('protocol: кожен вид поганого повідомлення ма
   assert.equal(code('{"no":"type"}'), CLOSE.BAD_SHAPE)
   assert.equal(code('{"type":"fly"}'), CLOSE.UNKNOWN_TYPE)
   assert.equal(code('{"type":"__proto__"}'), CLOSE.UNKNOWN_TYPE) // не дістанемось до прототипу
-  assert.equal(code('{"type":"join","v":1,"roomId":"r","name":"a"}'), CLOSE.BAD_VERSION)
-  assert.equal(code('{"type":"join","v":0,"roomId":"r","name":""}'), CLOSE.BAD_SHAPE)
+  assert.equal(code('{"type":"join","v":7,"roomId":"r","name":"a"}'), CLOSE.BAD_VERSION)
+  assert.equal(code('{"type":"join","v":1,"roomId":"r","name":""}'), CLOSE.BAD_SHAPE)
   assert.equal(code(JSON.stringify({ type: 'chat', text: 'x'.repeat(201) })), CLOSE.BAD_SHAPE)
   assert.equal(code(JSON.stringify({ type: 'chat', text: 'x'.repeat(3000) })), CLOSE.TOO_BIG)
 })

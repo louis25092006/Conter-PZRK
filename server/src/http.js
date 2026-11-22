@@ -87,7 +87,7 @@ async function serveStatic(req, res, root, pathname) {
   await pipeline(createReadStream(file), res)
 }
 
-export function createHttpHandler({ config, manager, log, stats }) {
+export function createHttpHandler({ config, manager, log, stats, matchStats = () => [] }) {
   const routes = {
     'GET /health': (req, res) =>
       sendJson(res, 200, {
@@ -100,6 +100,9 @@ export function createHttpHandler({ config, manager, log, stats }) {
       }),
 
     'GET /api/rooms': (req, res) => sendJson(res, 200, { rooms: manager.list() }),
+
+    // Lab 5: стан матчів — тривалість і джитер тіку, гравці, трафік кожного клієнта
+    'GET /api/stats': (req, res) => sendJson(res, 200, { matches: matchStats() }),
 
     'POST /api/rooms': async (req, res) => {
       const { name, arena } = validateNewRoom(await readJsonBody(req, config.maxBodyBytes))

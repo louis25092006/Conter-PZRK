@@ -203,7 +203,7 @@ test('паралельно швидше, ніж послідовно', async () 
 // ---------- архітектура ----------
 
 test('симуляція не імпортує audio.js і hud.js', () => {
-  const dir = new URL('../src/sim/', import.meta.url)
+  const dir = new URL('../../shared/src/sim/', import.meta.url)
   for (const file of readdirSync(dir)) {
     const code = readFileSync(new URL(file, dir), 'utf8')
     assert.doesNotMatch(code, /from ['"].*(audio|hud)(\.js)?['"]/, `${file} imports audio/hud`)

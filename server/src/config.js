@@ -31,6 +31,8 @@ export function loadConfig(env = process.env, overrides = {}) {
     host: env.HOST || '0.0.0.0',
     logDir: resolve(SERVER_ROOT, env.LOG_DIR || 'logs'),
     clientDist: resolve(SERVER_ROOT, env.CLIENT_DIST || '../client/dist'),
+    // параметри арен — той самий файл, що вантажить клієнт (одне джерело правди)
+    arenasFile: resolve(SERVER_ROOT, env.ARENAS_FILE || '../client/public/assets/arenas.json'),
 
     maxRooms: int(env, 'MAX_ROOMS', 20, { min: 1, max: 1000 }),
     maxPlayersPerRoom: int(env, 'MAX_PLAYERS_PER_ROOM', 8, { min: 1, max: 100 }),

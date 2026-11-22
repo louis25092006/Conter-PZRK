@@ -513,6 +513,42 @@
       .chat-input.open {
         display: block;
       }
+      /* ---------- Lab 5: керування імітатором мережі (під нетграфом) ---------- */
+      .net-controls {
+        position: absolute;
+        right: 10px;
+        bottom: 236px;
+        width: 290px;
+        box-sizing: border-box;
+        display: grid;
+        grid-template-columns: 1fr 1fr;
+        gap: 4px 12px;
+        padding: 8px 10px;
+        font:
+          11px ui-monospace,
+          Consolas,
+          monospace;
+        color: #d1d5db;
+        background: rgba(8, 10, 16, 0.78);
+        border: 1px solid rgba(245, 184, 61, 0.35);
+        pointer-events: auto;
+      }
+      .net-controls label {
+        display: grid;
+        gap: 2px;
+      }
+      .net-controls input[type='range'] {
+        width: 100%;
+        accent-color: #f5b83d;
+      }
+      .net-controls label:last-child {
+        display: flex;
+        align-items: center;
+        gap: 6px;
+      }
+      #game-ui.hide-net .net-controls {
+        display: none;
+      }
     </style>
   </head>
   <body>

@@ -44,16 +44,11 @@ export function homingSystem(world, dt) {
 const IDLE = Object.freeze({ turn: 0, thrust: false, fire: false })
 
 export const controllers = {
-  keyboard(ship, world) {
-    const input = world.input
-    if (!input) return IDLE
-    const left = input.isDown('KeyA') || input.isDown('ArrowLeft')
-    const right = input.isDown('KeyD') || input.isDown('ArrowRight')
-    return {
-      turn: (right ? 1 : 0) - (left ? 1 : 0),
-      thrust: input.isDown('KeyW') || input.isDown('ArrowUp'),
-      fire: input.isDown('Space'),
-    }
+  // Lab 5: гравцем керують КОМАНДИ, а не клавіатура. Клавіатуру в команду перетворює
+  // клієнт (keyboardCommand), а сервер отримує ті самі команди по мережі.
+  // world.inputs: Map<shipId, { turn, thrust, fire, seq }> на цей крок.
+  input(ship, world) {
+    return world.inputs.get(ship.id) ?? IDLE
   },
 
   // простий ворог-переслідувач: розвертається до найближчого чужого корабля,

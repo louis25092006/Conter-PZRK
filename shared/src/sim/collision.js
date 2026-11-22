@@ -27,7 +27,8 @@ export function* findCollisions(world) {
 const rules = {
   'asteroid:bullet'(world, asteroid, bullet) {
     bullet.kill()
-    if (asteroid.damage(bullet.damage)) destroyAsteroid(world, asteroid, bullet.team)
+    if (asteroid.damage(bullet.damage))
+      destroyAsteroid(world, asteroid, { team: bullet.team, shipId: bullet.ownerId })
     else {
       sparks(world, bullet.pos, '#aaa')
       world.emit('hit', { target: 'asteroid', team: asteroid.team, x: bullet.pos.x, y: bullet.pos.y })
@@ -37,7 +38,7 @@ const rules = {
   'bullet:ship'(world, bullet, ship) {
     if (bullet.team === ship.team) return // своїх не б'ємо
     bullet.kill()
-    hitShip(world, ship, bullet.damage, bullet.team)
+    hitShip(world, ship, bullet.damage, { team: bullet.team, shipId: bullet.ownerId })
   },
 
   'asteroid:ship'(world, asteroid, ship) {
@@ -48,8 +49,8 @@ const rules = {
 
   'ship:ship'(world, a, b) {
     if (a.team === b.team) return
-    hitShip(world, a, 1, b.team)
-    hitShip(world, b, 1, a.team)
+    hitShip(world, a, 1, { team: b.team, shipId: b.id })
+    hitShip(world, b, 1, { team: a.team, shipId: a.id })
     // відштовхуємо один від одного, щоб не бились кожен кадр
     const push = a.pos.sub(b.pos).normalize().scale(220)
     a.vel = a.vel.add(push)
@@ -60,7 +61,7 @@ const rules = {
     if (ship.team !== 'player') return // вороги бонуси не підбирають
     ship.applyEffect(pickup.effect)
     pickup.kill()
-    world.emit('pickup', { effect: pickup.effect, x: pickup.pos.x, y: pickup.pos.y })
+    world.emit('pickup', { effect: pickup.effect, shipId: ship.id, x: pickup.pos.x, y: pickup.pos.y })
   },
 }
 
@@ -80,14 +81,22 @@ function sparks(world, pos, color) {
   world.spawn(new Explosion({ rng: world.rng, x: pos.x, y: pos.y, count: 6, speed: 90, ttl: 0.35, color }))
 }
 
-function hitShip(world, ship, amount, attackerTeam) {
+// attacker = { team, shipId } або null (зіткнення з астероїдом)
+function hitShip(world, ship, amount, attacker) {
   const killed = ship.damage(amount)
   if (!killed) {
     sparks(world, ship.pos, '#ffe066')
-    world.emit('hit', { target: 'ship', team: ship.team, x: ship.pos.x, y: ship.pos.y })
+    world.emit('hit', { target: 'ship', team: ship.team, shipId: ship.id, x: ship.pos.x, y: ship.pos.y })
     return
   }
-  world.emit('exploded', { kind: 'ship', team: ship.team, size: 3, x: ship.pos.x, y: ship.pos.y })
+  world.emit('exploded', {
+    kind: 'ship',
+    team: ship.team,
+    shipId: ship.id,
+    size: 3,
+    x: ship.pos.x,
+    y: ship.pos.y,
+  })
 
   world.spawn(
     new Explosion({
@@ -102,14 +111,15 @@ function hitShip(world, ship, amount, attackerTeam) {
 
   if (ship.team === 'player') {
     ship.startRespawn() // гравець не зникає зі світу — через 2 с з'явиться знову
+    ship.deaths++
     world.deaths++
   } else {
     ship.kill()
-    if (attackerTeam === 'player') world.addScore(150, ship.pos)
+    if (attacker?.team === 'player') world.addScore(150, ship.pos, attacker.shipId)
   }
 }
 
-function destroyAsteroid(world, asteroid, attackerTeam) {
+function destroyAsteroid(world, asteroid, attacker) {
   asteroid.kill()
   asteroid.split(world)
   world.spawn(
@@ -129,5 +139,6 @@ function destroyAsteroid(world, asteroid, attackerTeam) {
     x: asteroid.pos.x,
     y: asteroid.pos.y,
   })
-  if (attackerTeam === 'player') world.addScore(ASTEROID_SCORE[asteroid.size], asteroid.pos)
+  if (attacker?.team === 'player')
+    world.addScore(ASTEROID_SCORE[asteroid.size], asteroid.pos, attacker.shipId)
 }

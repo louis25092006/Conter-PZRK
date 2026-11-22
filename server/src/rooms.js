@@ -116,6 +116,10 @@ export class RoomManager extends EventEmitter {
     return this.#rooms.get(id)
   }
 
+  *rooms() {
+    yield* this.#rooms.values()
+  }
+
   delete(id) {
     const room = this.#rooms.get(id)
     if (!room) return false

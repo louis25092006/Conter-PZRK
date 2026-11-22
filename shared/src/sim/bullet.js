@@ -8,6 +8,7 @@ export class Bullet extends Entity {
     this.damage = damage
     this.ownerId = ownerId
     this.homing = null // компонент може бути причеплений кораблем (бонус HOMING)
+    this.spawnSeq = 0 // номер команди гравця, якою випущено кулю (Lab 5: передбачення)
   }
 
   update(dt, world) {

@@ -1,0 +1,13 @@
+{
+  "name": "@conter/shared",
+  "version": "0.0.0",
+  "private": true,
+  "type": "module",
+  "description": "Спільна детермінована симуляція, протокол і кодеки — для клієнта і сервера",
+  "exports": {
+    "./*": "./src/*"
+  },
+  "scripts": {
+    "test": "node --test --test-timeout=20000 test/*.test.js"
+  }
+}

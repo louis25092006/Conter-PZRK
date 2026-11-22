@@ -104,7 +104,8 @@ function client() {
   const ws = new WebSocket(wsUrl)
   const inbox = []
   const waiters = []
-  ws.on('message', (data) => {
+  ws.on('message', (data, isBinary) => {
+    if (isBinary) return // бінарні знімки світу (Lab 5) тут не потрібні
     const m = JSON.parse(data)
     inbox.push(m)
     for (const w of waiters.splice(0)) w()
@@ -133,9 +134,9 @@ test('два гравці в одній кімнаті бачать одне о�
   const a = client()
   const b = client()
   await Promise.all([a.open(), b.open()])
-  a.send({ type: 'join', v: 0, roomId: 'r-classic', name: 'Ira' })
+  a.send({ type: 'join', v: 1, roomId: 'r-classic', name: 'Ira' })
   assert.equal((await a.next('welcome')).you.name, 'Ira')
-  b.send({ type: 'join', v: 0, roomId: 'r-classic', name: 'Bob' })
+  b.send({ type: 'join', v: 1, roomId: 'r-classic', name: 'Bob' })
   await b.next('welcome')
 
   // у обох з'явився склад з двох гравців
@@ -184,14 +185,14 @@ test('не JSON → 4000, невідомий тип → 4001, чат до join �
 test('неіснуюча кімната → 4006', async () => {
   const c = client()
   await c.open()
-  c.send({ type: 'join', v: 0, roomId: 'nope', name: 'x' })
+  c.send({ type: 'join', v: 1, roomId: 'nope', name: 'x' })
   assert.equal((await c.closed).code, CLOSE.ROOM_UNAVAILABLE)
 })
 
 test('спам повідомленнями → rate limit 4005', async () => {
   const c = client()
   await c.open()
-  c.send({ type: 'join', v: 0, roomId: 'r-training', name: 'spam' })
+  c.send({ type: 'join', v: 1, roomId: 'r-training', name: 'spam' })
   await c.next('welcome')
   for (let i = 0; i < 20; i++) c.send({ type: 'chat', text: `spam ${i}` })
   assert.equal((await c.closed).code, CLOSE.RATE_LIMIT)
@@ -212,7 +213,7 @@ test('graceful shutdown: клієнти отримують 1001, лог матч
   const ws = new WebSocket(`ws://127.0.0.1:${port}/ws`)
   ws.on('error', () => {})
   await new Promise((r) => ws.once('open', r))
-  ws.send(JSON.stringify({ type: 'join', v: 0, roomId: 'r-dogfight', name: 'Last' }))
+  ws.send(JSON.stringify({ type: 'join', v: 1, roomId: 'r-dogfight', name: 'Last' }))
   await new Promise((r) => ws.once('message', r))
   const closed = new Promise((r) => ws.on('close', (code) => r(code)))
 

@@ -1,0 +1,88 @@
+== node scripts/net-harness.js --lag 100 --jitter 30 --drop 0.02 --nopredict
+{
+  "net": "100±30 ms, drop 2%",
+  "codec": "binary",
+  "prediction": false,
+  "determinismBroken": false,
+  "rttMs": 158,
+  "serverConfirmsThrustAfterMs": 187,
+  "playerSeesThrustAfterMs": 187,
+  "pendingAvg": 9.3,
+  "pendingMax": 11,
+  "corrections": {
+    "snapshots": 0,
+    "zero": 0,
+    "median": 0,
+    "p95": 0,
+    "max": 0
+  },
+  "downKBs": 2.76,
+  "upKBs": 0.52,
+  "snapshotBytes": 95
+}
+== node scripts/net-harness.js --lag 100 --jitter 30 --drop 0.02 
+{
+  "net": "100±30 ms, drop 2%",
+  "codec": "binary",
+  "prediction": true,
+  "determinismBroken": false,
+  "rttMs": 173,
+  "serverConfirmsThrustAfterMs": 171,
+  "playerSeesThrustAfterMs": 0,
+  "pendingAvg": 9.4,
+  "pendingMax": 12,
+  "corrections": {
+    "snapshots": 180,
+    "zero": 180,
+    "median": 0,
+    "p95": 0,
+    "max": 0
+  },
+  "downKBs": 2.67,
+  "upKBs": 0.52,
+  "snapshotBytes": 95
+}
+== node scripts/net-harness.js --lag 100 --jitter 30 --drop 0.02 --nondet
+{
+  "net": "100±30 ms, drop 2%",
+  "codec": "binary",
+  "prediction": true,
+  "determinismBroken": true,
+  "rttMs": 124,
+  "serverConfirmsThrustAfterMs": 157,
+  "playerSeesThrustAfterMs": 0,
+  "pendingAvg": 9.4,
+  "pendingMax": 11,
+  "corrections": {
+    "snapshots": 180,
+    "zero": 0,
+    "median": 2.631,
+    "p95": 11.13,
+    "max": 13.45
+  },
+  "downKBs": 2.92,
+  "upKBs": 0.53,
+  "snapshotBytes": 95
+}
+== node scripts/net-harness.js --lag 100 --jitter 30 --drop 0.02 --codec json
+{
+  "net": "100±30 ms, drop 2%",
+  "codec": "json",
+  "prediction": true,
+  "determinismBroken": false,
+  "rttMs": 142,
+  "serverConfirmsThrustAfterMs": 0,
+  "playerSeesThrustAfterMs": 0,
+  "pendingAvg": 9.4,
+  "pendingMax": 11,
+  "corrections": {
+    "snapshots": 180,
+    "zero": 180,
+    "median": 0,
+    "p95": 0,
+    "max": 0
+  },
+  "downKBs": 18.34,
+  "upKBs": 3.7,
+  "snapshotBytes": 631
+}

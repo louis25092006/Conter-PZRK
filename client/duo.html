@@ -1,0 +1,38 @@
+<!doctype html>
+<html lang="uk">
+  <head>
+    <meta charset="UTF-8" />
+    <title>Conter-PZRK — двоє гравців</title>
+    <!--
+      Lab 5: два клієнти поруч в одному вікні — для перевірки мультиплеєра і запису демо.
+      Ліворуч керуєш ти (клікни в ліве вікно), праворуч літає бот. Обидва — з імітацією
+      поганої мережі: 100 мс ± 30 мс затримки і 2% втрачених знімків.
+      Відкрити: npm run dev → http://localhost:5173/duo.html
+    -->
+    <style>
+      html,
+      body {
+        margin: 0;
+        height: 100%;
+        background: #000;
+      }
+      body {
+        display: grid;
+        grid-template-columns: 1fr 1fr;
+        gap: 4px;
+      }
+      iframe {
+        width: 100%;
+        height: 100%;
+        border: 0;
+      }
+    </style>
+  </head>
+  <body>
+    <iframe src="index.html?autojoin=r-classic&name=Ira&lag=100&jitter=30&drop=0.02" title="Ira"></iframe>
+    <iframe
+      src="index.html?autojoin=r-classic&name=Bot-Bob&bot=1&lag=100&jitter=30&drop=0.02"
+      title="Bob"
+    ></iframe>
+  </body>
+</html>
