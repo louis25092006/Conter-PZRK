@@ -84,6 +84,10 @@ async function serveStatic(
     throw new HttpError(400, 'bad URL encoding')
   }
   if (rel.includes('\0')) throw new HttpError(400, 'bad path')
+  // На Windows «\» — роздільник шляху, на Linux — звичайний символ імені файлу. Щоб сервер
+  // поводився однаково на будь-якій ОС (CI на Linux це впіймав: там був 404, а не 403),
+  // шляхи зі зворотним слешем не приймаємо взагалі — у URL статики їм не місце.
+  if (rel.includes('\\')) throw new HttpError(403, 'forbidden')
   let file = resolve(root, '.' + rel)
   if (file !== root && !file.startsWith(root + sep)) throw new HttpError(403, 'forbidden')
 
