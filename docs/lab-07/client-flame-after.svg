@@ -1,0 +1,107 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="1200" height="220" viewBox="0 0 1200 220" font-family="monospace">
+<rect width="100%" height="100%" fill="#fdfaf3"/>
+<text x="6" y="18" font-size="13" fill="#333">Клієнт ПІСЛЯ: 30 с, 8 AI-пілотів — 1.6 s CPU (простій не показано); наведіть на блок, щоб побачити час</text>
+<g><title>all (без простою) — 1576 ms (100.0%)</title><rect x="0.0" y="192" width="1200.0" height="17" fill="#c97b5a" rx="2"/><text x="4.0" y="205" font-size="11" fill="#111">all (без простою)</text></g>
+<g><title>frame loop.ts:21 — 1554 ms (98.6%)</title><rect x="0.0" y="174" width="1182.8" height="17" fill="#c97b5a" rx="2"/><text x="4.0" y="187" font-size="11" fill="#111">frame loop.ts:21</text></g>
+<g><title>render main.ts:334 — 1502 ms (95.3%)</title><rect x="0.0" y="156" width="1143.5" height="17" fill="#c97b5a" rx="2"/><text x="4.0" y="169" font-size="11" fill="#111">render main.ts:334</text></g>
+<g><title>renderFrame main.ts:339 — 1499 ms (95.1%)</title><rect x="0.0" y="138" width="1141.3" height="17" fill="#c97b5a" rx="2"/><text x="4.0" y="151" font-size="11" fill="#111">renderFrame main.ts:339</text></g>
+<g><title>drawWorld draw.ts:429 — 1150 ms (73.0%)</title><rect x="0.0" y="120" width="875.6" height="17" fill="#c97b5a" rx="2"/><text x="4.0" y="133" font-size="11" fill="#111">drawWorld draw.ts:429</text></g>
+<g><title>drawPickup draw.ts:356 — 47 ms (3.0%)</title><rect x="0.0" y="102" width="36.0" height="17" fill="#c97b5a" rx="2"/></g>
+<g><title>fillText — 15 ms (0.9%)</title><rect x="0.0" y="84" width="11.3" height="17" fill="#c97b5a" rx="2"/></g>
+<g><title>restore — 4 ms (0.2%)</title><rect x="11.3" y="84" width="2.9" height="17" fill="#c97b5a" rx="2"/></g>
+<g><title>fill — 2 ms (0.1%)</title><rect x="14.2" y="84" width="1.7" height="17" fill="#c97b5a" rx="2"/></g>
+<g><title>translate — 2 ms (0.1%)</title><rect x="15.9" y="84" width="1.2" height="17" fill="#c97b5a" rx="2"/></g>
+<g><title>save — 2 ms (0.1%)</title><rect x="17.1" y="84" width="1.7" height="17" fill="#c97b5a" rx="2"/></g>
+<g><title>stroke — 2 ms (0.1%)</title><rect x="18.8" y="84" width="1.7" height="17" fill="#c97b5a" rx="2"/></g>
+<g><title>arc — 1 ms (0.0%)</title><rect x="20.5" y="84" width="0.5" height="17" fill="#c97b5a" rx="2"/></g>
+<g><title>drawShip draw.ts:130 — 277 ms (17.6%)</title><rect x="36.0" y="102" width="211.1" height="17" fill="#c97b5a" rx="2"/><text x="40.0" y="115" font-size="11" fill="#111">drawShip draw.ts:130</text></g>
+<g><title>drawImage — 191 ms (12.1%)</title><rect x="36.0" y="84" width="145.4" height="17" fill="#c97b5a" rx="2"/><text x="40.0" y="97" font-size="11" fill="#111">drawImage</text></g>
+<g><title>drawFlame draw.ts:117 — 33 ms (2.1%)</title><rect x="181.5" y="84" width="24.8" height="17" fill="#c97b5a" rx="2"/></g>
+<g><title>fill — 11 ms (0.7%)</title><rect x="181.5" y="66" width="8.7" height="17" fill="#c97b5a" rx="2"/></g>
+<g><title>flameShape draw.ts:110 — 9 ms (0.6%)</title><rect x="190.1" y="66" width="6.8" height="17" fill="#c97b5a" rx="2"/></g>
+<g><title>quadraticCurveTo — 3 ms (0.2%)</title><rect x="190.1" y="48" width="2.1" height="17" fill="#c97b5a" rx="2"/></g>
+<g><title>closePath — 2 ms (0.1%)</title><rect x="192.2" y="48" width="1.3" height="17" fill="#c97b5a" rx="2"/></g>
+<g><title>beginPath — 1 ms (0.0%)</title><rect x="193.5" y="48" width="0.5" height="17" fill="#c97b5a" rx="2"/></g>
+<g><title>interpolate draw.ts:30 — 1 ms (0.1%)</title><rect x="206.3" y="84" width="0.8" height="17" fill="#c97b5a" rx="2"/></g>
+<g><title>save — 14 ms (0.9%)</title><rect x="207.1" y="84" width="10.8" height="17" fill="#c97b5a" rx="2"/></g>
+<g><title>restore — 9 ms (0.6%)</title><rect x="217.9" y="84" width="6.6" height="17" fill="#c97b5a" rx="2"/></g>
+<g><title>rotate — 10 ms (0.6%)</title><rect x="224.5" y="84" width="7.5" height="17" fill="#c97b5a" rx="2"/></g>
+<g><title>frameRect draw.ts:3 — 2 ms (0.1%)</title><rect x="232.1" y="84" width="1.5" height="17" fill="#c97b5a" rx="2"/></g>
+<g><title>translate — 2 ms (0.1%)</title><rect x="233.5" y="84" width="1.3" height="17" fill="#c97b5a" rx="2"/></g>
+<g><title>drawBullet draw.ts:172 — 439 ms (27.8%)</title><rect x="247.1" y="102" width="333.9" height="17" fill="#c97b5a" rx="2"/><text x="251.1" y="115" font-size="11" fill="#111">drawBullet draw.ts:172</text></g>
+<g><title>drawImage — 392 ms (24.9%)</title><rect x="247.1" y="84" width="298.4" height="17" fill="#c97b5a" rx="2"/><text x="251.1" y="97" font-size="11" fill="#111">drawImage</text></g>
+<g><title>lineTo — 1 ms (0.1%)</title><rect x="545.5" y="84" width="0.9" height="17" fill="#c97b5a" rx="2"/></g>
+<g><title>stroke — 8 ms (0.5%)</title><rect x="546.8" y="84" width="6.1" height="17" fill="#c97b5a" rx="2"/></g>
+<g><title>moveTo — 1 ms (0.1%)</title><rect x="552.9" y="84" width="1.1" height="17" fill="#c97b5a" rx="2"/></g>
+<g><title>interpolate draw.ts:30 — 3 ms (0.2%)</title><rect x="553.9" y="84" width="2.4" height="17" fill="#c97b5a" rx="2"/></g>
+<g><title>beginPath — 1 ms (0.1%)</title><rect x="556.4" y="84" width="0.6" height="17" fill="#c97b5a" rx="2"/></g>
+<g><title>drawParticles draw.ts:388 — 12 ms (0.8%)</title><rect x="581.0" y="102" width="9.4" height="17" fill="#c97b5a" rx="2"/></g>
+<g><title>fillRect — 4 ms (0.3%)</title><rect x="581.0" y="84" width="3.1" height="17" fill="#c97b5a" rx="2"/></g>
+<g><title>drawAsteroid draw.ts:241 — 362 ms (22.9%)</title><rect x="590.4" y="102" width="275.3" height="17" fill="#c97b5a" rx="2"/><text x="594.4" y="115" font-size="11" fill="#111">drawAsteroid draw.ts:241</text></g>
+<g><title>drawAsteroidSprite draw.ts:216 — 359 ms (22.8%)</title><rect x="590.4" y="84" width="273.5" height="17" fill="#c97b5a" rx="2"/><text x="594.4" y="97" font-size="11" fill="#111">drawAsteroidSprite draw.ts:216</text></g>
+<g><title>drawImage — 338 ms (21.4%)</title><rect x="590.4" y="66" width="257.3" height="17" fill="#c97b5a" rx="2"/><text x="594.4" y="79" font-size="11" fill="#111">drawImage</text></g>
+<g><title>createRadialGradient — 3 ms (0.2%)</title><rect x="847.8" y="66" width="2.4" height="17" fill="#c97b5a" rx="2"/></g>
+<g><title>fillRect — 4 ms (0.3%)</title><rect x="850.1" y="66" width="3.1" height="17" fill="#c97b5a" rx="2"/></g>
+<g><title>addColorStop — 4 ms (0.2%)</title><rect x="853.2" y="66" width="2.8" height="17" fill="#c97b5a" rx="2"/></g>
+<g><title>setTransform — 2 ms (0.1%)</title><rect x="856.0" y="66" width="1.7" height="17" fill="#c97b5a" rx="2"/></g>
+<g><title>clearRect — 1 ms (0.0%)</title><rect x="857.9" y="66" width="0.6" height="17" fill="#c97b5a" rx="2"/></g>
+<g><title>rotate — 1 ms (0.1%)</title><rect x="858.5" y="66" width="1.0" height="17" fill="#c97b5a" rx="2"/></g>
+<g><title>interpolate draw.ts:30 — 1 ms (0.1%)</title><rect x="865.7" y="102" width="0.8" height="17" fill="#c97b5a" rx="2"/></g>
+<g><title>drawImage — 19 ms (1.2%)</title><rect x="875.6" y="120" width="14.7" height="17" fill="#c97b5a" rx="2"/></g>
+<g><title>draw hud.ts:33 — 191 ms (12.1%)</title><rect x="890.3" y="120" width="145.4" height="17" fill="#c97b5a" rx="2"/><text x="894.3" y="133" font-size="11" fill="#111">draw hud.ts:33</text></g>
+<g><title>fillText — 124 ms (7.8%)</title><rect x="890.3" y="102" width="94.1" height="17" fill="#c97b5a" rx="2"/><text x="894.3" y="115" font-size="11" fill="#111">fillText</text></g>
+<g><title>now — 1 ms (0.1%)</title><rect x="984.4" y="102" width="1.1" height="17" fill="#c97b5a" rx="2"/></g>
+<g><title>toScreen main.ts:363 — 1 ms (0.1%)</title><rect x="985.5" y="102" width="0.9" height="17" fill="#c97b5a" rx="2"/></g>
+<g><title>toScreen camera.ts:12 — 1 ms (0.1%)</title><rect x="985.5" y="84" width="0.9" height="17" fill="#c97b5a" rx="2"/></g>
+<g><title>drawArenaBackground camera.ts:23 — 20 ms (1.3%)</title><rect x="1035.8" y="120" width="15.2" height="17" fill="#c97b5a" rx="2"/></g>
+<g><title>apply camera.ts:16 — 3 ms (0.2%)</title><rect x="1035.8" y="102" width="2.1" height="17" fill="#c97b5a" rx="2"/></g>
+<g><title>scale — 2 ms (0.2%)</title><rect x="1035.8" y="84" width="1.9" height="17" fill="#c97b5a" rx="2"/></g>
+<g><title>fillRect — 4 ms (0.2%)</title><rect x="1037.9" y="102" width="2.9" height="17" fill="#c97b5a" rx="2"/></g>
+<g><title>save — 3 ms (0.2%)</title><rect x="1040.8" y="102" width="2.1" height="17" fill="#c97b5a" rx="2"/></g>
+<g><title>view net-game.ts:374 — 11 ms (0.7%)</title><rect x="1050.9" y="120" width="8.3" height="17" fill="#c97b5a" rx="2"/></g>
+<g><title>#addView net-game.ts:447 — 5 ms (0.3%)</title><rect x="1050.9" y="102" width="3.5" height="17" fill="#c97b5a" rx="2"/></g>
+<g><title>syncEffects view-pool.ts:80 — 1 ms (0.1%)</title><rect x="1050.9" y="84" width="0.7" height="17" fill="#c97b5a" rx="2"/></g>
+<g><title>drawNames main.ts:325 — 55 ms (3.5%)</title><rect x="1059.2" y="120" width="41.8" height="17" fill="#c97b5a" rx="2"/></g>
+<g><title>fillText — 32 ms (2.0%)</title><rect x="1059.2" y="102" width="24.1" height="17" fill="#c97b5a" rx="2"/></g>
+<g><title>get hudWorld net-game.ts:548 — 1 ms (0.1%)</title><rect x="1101.0" y="120" width="0.6" height="17" fill="#c97b5a" rx="2"/></g>
+<g><title>get state audio.ts:53 — 6 ms (0.4%)</title><rect x="1101.6" y="120" width="4.4" height="17" fill="#c97b5a" rx="2"/></g>
+<g><title>drawArenaBorder camera.ts:32 — 10 ms (0.6%)</title><rect x="1106.3" y="120" width="7.7" height="17" fill="#c97b5a" rx="2"/></g>
+<g><title>strokeRect — 3 ms (0.2%)</title><rect x="1106.3" y="102" width="2.6" height="17" fill="#c97b5a" rx="2"/></g>
+<g><title>save — 1 ms (0.1%)</title><rect x="1109.0" y="102" width="1.0" height="17" fill="#c97b5a" rx="2"/></g>
+<g><title>apply camera.ts:16 — 3 ms (0.2%)</title><rect x="1109.9" y="102" width="2.3" height="17" fill="#c97b5a" rx="2"/></g>
+<g><title>scale — 2 ms (0.1%)</title><rect x="1109.9" y="84" width="1.8" height="17" fill="#c97b5a" rx="2"/></g>
+<g><title>raf loop.ts:2 — 33 ms (2.1%)</title><rect x="1143.5" y="156" width="24.8" height="17" fill="#c97b5a" rx="2"/></g>
+<g><title>requestAnimationFrame — 31 ms (2.0%)</title><rect x="1143.5" y="138" width="24.0" height="17" fill="#c97b5a" rx="2"/></g>
+<g><title>simulate main.ts:302 — 11 ms (0.7%)</title><rect x="1168.2" y="156" width="8.3" height="17" fill="#c97b5a" rx="2"/></g>
+<g><title>simulateStep main.ts:308 — 11 ms (0.7%)</title><rect x="1168.2" y="138" width="8.1" height="17" fill="#c97b5a" rx="2"/></g>
+<g><title>step net-game.ts:173 — 10 ms (0.6%)</title><rect x="1168.2" y="120" width="7.3" height="17" fill="#c97b5a" rx="2"/></g>
+<g><title>sendRaw connection.ts:116 — 4 ms (0.3%)</title><rect x="1168.2" y="102" width="3.2" height="17" fill="#c97b5a" rx="2"/></g>
+<g><title>#write connection.ts:104 — 4 ms (0.3%)</title><rect x="1168.2" y="84" width="3.1" height="17" fill="#c97b5a" rx="2"/></g>
+<g><title>send — 4 ms (0.3%)</title><rect x="1168.2" y="66" width="3.1" height="17" fill="#c97b5a" rx="2"/></g>
+<g><title>emit bus.ts:13 — 2 ms (0.1%)</title><rect x="1171.4" y="102" width="1.2" height="17" fill="#c97b5a" rx="2"/></g>
+<g><title>(anonymous) audio.ts:28 — 2 ms (0.1%)</title><rect x="1171.4" y="84" width="1.2" height="17" fill="#9aa7b8" rx="2"/></g>
+<g><title>play audio.ts:11 — 2 ms (0.1%)</title><rect x="1171.4" y="66" width="1.2" height="17" fill="#c97b5a" rx="2"/></g>
+<g><title>stepShip ship-physics.ts:16 — 1 ms (0.0%)</title><rect x="1172.7" y="102" width="0.6" height="17" fill="#c97b5a" rx="2"/></g>
+<g><title>clock loop.ts:2 — 2 ms (0.1%)</title><rect x="1176.5" y="156" width="1.6" height="17" fill="#c97b5a" rx="2"/></g>
+<g><title>(anonymous) connection.ts:68 — 22 ms (1.4%)</title><rect x="1182.8" y="174" width="16.7" height="17" fill="#9aa7b8" rx="2"/></g>
+<g><title>emit bus.ts:13 — 21 ms (1.3%)</title><rect x="1182.8" y="156" width="15.9" height="17" fill="#c97b5a" rx="2"/></g>
+<g><title>(anonymous) net-game.ts:134 — 20 ms (1.3%)</title><rect x="1182.8" y="138" width="15.5" height="17" fill="#9aa7b8" rx="2"/></g>
+<g><title>#onSnapshot net-game.ts:231 — 17 ms (1.1%)</title><rect x="1182.8" y="120" width="13.0" height="17" fill="#c97b5a" rx="2"/></g>
+<g><title>#onEvent net-game.ts:312 — 11 ms (0.7%)</title><rect x="1182.8" y="102" width="8.5" height="17" fill="#c97b5a" rx="2"/></g>
+<g><title>emit bus.ts:13 — 10 ms (0.7%)</title><rect x="1182.8" y="84" width="7.9" height="17" fill="#c97b5a" rx="2"/></g>
+<g><title>(anonymous) audio.ts:28 — 9 ms (0.6%)</title><rect x="1182.8" y="66" width="7.0" height="17" fill="#9aa7b8" rx="2"/></g>
+<g><title>play audio.ts:11 — 9 ms (0.6%)</title><rect x="1182.8" y="48" width="6.7" height="17" fill="#c97b5a" rx="2"/></g>
+<g><title>createGain — 3 ms (0.2%)</title><rect x="1182.8" y="30" width="2.3" height="17" fill="#c97b5a" rx="2"/></g>
+<g><title>createBufferSource — 3 ms (0.2%)</title><rect x="1185.1" y="30" width="2.0" height="17" fill="#c97b5a" rx="2"/></g>
+<g><title>connect — 1 ms (0.1%)</title><rect x="1187.3" y="30" width="0.9" height="17" fill="#c97b5a" rx="2"/></g>
+<g><title>(anonymous) audio.ts:29 — 1 ms (0.1%)</title><rect x="1189.8" y="66" width="0.6" height="17" fill="#9aa7b8" rx="2"/></g>
+<g><title>play audio.ts:11 — 1 ms (0.1%)</title><rect x="1189.8" y="48" width="0.6" height="17" fill="#c97b5a" rx="2"/></g>
+<g><title>#burst net-game.ts:336 — 1 ms (0.0%)</title><rect x="1190.7" y="84" width="0.6" height="17" fill="#c97b5a" rx="2"/></g>
+<g><title>#reconcileBullets net-game.ts:300 — 1 ms (0.1%)</title><rect x="1191.6" y="102" width="0.8" height="17" fill="#c97b5a" rx="2"/></g>
+<g><title>#reconcile net-game.ts:263 — 2 ms (0.1%)</title><rect x="1192.5" y="102" width="1.4" height="17" fill="#c97b5a" rx="2"/></g>
+<g><title>decodeSnapshot index.ts:54 — 2 ms (0.2%)</title><rect x="1195.8" y="120" width="1.8" height="17" fill="#c97b5a" rx="2"/></g>
+<g><title>attempt index.ts:35 — 2 ms (0.2%)</title><rect x="1195.8" y="102" width="1.8" height="17" fill="#c97b5a" rx="2"/></g>
+<g><title>(anonymous) index.ts:56 — 2 ms (0.2%)</title><rect x="1195.8" y="84" width="1.8" height="17" fill="#9aa7b8" rx="2"/></g>
+<g><title>decodeSnapshot binary.ts:455 — 2 ms (0.2%)</title><rect x="1195.8" y="66" width="1.8" height="17" fill="#c97b5a" rx="2"/></g>
+<g><title>readEntity binary.ts:316 — 2 ms (0.1%)</title><rect x="1195.8" y="48" width="1.4" height="17" fill="#c97b5a" rx="2"/></g>
+</svg>

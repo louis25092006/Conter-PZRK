@@ -1,0 +1,413 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="1200" height="598" viewBox="0 0 1200 598" font-family="monospace">
+<rect width="100%" height="100%" fill="#fdfaf3"/>
+<text x="6" y="18" font-size="13" fill="#333">Сервер ПІСЛЯ: 64 клієнти, 60 с — 15.2 s CPU (простій не показано); наведіть на блок, щоб побачити час</text>
+<g><title>all (без простою) — 15226 ms (100.0%)</title><rect x="0.0" y="570" width="1200.0" height="17" fill="#c97b5a" rx="2"/><text x="4.0" y="583" font-size="11" fill="#111">all (без простою)</text></g>
+<g><title>(anonymous) run_main_module:1 — 564 ms (3.7%)</title><rect x="0.0" y="552" width="44.4" height="17" fill="#9aa7b8" rx="2"/></g>
+<g><title>prepareMainThreadExecution pre_execution:45 — 12 ms (0.1%)</title><rect x="0.0" y="534" width="0.9" height="17" fill="#c97b5a" rx="2"/></g>
+<g><title>prepareExecution pre_execution:105 — 12 ms (0.1%)</title><rect x="0.0" y="516" width="0.9" height="17" fill="#c97b5a" rx="2"/></g>
+<g><title>setupChildProcessIpcChannel pre_execution:583 — 10 ms (0.1%)</title><rect x="0.2" y="498" width="0.8" height="17" fill="#c97b5a" rx="2"/></g>
+<g><title>requireBuiltin realm:420 — 9 ms (0.1%)</title><rect x="0.2" y="480" width="0.7" height="17" fill="#c97b5a" rx="2"/></g>
+<g><title>compileForInternalLoader realm:383 — 9 ms (0.1%)</title><rect x="0.2" y="462" width="0.7" height="17" fill="#c97b5a" rx="2"/></g>
+<g><title>(anonymous) node:child_process:1 — 9 ms (0.1%)</title><rect x="0.2" y="444" width="0.7" height="17" fill="#9aa7b8" rx="2"/></g>
+<g><title>requireBuiltin realm:420 — 9 ms (0.1%)</title><rect x="0.2" y="426" width="0.7" height="17" fill="#c97b5a" rx="2"/></g>
+<g><title>compileForInternalLoader realm:383 — 9 ms (0.1%)</title><rect x="0.2" y="408" width="0.7" height="17" fill="#c97b5a" rx="2"/></g>
+<g><title>(anonymous) child_process:1 — 9 ms (0.1%)</title><rect x="0.2" y="390" width="0.7" height="17" fill="#9aa7b8" rx="2"/></g>
+<g><title>requireBuiltin realm:420 — 7 ms (0.0%)</title><rect x="0.2" y="372" width="0.5" height="17" fill="#c97b5a" rx="2"/></g>
+<g><title>compileForInternalLoader realm:383 — 7 ms (0.0%)</title><rect x="0.2" y="354" width="0.5" height="17" fill="#c97b5a" rx="2"/></g>
+<g><title>executeUserEntryPoint run_main:140 — 552 ms (3.6%)</title><rect x="0.9" y="534" width="43.5" height="17" fill="#c97b5a" rx="2"/></g>
+<g><title>runEntryPointWithESMLoader run_main:122 — 547 ms (3.6%)</title><rect x="1.3" y="516" width="43.1" height="17" fill="#c97b5a" rx="2"/></g>
+<g><title>asyncRunEntryPointWithESMLoader run_main:89 — 547 ms (3.6%)</title><rect x="1.3" y="498" width="43.1" height="17" fill="#c97b5a" rx="2"/></g>
+<g><title>(anonymous) run_main:159 — 545 ms (3.6%)</title><rect x="1.5" y="480" width="43.0" height="17" fill="#9aa7b8" rx="2"/></g>
+<g><title>import loader:617 — 545 ms (3.6%)</title><rect x="1.5" y="462" width="43.0" height="17" fill="#c97b5a" rx="2"/></g>
+<g><title>tracePromise node:diagnostics_channel:360 — 545 ms (3.6%)</title><rect x="1.5" y="444" width="43.0" height="17" fill="#9aa7b8" rx="2"/></g>
+<g><title>(anonymous) loader:618 — 545 ms (3.6%)</title><rect x="1.5" y="426" width="43.0" height="17" fill="#9aa7b8" rx="2"/></g>
+<g><title>getOrCreateModuleJob loader:586 — 545 ms (3.6%)</title><rect x="1.5" y="408" width="43.0" height="17" fill="#c97b5a" rx="2"/></g>
+<g><title>afterResolve loader:596 — 543 ms (3.6%)</title><rect x="1.7" y="390" width="42.8" height="17" fill="#c97b5a" rx="2"/></g>
+<g><title>#getOrCreateModuleJobAfterResolve loader:511 — 543 ms (3.6%)</title><rect x="1.7" y="372" width="42.8" height="17" fill="#c97b5a" rx="2"/></g>
+<g><title>loadAndTranslate loader:487 — 60 ms (0.4%)</title><rect x="1.7" y="354" width="4.7" height="17" fill="#c97b5a" rx="2"/></g>
+<g><title>afterLoad loader:489 — 60 ms (0.4%)</title><rect x="1.7" y="336" width="4.7" height="17" fill="#c97b5a" rx="2"/></g>
+<g><title>#translate loader:426 — 60 ms (0.4%)</title><rect x="1.7" y="318" width="4.7" height="17" fill="#c97b5a" rx="2"/></g>
+<g><title>(anonymous) translators:641 — 60 ms (0.4%)</title><rect x="1.7" y="300" width="4.7" height="17" fill="#9aa7b8" rx="2"/></g>
+<g><title>stripTypeScriptModuleTypes typescript:180 — 60 ms (0.4%)</title><rect x="1.7" y="282" width="4.7" height="17" fill="#c97b5a" rx="2"/></g>
+<g><title>processTypeScriptCode typescript:145 — 60 ms (0.4%)</title><rect x="1.7" y="264" width="4.7" height="17" fill="#c97b5a" rx="2"/></g>
+<g><title>parseTypeScript typescript:57 — 60 ms (0.4%)</title><rect x="1.7" y="246" width="4.7" height="17" fill="#c97b5a" rx="2"/></g>
+<g><title>(anonymous) util:816 — 29 ms (0.2%)</title><rect x="1.7" y="228" width="2.3" height="17" fill="#9aa7b8" rx="2"/></g>
+<g><title>(anonymous) typescript:45 — 29 ms (0.2%)</title><rect x="1.7" y="210" width="2.3" height="17" fill="#9aa7b8" rx="2"/></g>
+<g><title>requireBuiltin realm:420 — 29 ms (0.2%)</title><rect x="1.7" y="192" width="2.3" height="17" fill="#c97b5a" rx="2"/></g>
+<g><title>compileForInternalLoader realm:383 — 29 ms (0.2%)</title><rect x="1.7" y="174" width="2.3" height="17" fill="#c97b5a" rx="2"/></g>
+<g><title>(anonymous) index:1 — 24 ms (0.2%)</title><rect x="1.7" y="156" width="1.9" height="17" fill="#9aa7b8" rx="2"/></g>
+<g><title>__require index:8 — 24 ms (0.2%)</title><rect x="1.7" y="138" width="1.9" height="17" fill="#c97b5a" rx="2"/></g>
+<g><title>lib/wasm.js index:35 — 10 ms (0.1%)</title><rect x="1.7" y="120" width="0.8" height="17" fill="#c97b5a" rx="2"/></g>
+<g><title>Module — 7 ms (0.0%)</title><rect x="1.8" y="102" width="0.6" height="17" fill="#c97b5a" rx="2"/></g>
+<g><title>transformSync index:576 — 31 ms (0.2%)</title><rect x="3.9" y="228" width="2.5" height="17" fill="#c97b5a" rx="2"/></g>
+<g><title>module2.exports.transformSync index:229 — 31 ms (0.2%)</title><rect x="3.9" y="210" width="2.5" height="17" fill="#c97b5a" rx="2"/></g>
+<g><title>js-to-wasm — 31 ms (0.2%)</title><rect x="3.9" y="192" width="2.5" height="17" fill="#c97b5a" rx="2"/></g>
+<g><title>wasm-function[2927] 00aa4bda:1 — 29 ms (0.2%)</title><rect x="3.9" y="174" width="2.3" height="17" fill="#c97b5a" rx="2"/></g>
+<g><title>wasm-function[103] 00aa4bda:1 — 29 ms (0.2%)</title><rect x="3.9" y="156" width="2.3" height="17" fill="#c97b5a" rx="2"/></g>
+<g><title>wasm-function[63] 00aa4bda:1 — 22 ms (0.1%)</title><rect x="4.2" y="138" width="1.7" height="17" fill="#c97b5a" rx="2"/></g>
+<g><title>wasm-function[1077] 00aa4bda:1 — 17 ms (0.1%)</title><rect x="4.2" y="120" width="1.3" height="17" fill="#c97b5a" rx="2"/></g>
+<g><title>wasm-function[787] 00aa4bda:1 — 17 ms (0.1%)</title><rect x="4.2" y="102" width="1.3" height="17" fill="#c97b5a" rx="2"/></g>
+<g><title>wasm-function[67] 00aa4bda:1 — 12 ms (0.1%)</title><rect x="4.3" y="84" width="0.9" height="17" fill="#c97b5a" rx="2"/></g>
+<g><title>ModuleJob module_job:218 — 483 ms (3.2%)</title><rect x="6.4" y="354" width="38.0" height="17" fill="#c97b5a" rx="2"/></g>
+<g><title>link module_job:249 — 483 ms (3.2%)</title><rect x="6.4" y="336" width="38.0" height="17" fill="#c97b5a" rx="2"/></g>
+<g><title>syncLink module_job:147 — 483 ms (3.2%)</title><rect x="6.4" y="318" width="38.0" height="17" fill="#c97b5a" rx="2"/></g>
+<g><title>getOrCreateModuleJob loader:586 — 483 ms (3.2%)</title><rect x="6.4" y="300" width="38.0" height="17" fill="#c97b5a" rx="2"/></g>
+<g><title>afterResolve loader:596 — 481 ms (3.2%)</title><rect x="6.5" y="282" width="37.9" height="17" fill="#c97b5a" rx="2"/></g>
+<g><title>#getOrCreateModuleJobAfterResolve loader:511 — 481 ms (3.2%)</title><rect x="6.5" y="264" width="37.9" height="17" fill="#c97b5a" rx="2"/></g>
+<g><title>loadAndTranslate loader:487 — 7 ms (0.0%)</title><rect x="6.5" y="246" width="0.5" height="17" fill="#c97b5a" rx="2"/></g>
+<g><title>afterLoad loader:489 — 7 ms (0.0%)</title><rect x="6.5" y="228" width="0.5" height="17" fill="#c97b5a" rx="2"/></g>
+<g><title>#translate loader:426 — 7 ms (0.0%)</title><rect x="6.5" y="210" width="0.5" height="17" fill="#c97b5a" rx="2"/></g>
+<g><title>(anonymous) translators:641 — 7 ms (0.0%)</title><rect x="6.5" y="192" width="0.5" height="17" fill="#9aa7b8" rx="2"/></g>
+<g><title>ModuleJob module_job:218 — 475 ms (3.1%)</title><rect x="7.0" y="246" width="37.4" height="17" fill="#c97b5a" rx="2"/></g>
+<g><title>link module_job:249 — 475 ms (3.1%)</title><rect x="7.0" y="228" width="37.4" height="17" fill="#c97b5a" rx="2"/></g>
+<g><title>syncLink module_job:147 — 475 ms (3.1%)</title><rect x="7.0" y="210" width="37.4" height="17" fill="#c97b5a" rx="2"/></g>
+<g><title>getOrCreateModuleJob loader:586 — 475 ms (3.1%)</title><rect x="7.0" y="192" width="37.4" height="17" fill="#c97b5a" rx="2"/></g>
+<g><title>#resolve loader:665 — 15 ms (0.1%)</title><rect x="7.0" y="174" width="1.1" height="17" fill="#c97b5a" rx="2"/></g>
+<g><title>resolveSync loader:724 — 15 ms (0.1%)</title><rect x="7.0" y="156" width="1.1" height="17" fill="#c97b5a" rx="2"/></g>
+<g><title>#resolveAndMaybeBlockOnLoaderThread loader:704 — 15 ms (0.1%)</title><rect x="7.0" y="138" width="1.1" height="17" fill="#c97b5a" rx="2"/></g>
+<g><title>#cachedDefaultResolve loader:683 — 15 ms (0.1%)</title><rect x="7.0" y="120" width="1.1" height="17" fill="#c97b5a" rx="2"/></g>
+<g><title>defaultResolve resolve:947 — 15 ms (0.1%)</title><rect x="7.0" y="102" width="1.1" height="17" fill="#c97b5a" rx="2"/></g>
+<g><title>moduleResolve resolve:831 — 15 ms (0.1%)</title><rect x="7.0" y="84" width="1.1" height="17" fill="#c97b5a" rx="2"/></g>
+<g><title>packageResolve resolve:762 — 7 ms (0.0%)</title><rect x="7.0" y="66" width="0.5" height="17" fill="#c97b5a" rx="2"/></g>
+<g><title>finalizeResolution resolve:225 — 8 ms (0.1%)</title><rect x="7.6" y="66" width="0.6" height="17" fill="#c97b5a" rx="2"/></g>
+<g><title>afterResolve loader:596 — 460 ms (3.0%)</title><rect x="8.2" y="174" width="36.3" height="17" fill="#c97b5a" rx="2"/></g>
+<g><title>#getOrCreateModuleJobAfterResolve loader:511 — 460 ms (3.0%)</title><rect x="8.2" y="156" width="36.3" height="17" fill="#c97b5a" rx="2"/></g>
+<g><title>loadAndTranslate loader:487 — 79 ms (0.5%)</title><rect x="8.2" y="138" width="6.2" height="17" fill="#c97b5a" rx="2"/></g>
+<g><title>afterLoad loader:489 — 76 ms (0.5%)</title><rect x="8.4" y="120" width="6.0" height="17" fill="#c97b5a" rx="2"/></g>
+<g><title>#translate loader:426 — 76 ms (0.5%)</title><rect x="8.4" y="102" width="6.0" height="17" fill="#c97b5a" rx="2"/></g>
+<g><title>builtinStrategy translators:435 — 57 ms (0.4%)</title><rect x="8.4" y="84" width="4.5" height="17" fill="#c97b5a" rx="2"/></g>
+<g><title>getESMFacade realm:347 — 53 ms (0.3%)</title><rect x="8.8" y="66" width="4.1" height="17" fill="#c97b5a" rx="2"/></g>
+<g><title>evaluate — 53 ms (0.3%)</title><rect x="8.8" y="48" width="4.1" height="17" fill="#c97b5a" rx="2"/></g>
+<g><title>(anonymous) realm:357 — 53 ms (0.3%)</title><rect x="8.8" y="30" width="4.1" height="17" fill="#9aa7b8" rx="2"/></g>
+<g><title>(anonymous) translators:641 — 19 ms (0.1%)</title><rect x="12.9" y="84" width="1.5" height="17" fill="#9aa7b8" rx="2"/></g>
+<g><title>stripTypeScriptModuleTypes typescript:180 — 17 ms (0.1%)</title><rect x="12.9" y="66" width="1.4" height="17" fill="#c97b5a" rx="2"/></g>
+<g><title>processTypeScriptCode typescript:145 — 17 ms (0.1%)</title><rect x="12.9" y="48" width="1.4" height="17" fill="#c97b5a" rx="2"/></g>
+<g><title>parseTypeScript typescript:57 — 17 ms (0.1%)</title><rect x="12.9" y="30" width="1.4" height="17" fill="#c97b5a" rx="2"/></g>
+<g><title>ModuleJob module_job:218 — 381 ms (2.5%)</title><rect x="14.4" y="138" width="30.0" height="17" fill="#c97b5a" rx="2"/></g>
+<g><title>link module_job:249 — 381 ms (2.5%)</title><rect x="14.4" y="120" width="30.0" height="17" fill="#c97b5a" rx="2"/></g>
+<g><title>syncLink module_job:147 — 379 ms (2.5%)</title><rect x="14.4" y="102" width="29.8" height="17" fill="#c97b5a" rx="2"/></g>
+<g><title>getOrCreateModuleJob loader:586 — 377 ms (2.5%)</title><rect x="14.4" y="84" width="29.7" height="17" fill="#c97b5a" rx="2"/></g>
+<g><title>#resolve loader:665 — 25 ms (0.2%)</title><rect x="14.4" y="66" width="2.0" height="17" fill="#c97b5a" rx="2"/></g>
+<g><title>resolveSync loader:724 — 25 ms (0.2%)</title><rect x="14.4" y="48" width="2.0" height="17" fill="#c97b5a" rx="2"/></g>
+<g><title>#resolveAndMaybeBlockOnLoaderThread loader:704 — 25 ms (0.2%)</title><rect x="14.4" y="30" width="2.0" height="17" fill="#c97b5a" rx="2"/></g>
+<g><title>afterResolve loader:596 — 352 ms (2.3%)</title><rect x="16.4" y="66" width="27.7" height="17" fill="#c97b5a" rx="2"/></g>
+<g><title>#getOrCreateModuleJobAfterResolve loader:511 — 352 ms (2.3%)</title><rect x="16.4" y="48" width="27.7" height="17" fill="#c97b5a" rx="2"/></g>
+<g><title>ModuleJob module_job:218 — 299 ms (2.0%)</title><rect x="16.4" y="30" width="23.6" height="17" fill="#c97b5a" rx="2"/></g>
+<g><title>loadAndTranslate loader:487 — 51 ms (0.3%)</title><rect x="40.0" y="30" width="4.0" height="17" fill="#c97b5a" rx="2"/></g>
+<g><title>processTicksAndRejections task_queues:72 — 327 ms (2.2%)</title><rect x="44.4" y="552" width="25.8" height="17" fill="#c97b5a" rx="2"/></g>
+<g><title>runMicrotasks — 176 ms (1.2%)</title><rect x="44.7" y="534" width="13.9" height="17" fill="#c97b5a" rx="2"/></g>
+<g><title>run module_job:428 — 97 ms (0.6%)</title><rect x="45.0" y="516" width="7.7" height="17" fill="#c97b5a" rx="2"/></g>
+<g><title>evaluate — 97 ms (0.6%)</title><rect x="45.0" y="498" width="7.7" height="17" fill="#c97b5a" rx="2"/></g>
+<g><title>(anonymous) config.ts:1 — 10 ms (0.1%)</title><rect x="45.3" y="480" width="0.8" height="17" fill="#9aa7b8" rx="2"/></g>
+<g><title>(anonymous) translators:227 — 22 ms (0.1%)</title><rect x="46.1" y="480" width="1.7" height="17" fill="#9aa7b8" rx="2"/></g>
+<g><title>loadCJSModuleWithModuleLoad translators:322 — 22 ms (0.1%)</title><rect x="46.1" y="462" width="1.7" height="17" fill="#c97b5a" rx="2"/></g>
+<g><title>wrapModuleLoad loader:238 — 22 ms (0.1%)</title><rect x="46.1" y="444" width="1.7" height="17" fill="#c97b5a" rx="2"/></g>
+<g><title>(anonymous) loader:1261 — 22 ms (0.1%)</title><rect x="46.1" y="426" width="1.7" height="17" fill="#9aa7b8" rx="2"/></g>
+<g><title>(anonymous) loader:1562 — 20 ms (0.1%)</title><rect x="46.2" y="408" width="1.6" height="17" fill="#9aa7b8" rx="2"/></g>
+<g><title>(anonymous) loader:1950 — 20 ms (0.1%)</title><rect x="46.2" y="390" width="1.6" height="17" fill="#9aa7b8" rx="2"/></g>
+<g><title>(anonymous) loader:1806 — 20 ms (0.1%)</title><rect x="46.2" y="372" width="1.6" height="17" fill="#9aa7b8" rx="2"/></g>
+<g><title>(anonymous) stream.js:1 — 19 ms (0.1%)</title><rect x="46.2" y="354" width="1.5" height="17" fill="#9aa7b8" rx="2"/></g>
+<g><title>require helpers:152 — 19 ms (0.1%)</title><rect x="46.2" y="336" width="1.5" height="17" fill="#c97b5a" rx="2"/></g>
+<g><title>(anonymous) loader:1592 — 19 ms (0.1%)</title><rect x="46.2" y="318" width="1.5" height="17" fill="#9aa7b8" rx="2"/></g>
+<g><title>wrapModuleLoad loader:238 — 19 ms (0.1%)</title><rect x="46.2" y="300" width="1.5" height="17" fill="#c97b5a" rx="2"/></g>
+<g><title>(anonymous) loader:1261 — 19 ms (0.1%)</title><rect x="46.2" y="282" width="1.5" height="17" fill="#9aa7b8" rx="2"/></g>
+<g><title>(anonymous) loader:1562 — 17 ms (0.1%)</title><rect x="46.3" y="264" width="1.4" height="17" fill="#9aa7b8" rx="2"/></g>
+<g><title>(anonymous) loader:1950 — 17 ms (0.1%)</title><rect x="46.3" y="246" width="1.4" height="17" fill="#9aa7b8" rx="2"/></g>
+<g><title>(anonymous) loader:1806 — 17 ms (0.1%)</title><rect x="46.3" y="228" width="1.4" height="17" fill="#9aa7b8" rx="2"/></g>
+<g><title>(anonymous) websocket.js:1 — 16 ms (0.1%)</title><rect x="46.5" y="210" width="1.2" height="17" fill="#9aa7b8" rx="2"/></g>
+<g><title>require helpers:152 — 16 ms (0.1%)</title><rect x="46.5" y="192" width="1.2" height="17" fill="#c97b5a" rx="2"/></g>
+<g><title>(anonymous) loader:1592 — 16 ms (0.1%)</title><rect x="46.5" y="174" width="1.2" height="17" fill="#9aa7b8" rx="2"/></g>
+<g><title>wrapModuleLoad loader:238 — 16 ms (0.1%)</title><rect x="46.5" y="156" width="1.2" height="17" fill="#c97b5a" rx="2"/></g>
+<g><title>(anonymous) loader:1261 — 16 ms (0.1%)</title><rect x="46.5" y="138" width="1.2" height="17" fill="#9aa7b8" rx="2"/></g>
+<g><title>(anonymous) loader:1562 — 12 ms (0.1%)</title><rect x="46.7" y="120" width="1.0" height="17" fill="#9aa7b8" rx="2"/></g>
+<g><title>(anonymous) loader:1950 — 12 ms (0.1%)</title><rect x="46.7" y="102" width="1.0" height="17" fill="#9aa7b8" rx="2"/></g>
+<g><title>(anonymous) loader:1806 — 9 ms (0.1%)</title><rect x="46.8" y="84" width="0.7" height="17" fill="#9aa7b8" rx="2"/></g>
+<g><title>(anonymous) protocol.ts:1 — 8 ms (0.1%)</title><rect x="48.2" y="480" width="0.6" height="17" fill="#9aa7b8" rx="2"/></g>
+<g><title>(anonymous) index.ts:1 — 49 ms (0.3%)</title><rect x="48.8" y="480" width="3.8" height="17" fill="#9aa7b8" rx="2"/></g>
+<g><title>loadConfig config.ts:73 — 7 ms (0.0%)</title><rect x="48.8" y="462" width="0.5" height="17" fill="#c97b5a" rx="2"/></g>
+<g><title>createGameServer app.ts:37 — 8 ms (0.1%)</title><rect x="49.3" y="462" width="0.6" height="17" fill="#c97b5a" rx="2"/></g>
+<g><title>listen app.ts:85 — 34 ms (0.2%)</title><rect x="49.9" y="462" width="2.7" height="17" fill="#c97b5a" rx="2"/></g>
+<g><title>(anonymous) app.ts:87 — 31 ms (0.2%)</title><rect x="50.2" y="444" width="2.5" height="17" fill="#9aa7b8" rx="2"/></g>
+<g><title>Server.listen node:net:2106 — 31 ms (0.2%)</title><rect x="50.2" y="426" width="2.5" height="17" fill="#9aa7b8" rx="2"/></g>
+<g><title>lookupAndListen node:net:2259 — 31 ms (0.2%)</title><rect x="50.2" y="408" width="2.5" height="17" fill="#9aa7b8" rx="2"/></g>
+<g><title>requireBuiltin realm:420 — 31 ms (0.2%)</title><rect x="50.2" y="390" width="2.5" height="17" fill="#c97b5a" rx="2"/></g>
+<g><title>compileForInternalLoader realm:383 — 31 ms (0.2%)</title><rect x="50.2" y="372" width="2.5" height="17" fill="#c97b5a" rx="2"/></g>
+<g><title>(anonymous) node:dns:1 — 29 ms (0.2%)</title><rect x="50.2" y="354" width="2.3" height="17" fill="#9aa7b8" rx="2"/></g>
+<g><title>bindDefaultResolver utils:266 — 28 ms (0.2%)</title><rect x="50.2" y="336" width="2.2" height="17" fill="#c97b5a" rx="2"/></g>
+<g><title>getDefaultResolver utils:253 — 28 ms (0.2%)</title><rect x="50.2" y="318" width="2.2" height="17" fill="#c97b5a" rx="2"/></g>
+<g><title>ResolverBase utils:74 — 28 ms (0.2%)</title><rect x="50.2" y="300" width="2.2" height="17" fill="#c97b5a" rx="2"/></g>
+<g><title>(anonymous) utils:86 — 28 ms (0.2%)</title><rect x="50.2" y="282" width="2.2" height="17" fill="#9aa7b8" rx="2"/></g>
+<g><title>POST /api/rooms http.ts:172 — 9 ms (0.1%)</title><rect x="52.7" y="516" width="0.7" height="17" fill="#c97b5a" rx="2"/></g>
+<g><title>nextAsync from:190 — 8 ms (0.1%)</title><rect x="53.6" y="516" width="0.6" height="17" fill="#c97b5a" rx="2"/></g>
+<g><title>(anonymous) node:net:2264 — 8 ms (0.1%)</title><rect x="58.6" y="534" width="0.7" height="17" fill="#9aa7b8" rx="2"/></g>
+<g><title>maybeReadMore_ readable:866 — 58 ms (0.4%)</title><rect x="60.1" y="534" width="4.5" height="17" fill="#c97b5a" rx="2"/></g>
+<g><title>Socket.read node:net:839 — 51 ms (0.3%)</title><rect x="60.1" y="516" width="4.0" height="17" fill="#9aa7b8" rx="2"/></g>
+<g><title>Readable.read readable:649 — 26 ms (0.2%)</title><rect x="60.1" y="498" width="2.0" height="17" fill="#c97b5a" rx="2"/></g>
+<g><title>Socket._read node:net:779 — 18 ms (0.1%)</title><rect x="60.1" y="480" width="1.4" height="17" fill="#9aa7b8" rx="2"/></g>
+<g><title>endReadableNT readable:1729 — 10 ms (0.1%)</title><rect x="64.7" y="534" width="0.8" height="17" fill="#c97b5a" rx="2"/></g>
+<g><title>onconnection node:net:2303 — 10 ms (0.1%)</title><rect x="70.7" y="552" width="0.8" height="17" fill="#9aa7b8" rx="2"/></g>
+<g><title>parserOnHeadersComplete node:_http_common:77 — 11 ms (0.1%)</title><rect x="71.5" y="552" width="0.9" height="17" fill="#9aa7b8" rx="2"/></g>
+<g><title>parserOnIncoming node:_http_server:1100 — 9 ms (0.1%)</title><rect x="71.5" y="534" width="0.7" height="17" fill="#9aa7b8" rx="2"/></g>
+<g><title>emit node:events:456 — 6 ms (0.0%)</title><rect x="71.7" y="516" width="0.5" height="17" fill="#9aa7b8" rx="2"/></g>
+<g><title>(anonymous) app.ts:77 — 6 ms (0.0%)</title><rect x="71.7" y="498" width="0.5" height="17" fill="#9aa7b8" rx="2"/></g>
+<g><title>handle http.ts:209 — 6 ms (0.0%)</title><rect x="71.7" y="480" width="0.5" height="17" fill="#c97b5a" rx="2"/></g>
+<g><title>onParserExecute node:_http_server:897 — 29 ms (0.2%)</title><rect x="72.7" y="552" width="2.3" height="17" fill="#9aa7b8" rx="2"/></g>
+<g><title>onParserExecuteCommon node:_http_server:970 — 29 ms (0.2%)</title><rect x="72.7" y="534" width="2.3" height="17" fill="#9aa7b8" rx="2"/></g>
+<g><title>emit node:events:456 — 25 ms (0.2%)</title><rect x="72.7" y="516" width="2.0" height="17" fill="#9aa7b8" rx="2"/></g>
+<g><title>upgrade websocket-server.js:131 — 25 ms (0.2%)</title><rect x="72.7" y="498" width="2.0" height="17" fill="#c97b5a" rx="2"/></g>
+<g><title>handleUpgrade websocket-server.js:247 — 25 ms (0.2%)</title><rect x="72.7" y="480" width="2.0" height="17" fill="#c97b5a" rx="2"/></g>
+<g><title>completeUpgrade websocket-server.js:375 — 24 ms (0.2%)</title><rect x="72.7" y="462" width="1.9" height="17" fill="#c97b5a" rx="2"/></g>
+<g><title>emit node:events:456 — 9 ms (0.1%)</title><rect x="73.2" y="444" width="0.7" height="17" fill="#9aa7b8" rx="2"/></g>
+<g><title>(anonymous) ws.ts:269 — 8 ms (0.1%)</title><rect x="73.2" y="426" width="0.6" height="17" fill="#9aa7b8" rx="2"/></g>
+<g><title>onStreamRead stream_base_commons:166 — 2674 ms (17.6%)</title><rect x="74.9" y="552" width="210.8" height="17" fill="#c97b5a" rx="2"/><text x="78.9" y="565" font-size="11" fill="#111">onStreamRead stream_base_commons</text></g>
+<g><title>Readable.push readable:389 — 2201 ms (14.5%)</title><rect x="74.9" y="534" width="173.5" height="17" fill="#c97b5a" rx="2"/><text x="78.9" y="547" font-size="11" fill="#111">Readable.push readable:389</text></g>
+<g><title>readableAddChunkPushByteMode readable:465 — 2196 ms (14.4%)</title><rect x="74.9" y="516" width="173.1" height="17" fill="#c97b5a" rx="2"/><text x="78.9" y="529" font-size="11" fill="#111">readableAddChunkPushByteMo</text></g>
+<g><title>addChunk readable:552 — 2154 ms (14.1%)</title><rect x="74.9" y="498" width="169.8" height="17" fill="#c97b5a" rx="2"/><text x="78.9" y="511" font-size="11" fill="#111">addChunk readable:552</text></g>
+<g><title>emit node:events:456 — 2046 ms (13.4%)</title><rect x="74.9" y="480" width="161.3" height="17" fill="#9aa7b8" rx="2"/><text x="78.9" y="493" font-size="11" fill="#111">emit node:events:456</text></g>
+<g><title>socketOnData websocket.js:1437 — 2038 ms (13.4%)</title><rect x="74.9" y="462" width="160.6" height="17" fill="#c97b5a" rx="2"/><text x="78.9" y="475" font-size="11" fill="#111">socketOnData websocket.j</text></g>
+<g><title>Writable.write writable:502 — 1948 ms (12.8%)</title><rect x="74.9" y="444" width="153.5" height="17" fill="#c97b5a" rx="2"/><text x="78.9" y="457" font-size="11" fill="#111">Writable.write writable</text></g>
+<g><title>_write writable:451 — 1933 ms (12.7%)</title><rect x="74.9" y="426" width="152.3" height="17" fill="#c97b5a" rx="2"/><text x="78.9" y="439" font-size="11" fill="#111">_write writable:451</text></g>
+<g><title>writeOrBuffer writable:546 — 1853 ms (12.2%)</title><rect x="74.9" y="408" width="146.0" height="17" fill="#c97b5a" rx="2"/><text x="78.9" y="421" font-size="11" fill="#111">writeOrBuffer writable</text></g>
+<g><title>_write receiver.js:96 — 1794 ms (11.8%)</title><rect x="74.9" y="390" width="141.4" height="17" fill="#c97b5a" rx="2"/><text x="78.9" y="403" font-size="11" fill="#111">_write receiver.js:96</text></g>
+<g><title>startLoop receiver.js:172 — 1762 ms (11.6%)</title><rect x="74.9" y="372" width="138.9" height="17" fill="#c97b5a" rx="2"/><text x="78.9" y="385" font-size="11" fill="#111">startLoop receiver.js</text></g>
+<g><title>getData receiver.js:480 — 1544 ms (10.1%)</title><rect x="74.9" y="354" width="121.7" height="17" fill="#c97b5a" rx="2"/><text x="78.9" y="367" font-size="11" fill="#111">getData receiver.j</text></g>
+<g><title>dataMessage receiver.js:585 — 1431 ms (9.4%)</title><rect x="74.9" y="336" width="112.8" height="17" fill="#c97b5a" rx="2"/><text x="78.9" y="349" font-size="11" fill="#111">dataMessage recei</text></g>
+<g><title>emit node:events:456 — 1412 ms (9.3%)</title><rect x="74.9" y="318" width="111.3" height="17" fill="#9aa7b8" rx="2"/><text x="78.9" y="331" font-size="11" fill="#111">emit node:events:</text></g>
+<g><title>receiverOnMessage websocket.js:1281 — 1297 ms (8.5%)</title><rect x="74.9" y="300" width="102.2" height="17" fill="#c97b5a" rx="2"/><text x="78.9" y="313" font-size="11" fill="#111">receiverOnMessa</text></g>
+<g><title>emit node:events:456 — 1254 ms (8.2%)</title><rect x="74.9" y="282" width="98.8" height="17" fill="#9aa7b8" rx="2"/><text x="78.9" y="295" font-size="11" fill="#111">emit node:event</text></g>
+<g><title>(anonymous) ws.ts:296 — 1250 ms (8.2%)</title><rect x="74.9" y="264" width="98.5" height="17" fill="#9aa7b8" rx="2"/><text x="78.9" y="277" font-size="11" fill="#111">(anonymous) ws.</text></g>
+<g><title>onMessage ws.ts:250 — 996 ms (6.5%)</title><rect x="74.9" y="246" width="78.5" height="17" fill="#c97b5a" rx="2"/><text x="78.9" y="259" font-size="11" fill="#111">onMessage ws</text></g>
+<g><title>in netsim.ts:76 — 986 ms (6.5%)</title><rect x="74.9" y="228" width="77.7" height="17" fill="#c97b5a" rx="2"/><text x="78.9" y="241" font-size="11" fill="#111">in netsim.t</text></g>
+<g><title>(anonymous) ws.ts:254 — 986 ms (6.5%)</title><rect x="74.9" y="210" width="77.7" height="17" fill="#9aa7b8" rx="2"/><text x="78.9" y="223" font-size="11" fill="#111">(anonymous)</text></g>
+<g><title>parseClientMessage protocol.ts:263 — 11 ms (0.1%)</title><rect x="74.9" y="192" width="0.9" height="17" fill="#c97b5a" rx="2"/></g>
+<g><title>safeParse schemas.js:140 — 8 ms (0.1%)</title><rect x="74.9" y="174" width="0.7" height="17" fill="#c97b5a" rx="2"/></g>
+<g><title>(anonymous) parse.js:41 — 8 ms (0.1%)</title><rect x="74.9" y="156" width="0.7" height="17" fill="#9aa7b8" rx="2"/></g>
+<g><title>inst._zod.parse schemas.js:1424 — 8 ms (0.1%)</title><rect x="74.9" y="138" width="0.7" height="17" fill="#c97b5a" rx="2"/></g>
+<g><title>inst._zod.parse schemas.js:1199 — 7 ms (0.0%)</title><rect x="75.1" y="120" width="0.5" height="17" fill="#c97b5a" rx="2"/></g>
+<g><title>handle ws.ts:226 — 181 ms (1.2%)</title><rect x="75.8" y="192" width="14.2" height="17" fill="#c97b5a" rx="2"/></g>
+<g><title>join ws.ts:198 — 178 ms (1.2%)</title><rect x="75.8" y="174" width="14.0" height="17" fill="#c97b5a" rx="2"/></g>
+<g><title>deliver ws.ts:116 — 9 ms (0.1%)</title><rect x="76.3" y="156" width="0.7" height="17" fill="#c97b5a" rx="2"/></g>
+<g><title>out netsim.ts:68 — 9 ms (0.1%)</title><rect x="76.3" y="138" width="0.7" height="17" fill="#c97b5a" rx="2"/></g>
+<g><title>go ws.ts:121 — 9 ms (0.1%)</title><rect x="76.3" y="120" width="0.7" height="17" fill="#c97b5a" rx="2"/></g>
+<g><title>send ws.ts:78 — 9 ms (0.1%)</title><rect x="76.3" y="102" width="0.7" height="17" fill="#c97b5a" rx="2"/></g>
+<g><title>send websocket.js:476 — 9 ms (0.1%)</title><rect x="76.3" y="84" width="0.7" height="17" fill="#c97b5a" rx="2"/></g>
+<g><title>send sender.js:354 — 9 ms (0.1%)</title><rect x="76.3" y="66" width="0.7" height="17" fill="#c97b5a" rx="2"/></g>
+<g><title>dispatch sender.js:506 — 8 ms (0.1%)</title><rect x="76.3" y="48" width="0.6" height="17" fill="#c97b5a" rx="2"/></g>
+<g><title>sendFrame sender.js:566 — 8 ms (0.1%)</title><rect x="76.3" y="30" width="0.6" height="17" fill="#c97b5a" rx="2"/></g>
+<g><title>join rooms.ts:80 — 158 ms (1.0%)</title><rect x="77.1" y="156" width="12.4" height="17" fill="#c97b5a" rx="2"/></g>
+<g><title>emit node:events:456 — 154 ms (1.0%)</title><rect x="77.1" y="138" width="12.2" height="17" fill="#9aa7b8" rx="2"/></g>
+<g><title>(anonymous) ws.ts:175 — 154 ms (1.0%)</title><rect x="77.1" y="120" width="12.2" height="17" fill="#9aa7b8" rx="2"/></g>
+<g><title>broadcast ws.ts:133 — 154 ms (1.0%)</title><rect x="77.1" y="102" width="12.2" height="17" fill="#c97b5a" rx="2"/></g>
+<g><title>deliver ws.ts:116 — 153 ms (1.0%)</title><rect x="77.1" y="84" width="12.0" height="17" fill="#c97b5a" rx="2"/></g>
+<g><title>out netsim.ts:68 — 149 ms (1.0%)</title><rect x="77.1" y="66" width="11.8" height="17" fill="#c97b5a" rx="2"/></g>
+<g><title>go ws.ts:121 — 149 ms (1.0%)</title><rect x="77.1" y="48" width="11.8" height="17" fill="#c97b5a" rx="2"/></g>
+<g><title>send ws.ts:78 — 149 ms (1.0%)</title><rect x="77.1" y="30" width="11.8" height="17" fill="#c97b5a" rx="2"/></g>
+<g><title>decodeInput index.ts:70 — 415 ms (2.7%)</title><rect x="90.1" y="192" width="32.7" height="17" fill="#c97b5a" rx="2"/></g>
+<g><title>attempt index.ts:59 — 384 ms (2.5%)</title><rect x="90.1" y="174" width="30.3" height="17" fill="#c97b5a" rx="2"/></g>
+<g><title>(anonymous) index.ts:72 — 384 ms (2.5%)</title><rect x="90.1" y="156" width="30.3" height="17" fill="#9aa7b8" rx="2"/></g>
+<g><title>_parse schemas.js:134 — 255 ms (1.7%)</title><rect x="90.1" y="138" width="20.1" height="17" fill="#c97b5a" rx="2"/></g>
+<g><title>fn parse.js:9 — 255 ms (1.7%)</title><rect x="90.1" y="120" width="20.1" height="17" fill="#c97b5a" rx="2"/></g>
+<g><title>inst._zod.parse schemas.js:2390 — 255 ms (1.7%)</title><rect x="90.1" y="102" width="20.1" height="17" fill="#c97b5a" rx="2"/></g>
+<g><title>inst._zod.parse schemas.js:1199 — 181 ms (1.2%)</title><rect x="90.3" y="84" width="14.3" height="17" fill="#c97b5a" rx="2"/></g>
+<g><title>(anonymous) — 165 ms (1.1%)</title><rect x="90.3" y="66" width="13.0" height="17" fill="#9aa7b8" rx="2"/></g>
+<g><title>inst._zod.parse schemas.js:1265 — 48 ms (0.3%)</title><rect x="90.4" y="48" width="3.7" height="17" fill="#c97b5a" rx="2"/></g>
+<g><title>inst._zod.run schemas.js:97 — 57 ms (0.4%)</title><rect x="94.2" y="48" width="4.5" height="17" fill="#c97b5a" rx="2"/></g>
+<g><title>runChecks schemas.js:34 — 29 ms (0.2%)</title><rect x="94.2" y="30" width="2.2" height="17" fill="#c97b5a" rx="2"/></g>
+<g><title>handleReadonlyResult schemas.js:2401 — 71 ms (0.5%)</title><rect x="104.6" y="84" width="5.6" height="17" fill="#c97b5a" rx="2"/></g>
+<g><title>decodeInput binary.ts:197 — 120 ms (0.8%)</title><rect x="110.2" y="138" width="9.4" height="17" fill="#c97b5a" rx="2"/></g>
+<g><title>asView binary.ts:173 — 72 ms (0.5%)</title><rect x="110.2" y="120" width="5.7" height="17" fill="#c97b5a" rx="2"/></g>
+<g><title>header binary.ts:178 — 7 ms (0.0%)</title><rect x="115.8" y="120" width="0.5" height="17" fill="#c97b5a" rx="2"/></g>
+<g><title>acceptInput ws.ts:192 — 348 ms (2.3%)</title><rect x="122.8" y="192" width="27.5" height="17" fill="#c97b5a" rx="2"/></g>
+<g><title>take rate-limit.ts:20 — 64 ms (0.4%)</title><rect x="122.8" y="174" width="5.0" height="17" fill="#c97b5a" rx="2"/></g>
+<g><title>now rate-limit.ts:11 — 64 ms (0.4%)</title><rect x="122.8" y="156" width="5.0" height="17" fill="#c97b5a" rx="2"/></g>
+<g><title>now performance:137 — 56 ms (0.4%)</title><rect x="122.8" y="138" width="4.5" height="17" fill="#c97b5a" rx="2"/></g>
+<g><title>now — 47 ms (0.3%)</title><rect x="122.8" y="120" width="3.7" height="17" fill="#c97b5a" rx="2"/></g>
+<g><title>wrappedFn errors:537 — 9 ms (0.1%)</title><rect x="126.5" y="120" width="0.7" height="17" fill="#c97b5a" rx="2"/></g>
+<g><title>(anonymous) validators:537 — 9 ms (0.1%)</title><rect x="126.5" y="102" width="0.7" height="17" fill="#9aa7b8" rx="2"/></g>
+<g><title>pushInput match.ts:124 — 29 ms (0.2%)</title><rect x="127.8" y="174" width="2.2" height="17" fill="#c97b5a" rx="2"/></g>
+<g><title>toBuffer ws.ts:97 — 10 ms (0.1%)</title><rect x="152.7" y="228" width="0.8" height="17" fill="#c97b5a" rx="2"/></g>
+<g><title>consume receiver.js:127 — 69 ms (0.5%)</title><rect x="187.9" y="336" width="5.5" height="17" fill="#c97b5a" rx="2"/></g>
+<g><title>controlMessage receiver.js:661 — 14 ms (0.1%)</title><rect x="193.3" y="336" width="1.1" height="17" fill="#c97b5a" rx="2"/></g>
+<g><title>emit node:events:456 — 14 ms (0.1%)</title><rect x="193.3" y="318" width="1.1" height="17" fill="#9aa7b8" rx="2"/></g>
+<g><title>receiverOnConclude websocket.js:1200 — 14 ms (0.1%)</title><rect x="193.3" y="300" width="1.1" height="17" fill="#c97b5a" rx="2"/></g>
+<g><title>close websocket.js:323 — 14 ms (0.1%)</title><rect x="193.3" y="282" width="1.1" height="17" fill="#c97b5a" rx="2"/></g>
+<g><title>close sender.js:187 — 14 ms (0.1%)</title><rect x="193.3" y="264" width="1.1" height="17" fill="#c97b5a" rx="2"/></g>
+<g><title>sendFrame sender.js:566 — 14 ms (0.1%)</title><rect x="193.3" y="246" width="1.1" height="17" fill="#c97b5a" rx="2"/></g>
+<g><title>Writable.uncork writable:518 — 14 ms (0.1%)</title><rect x="193.3" y="228" width="1.1" height="17" fill="#c97b5a" rx="2"/></g>
+<g><title>clearBuffer writable:742 — 14 ms (0.1%)</title><rect x="193.3" y="210" width="1.1" height="17" fill="#c97b5a" rx="2"/></g>
+<g><title>doWrite writable:585 — 14 ms (0.1%)</title><rect x="193.3" y="192" width="1.1" height="17" fill="#c97b5a" rx="2"/></g>
+<g><title>Socket._writev node:net:1031 — 14 ms (0.1%)</title><rect x="193.3" y="174" width="1.1" height="17" fill="#9aa7b8" rx="2"/></g>
+<g><title>Socket._writeGeneric node:net:994 — 14 ms (0.1%)</title><rect x="193.3" y="156" width="1.1" height="17" fill="#9aa7b8" rx="2"/></g>
+<g><title>writevGeneric stream_base_commons:121 — 14 ms (0.1%)</title><rect x="193.3" y="138" width="1.1" height="17" fill="#c97b5a" rx="2"/></g>
+<g><title>writev — 14 ms (0.1%)</title><rect x="193.3" y="120" width="1.1" height="17" fill="#c97b5a" rx="2"/></g>
+<g><title>getInfo receiver.js:208 — 61 ms (0.4%)</title><rect x="196.6" y="354" width="4.8" height="17" fill="#c97b5a" rx="2"/></g>
+<g><title>consume receiver.js:127 — 35 ms (0.2%)</title><rect x="196.6" y="336" width="2.8" height="17" fill="#c97b5a" rx="2"/></g>
+<g><title>FastBuffer buffer:960 — 10 ms (0.1%)</title><rect x="196.6" y="318" width="0.8" height="17" fill="#c97b5a" rx="2"/></g>
+<g><title>getMask receiver.js:464 — 15 ms (0.1%)</title><rect x="201.4" y="354" width="1.2" height="17" fill="#c97b5a" rx="2"/></g>
+<g><title>consume receiver.js:127 — 15 ms (0.1%)</title><rect x="201.4" y="336" width="1.2" height="17" fill="#c97b5a" rx="2"/></g>
+<g><title>WritableState.onwrite writable:350 — 12 ms (0.1%)</title><rect x="202.6" y="354" width="0.9" height="17" fill="#c97b5a" rx="2"/></g>
+<g><title>onwrite writable:613 — 7 ms (0.0%)</title><rect x="202.6" y="336" width="0.5" height="17" fill="#c97b5a" rx="2"/></g>
+<g><title>_write writable:451 — 13 ms (0.1%)</title><rect x="228.5" y="444" width="1.0" height="17" fill="#c97b5a" rx="2"/></g>
+<g><title>writeOrBuffer writable:546 — 13 ms (0.1%)</title><rect x="228.5" y="426" width="1.0" height="17" fill="#c97b5a" rx="2"/></g>
+<g><title>_write receiver.js:96 — 13 ms (0.1%)</title><rect x="228.5" y="408" width="1.0" height="17" fill="#c97b5a" rx="2"/></g>
+<g><title>startLoop receiver.js:172 — 13 ms (0.1%)</title><rect x="228.5" y="390" width="1.0" height="17" fill="#c97b5a" rx="2"/></g>
+<g><title>getData receiver.js:480 — 8 ms (0.1%)</title><rect x="228.5" y="372" width="0.6" height="17" fill="#c97b5a" rx="2"/></g>
+<g><title>maybeReadMore readable:859 — 78 ms (0.5%)</title><rect x="236.2" y="480" width="6.1" height="17" fill="#c97b5a" rx="2"/></g>
+<g><title>nextTick task_queues:113 — 64 ms (0.4%)</title><rect x="236.2" y="462" width="5.0" height="17" fill="#c97b5a" rx="2"/></g>
+<g><title>readableAddChunkPushByteMode readable:465 — 317 ms (2.1%)</title><rect x="248.4" y="534" width="25.0" height="17" fill="#c97b5a" rx="2"/></g>
+<g><title>addChunk readable:552 — 312 ms (2.1%)</title><rect x="248.4" y="516" width="24.6" height="17" fill="#c97b5a" rx="2"/></g>
+<g><title>emit node:events:456 — 275 ms (1.8%)</title><rect x="248.4" y="498" width="21.7" height="17" fill="#9aa7b8" rx="2"/></g>
+<g><title>socketOnData websocket.js:1437 — 270 ms (1.8%)</title><rect x="248.4" y="480" width="21.3" height="17" fill="#c97b5a" rx="2"/></g>
+<g><title>_write writable:451 — 119 ms (0.8%)</title><rect x="248.4" y="462" width="9.4" height="17" fill="#c97b5a" rx="2"/></g>
+<g><title>writeOrBuffer writable:546 — 117 ms (0.8%)</title><rect x="248.4" y="444" width="9.3" height="17" fill="#c97b5a" rx="2"/></g>
+<g><title>_write receiver.js:96 — 116 ms (0.8%)</title><rect x="248.4" y="426" width="9.1" height="17" fill="#c97b5a" rx="2"/></g>
+<g><title>startLoop receiver.js:172 — 114 ms (0.8%)</title><rect x="248.4" y="408" width="9.0" height="17" fill="#c97b5a" rx="2"/></g>
+<g><title>getData receiver.js:480 — 99 ms (0.7%)</title><rect x="248.4" y="390" width="7.8" height="17" fill="#c97b5a" rx="2"/></g>
+<g><title>dataMessage receiver.js:585 — 94 ms (0.6%)</title><rect x="248.4" y="372" width="7.4" height="17" fill="#c97b5a" rx="2"/></g>
+<g><title>emit node:events:456 — 88 ms (0.6%)</title><rect x="248.4" y="354" width="7.0" height="17" fill="#9aa7b8" rx="2"/></g>
+<g><title>receiverOnMessage websocket.js:1281 — 87 ms (0.6%)</title><rect x="248.4" y="336" width="6.8" height="17" fill="#c97b5a" rx="2"/></g>
+<g><title>emit node:events:456 — 80 ms (0.5%)</title><rect x="248.4" y="318" width="6.3" height="17" fill="#9aa7b8" rx="2"/></g>
+<g><title>(anonymous) ws.ts:296 — 77 ms (0.5%)</title><rect x="248.4" y="300" width="6.1" height="17" fill="#9aa7b8" rx="2"/></g>
+<g><title>in netsim.ts:76 — 69 ms (0.5%)</title><rect x="248.4" y="282" width="5.5" height="17" fill="#c97b5a" rx="2"/></g>
+<g><title>(anonymous) ws.ts:254 — 66 ms (0.4%)</title><rect x="248.4" y="264" width="5.2" height="17" fill="#9aa7b8" rx="2"/></g>
+<g><title>decodeInput index.ts:70 — 38 ms (0.3%)</title><rect x="248.4" y="246" width="3.0" height="17" fill="#c97b5a" rx="2"/></g>
+<g><title>decodeInput binary.ts:197 — 17 ms (0.1%)</title><rect x="248.4" y="228" width="1.3" height="17" fill="#c97b5a" rx="2"/></g>
+<g><title>_parse schemas.js:134 — 18 ms (0.1%)</title><rect x="249.7" y="228" width="1.4" height="17" fill="#c97b5a" rx="2"/></g>
+<g><title>fn parse.js:9 — 17 ms (0.1%)</title><rect x="249.7" y="210" width="1.3" height="17" fill="#c97b5a" rx="2"/></g>
+<g><title>inst._zod.parse schemas.js:1199 — 17 ms (0.1%)</title><rect x="249.7" y="192" width="1.3" height="17" fill="#c97b5a" rx="2"/></g>
+<g><title>(anonymous) — 15 ms (0.1%)</title><rect x="249.7" y="174" width="1.2" height="17" fill="#9aa7b8" rx="2"/></g>
+<g><title>acceptInput ws.ts:192 — 21 ms (0.1%)</title><rect x="251.4" y="246" width="1.7" height="17" fill="#c97b5a" rx="2"/></g>
+<g><title>take rate-limit.ts:20 — 15 ms (0.1%)</title><rect x="251.4" y="228" width="1.2" height="17" fill="#c97b5a" rx="2"/></g>
+<g><title>now rate-limit.ts:11 — 10 ms (0.1%)</title><rect x="251.4" y="210" width="0.8" height="17" fill="#c97b5a" rx="2"/></g>
+<g><title>now — 7 ms (0.0%)</title><rect x="251.4" y="192" width="0.5" height="17" fill="#c97b5a" rx="2"/></g>
+<g><title>getInfo receiver.js:208 — 8 ms (0.1%)</title><rect x="256.4" y="390" width="0.6" height="17" fill="#c97b5a" rx="2"/></g>
+<g><title>consume receiver.js:127 — 8 ms (0.1%)</title><rect x="256.4" y="372" width="0.6" height="17" fill="#c97b5a" rx="2"/></g>
+<g><title>FastBuffer buffer:960 — 7 ms (0.0%)</title><rect x="256.4" y="354" width="0.5" height="17" fill="#c97b5a" rx="2"/></g>
+<g><title>Writable.write writable:502 — 140 ms (0.9%)</title><rect x="257.8" y="462" width="11.0" height="17" fill="#c97b5a" rx="2"/></g>
+<g><title>_write writable:451 — 139 ms (0.9%)</title><rect x="257.8" y="444" width="11.0" height="17" fill="#c97b5a" rx="2"/></g>
+<g><title>writeOrBuffer writable:546 — 139 ms (0.9%)</title><rect x="257.8" y="426" width="11.0" height="17" fill="#c97b5a" rx="2"/></g>
+<g><title>_write receiver.js:96 — 137 ms (0.9%)</title><rect x="257.8" y="408" width="10.8" height="17" fill="#c97b5a" rx="2"/></g>
+<g><title>startLoop receiver.js:172 — 137 ms (0.9%)</title><rect x="257.8" y="390" width="10.8" height="17" fill="#c97b5a" rx="2"/></g>
+<g><title>getData receiver.js:480 — 119 ms (0.8%)</title><rect x="257.8" y="372" width="9.4" height="17" fill="#c97b5a" rx="2"/></g>
+<g><title>dataMessage receiver.js:585 — 111 ms (0.7%)</title><rect x="257.8" y="354" width="8.8" height="17" fill="#c97b5a" rx="2"/></g>
+<g><title>emit node:events:456 — 108 ms (0.7%)</title><rect x="257.8" y="336" width="8.5" height="17" fill="#9aa7b8" rx="2"/></g>
+<g><title>receiverOnMessage websocket.js:1281 — 98 ms (0.6%)</title><rect x="257.8" y="318" width="7.7" height="17" fill="#c97b5a" rx="2"/></g>
+<g><title>emit node:events:456 — 95 ms (0.6%)</title><rect x="257.8" y="300" width="7.5" height="17" fill="#9aa7b8" rx="2"/></g>
+<g><title>(anonymous) ws.ts:296 — 95 ms (0.6%)</title><rect x="257.8" y="282" width="7.5" height="17" fill="#9aa7b8" rx="2"/></g>
+<g><title>onMessage ws.ts:250 — 78 ms (0.5%)</title><rect x="257.8" y="264" width="6.1" height="17" fill="#c97b5a" rx="2"/></g>
+<g><title>in netsim.ts:76 — 75 ms (0.5%)</title><rect x="257.8" y="246" width="5.9" height="17" fill="#c97b5a" rx="2"/></g>
+<g><title>(anonymous) ws.ts:254 — 75 ms (0.5%)</title><rect x="257.8" y="228" width="5.9" height="17" fill="#9aa7b8" rx="2"/></g>
+<g><title>decodeInput index.ts:70 — 50 ms (0.3%)</title><rect x="257.8" y="210" width="4.0" height="17" fill="#c97b5a" rx="2"/></g>
+<g><title>attempt index.ts:59 — 41 ms (0.3%)</title><rect x="257.8" y="192" width="3.2" height="17" fill="#c97b5a" rx="2"/></g>
+<g><title>(anonymous) index.ts:72 — 41 ms (0.3%)</title><rect x="257.8" y="174" width="3.2" height="17" fill="#9aa7b8" rx="2"/></g>
+<g><title>decodeInput binary.ts:197 — 18 ms (0.1%)</title><rect x="257.8" y="156" width="1.4" height="17" fill="#c97b5a" rx="2"/></g>
+<g><title>asView binary.ts:173 — 10 ms (0.1%)</title><rect x="257.8" y="138" width="0.8" height="17" fill="#c97b5a" rx="2"/></g>
+<g><title>header binary.ts:178 — 6 ms (0.0%)</title><rect x="258.6" y="138" width="0.5" height="17" fill="#c97b5a" rx="2"/></g>
+<g><title>_parse schemas.js:134 — 20 ms (0.1%)</title><rect x="259.2" y="156" width="1.6" height="17" fill="#c97b5a" rx="2"/></g>
+<g><title>fn parse.js:9 — 20 ms (0.1%)</title><rect x="259.2" y="138" width="1.6" height="17" fill="#c97b5a" rx="2"/></g>
+<g><title>inst._zod.parse schemas.js:2390 — 20 ms (0.1%)</title><rect x="259.2" y="120" width="1.6" height="17" fill="#c97b5a" rx="2"/></g>
+<g><title>inst._zod.parse schemas.js:1199 — 15 ms (0.1%)</title><rect x="259.6" y="102" width="1.2" height="17" fill="#c97b5a" rx="2"/></g>
+<g><title>(anonymous) — 15 ms (0.1%)</title><rect x="259.6" y="84" width="1.2" height="17" fill="#9aa7b8" rx="2"/></g>
+<g><title>acceptInput ws.ts:192 — 21 ms (0.1%)</title><rect x="261.7" y="210" width="1.7" height="17" fill="#c97b5a" rx="2"/></g>
+<g><title>getInfo receiver.js:208 — 8 ms (0.1%)</title><rect x="267.3" y="372" width="0.6" height="17" fill="#c97b5a" rx="2"/></g>
+<g><title>nextTick task_queues:113 — 23 ms (0.2%)</title><rect x="270.1" y="498" width="1.8" height="17" fill="#c97b5a" rx="2"/></g>
+<g><title>FastBuffer buffer:960 — 8 ms (0.1%)</title><rect x="273.4" y="534" width="0.6" height="17" fill="#c97b5a" rx="2"/></g>
+<g><title>processTimers timers:526 — 11583 ms (76.1%)</title><rect x="285.8" y="552" width="912.9" height="17" fill="#c97b5a" rx="2"/><text x="289.8" y="565" font-size="11" fill="#111">processTimers timers:526</text></g>
+<g><title>listOnTimeout timers:546 — 11565 ms (76.0%)</title><rect x="285.8" y="534" width="911.5" height="17" fill="#c97b5a" rx="2"/><text x="289.8" y="547" font-size="11" fill="#111">listOnTimeout timers:546</text></g>
+<g><title>loop match.ts:185 — 11527 ms (75.7%)</title><rect x="285.8" y="516" width="908.5" height="17" fill="#c97b5a" rx="2"/><text x="289.8" y="529" font-size="11" fill="#111">loop match.ts:185</text></g>
+<g><title>step match.ts:145 — 11446 ms (75.2%)</title><rect x="285.8" y="498" width="902.1" height="17" fill="#c97b5a" rx="2"/><text x="289.8" y="511" font-size="11" fill="#111">step match.ts:145</text></g>
+<g><title>step world.ts:155 — 657 ms (4.3%)</title><rect x="285.8" y="480" width="51.8" height="17" fill="#c97b5a" rx="2"/></g>
+<g><title>detect spatial-hash.ts:31 — 180 ms (1.2%)</title><rect x="285.8" y="462" width="14.2" height="17" fill="#c97b5a" rx="2"/></g>
+<g><title>(anonymous) world.ts:105 — 12 ms (0.1%)</title><rect x="285.8" y="444" width="1.0" height="17" fill="#9aa7b8" rx="2"/></g>
+<g><title>update ship.ts:128 — 122 ms (0.8%)</title><rect x="300.1" y="462" width="9.6" height="17" fill="#c97b5a" rx="2"/></g>
+<g><title>fire ship.ts:168 — 27 ms (0.2%)</title><rect x="300.1" y="444" width="2.1" height="17" fill="#c97b5a" rx="2"/></g>
+<g><title>Bullet bullet.ts:21 — 15 ms (0.1%)</title><rect x="300.1" y="426" width="1.2" height="17" fill="#c97b5a" rx="2"/></g>
+<g><title>stepShip ship-physics.ts:54 — 30 ms (0.2%)</title><rect x="302.2" y="444" width="2.3" height="17" fill="#c97b5a" rx="2"/></g>
+<g><title>chaser components.ts:49 — 8 ms (0.1%)</title><rect x="304.5" y="444" width="0.6" height="17" fill="#c97b5a" rx="2"/></g>
+<g><title>input components.ts:43 — 7 ms (0.0%)</title><rect x="305.4" y="444" width="0.6" height="17" fill="#c97b5a" rx="2"/></g>
+<g><title>homingSystem systems.ts:9 — 113 ms (0.7%)</title><rect x="309.7" y="462" width="8.9" height="17" fill="#c97b5a" rx="2"/></g>
+<g><title>(anonymous) world.ts:105 — 9 ms (0.1%)</title><rect x="309.7" y="444" width="0.7" height="17" fill="#9aa7b8" rx="2"/></g>
+<g><title>nearest world.ts:119 — 80 ms (0.5%)</title><rect x="310.4" y="444" width="6.3" height="17" fill="#c97b5a" rx="2"/></g>
+<g><title>(anonymous) systems.ts:17 — 15 ms (0.1%)</title><rect x="310.4" y="426" width="1.2" height="17" fill="#9aa7b8" rx="2"/></g>
+<g><title>(anonymous) world.ts:105 — 24 ms (0.2%)</title><rect x="311.6" y="426" width="1.9" height="17" fill="#9aa7b8" rx="2"/></g>
+<g><title>#sweep world.ts:172 — 10 ms (0.1%)</title><rect x="318.6" y="462" width="0.8" height="17" fill="#c97b5a" rx="2"/></g>
+<g><title>(anonymous) world.ts:105 — 28 ms (0.2%)</title><rect x="319.4" y="462" width="2.2" height="17" fill="#9aa7b8" rx="2"/></g>
+<g><title>update bullet.ts:28 — 72 ms (0.5%)</title><rect x="321.6" y="462" width="5.7" height="17" fill="#c97b5a" rx="2"/></g>
+<g><title>update entity.ts:74 — 8 ms (0.1%)</title><rect x="322.1" y="444" width="0.6" height="17" fill="#c97b5a" rx="2"/></g>
+<g><title>resolveCollisions collision.ts:92 — 15 ms (0.1%)</title><rect x="327.3" y="462" width="1.2" height="17" fill="#c97b5a" rx="2"/></g>
+<g><title>react collision.ts:43 — 12 ms (0.1%)</title><rect x="327.3" y="444" width="0.9" height="17" fill="#c97b5a" rx="2"/></g>
+<g><title>spawnerSystem spawner.ts:25 — 29 ms (0.2%)</title><rect x="328.6" y="462" width="2.3" height="17" fill="#c97b5a" rx="2"/></g>
+<g><title>spawnPickup spawner.ts:107 — 16 ms (0.1%)</title><rect x="328.6" y="444" width="1.3" height="17" fill="#c97b5a" rx="2"/></g>
+<g><title>findSafeSpot world.ts:134 — 13 ms (0.1%)</title><rect x="328.6" y="426" width="1.0" height="17" fill="#c97b5a" rx="2"/></g>
+<g><title>nearest world.ts:119 — 10 ms (0.1%)</title><rect x="328.6" y="408" width="0.8" height="17" fill="#c97b5a" rx="2"/></g>
+<g><title>match.onSnapshot ws.ts:145 — 10456 ms (68.7%)</title><rect x="337.6" y="480" width="824.1" height="17" fill="#c97b5a" rx="2"/><text x="341.6" y="493" font-size="11" fill="#111">match.onSnapshot ws.ts:145</text></g>
+<g><title>deliver ws.ts:116 — 7885 ms (51.8%)</title><rect x="337.6" y="462" width="621.5" height="17" fill="#c97b5a" rx="2"/><text x="341.6" y="475" font-size="11" fill="#111">deliver ws.ts:116</text></g>
+<g><title>out netsim.ts:68 — 7706 ms (50.6%)</title><rect x="337.6" y="444" width="607.3" height="17" fill="#c97b5a" rx="2"/><text x="341.6" y="457" font-size="11" fill="#111">out netsim.ts:68</text></g>
+<g><title>go ws.ts:121 — 7704 ms (50.6%)</title><rect x="337.6" y="426" width="607.2" height="17" fill="#c97b5a" rx="2"/><text x="341.6" y="439" font-size="11" fill="#111">go ws.ts:121</text></g>
+<g><title>send ws.ts:78 — 7704 ms (50.6%)</title><rect x="337.6" y="408" width="607.2" height="17" fill="#c97b5a" rx="2"/><text x="341.6" y="421" font-size="11" fill="#111">send ws.ts:78</text></g>
+<g><title>send websocket.js:476 — 7694 ms (50.5%)</title><rect x="337.6" y="390" width="606.4" height="17" fill="#c97b5a" rx="2"/><text x="341.6" y="403" font-size="11" fill="#111">send websocket.js:476</text></g>
+<g><title>send sender.js:354 — 7686 ms (50.5%)</title><rect x="337.6" y="372" width="605.8" height="17" fill="#c97b5a" rx="2"/><text x="341.6" y="385" font-size="11" fill="#111">send sender.js:354</text></g>
+<g><title>dispatch sender.js:506 — 7550 ms (49.6%)</title><rect x="337.6" y="354" width="595.0" height="17" fill="#c97b5a" rx="2"/><text x="341.6" y="367" font-size="11" fill="#111">dispatch sender.js:506</text></g>
+<g><title>sendFrame sender.js:566 — 7477 ms (49.1%)</title><rect x="337.6" y="336" width="589.3" height="17" fill="#c97b5a" rx="2"/><text x="341.6" y="349" font-size="11" fill="#111">sendFrame sender.js:566</text></g>
+<g><title>Writable.write writable:502 — 63 ms (0.4%)</title><rect x="337.6" y="318" width="4.9" height="17" fill="#c97b5a" rx="2"/></g>
+<g><title>_write writable:451 — 52 ms (0.3%)</title><rect x="337.6" y="300" width="4.1" height="17" fill="#c97b5a" rx="2"/></g>
+<g><title>writeOrBuffer writable:546 — 50 ms (0.3%)</title><rect x="337.6" y="282" width="4.0" height="17" fill="#c97b5a" rx="2"/></g>
+<g><title>_write receiver.js:96 — 6 ms (0.0%)</title><rect x="337.6" y="264" width="0.5" height="17" fill="#c97b5a" rx="2"/></g>
+<g><title>clearBuffer writable:742 — 542 ms (3.6%)</title><rect x="342.6" y="318" width="42.7" height="17" fill="#c97b5a" rx="2"/></g>
+<g><title>doWrite writable:585 — 541 ms (3.6%)</title><rect x="342.6" y="300" width="42.6" height="17" fill="#c97b5a" rx="2"/></g>
+<g><title>Socket._writev node:net:1031 — 541 ms (3.6%)</title><rect x="342.6" y="282" width="42.6" height="17" fill="#9aa7b8" rx="2"/></g>
+<g><title>Socket._writeGeneric node:net:994 — 541 ms (3.6%)</title><rect x="342.6" y="264" width="42.6" height="17" fill="#9aa7b8" rx="2"/></g>
+<g><title>writevGeneric stream_base_commons:121 — 533 ms (3.5%)</title><rect x="342.6" y="246" width="42.0" height="17" fill="#c97b5a" rx="2"/></g>
+<g><title>writev — 502 ms (3.3%)</title><rect x="342.6" y="228" width="39.6" height="17" fill="#c97b5a" rx="2"/></g>
+<g><title>WritableState.onwrite writable:350 — 13 ms (0.1%)</title><rect x="382.1" y="228" width="1.0" height="17" fill="#c97b5a" rx="2"/></g>
+<g><title>Writable.uncork writable:518 — 6827 ms (44.8%)</title><rect x="385.7" y="318" width="538.0" height="17" fill="#c97b5a" rx="2"/><text x="389.7" y="331" font-size="11" fill="#111">Writable.uncork writable:518</text></g>
+<g><title>clearBuffer writable:742 — 6827 ms (44.8%)</title><rect x="385.7" y="300" width="538.0" height="17" fill="#c97b5a" rx="2"/><text x="389.7" y="313" font-size="11" fill="#111">clearBuffer writable:742</text></g>
+<g><title>doWrite writable:585 — 6773 ms (44.5%)</title><rect x="385.7" y="282" width="533.8" height="17" fill="#c97b5a" rx="2"/><text x="389.7" y="295" font-size="11" fill="#111">doWrite writable:585</text></g>
+<g><title>Socket._writev node:net:1031 — 6773 ms (44.5%)</title><rect x="385.7" y="264" width="533.8" height="17" fill="#9aa7b8" rx="2"/><text x="389.7" y="277" font-size="11" fill="#111">Socket._writev node:net:1031</text></g>
+<g><title>Socket._writeGeneric node:net:994 — 6773 ms (44.5%)</title><rect x="385.7" y="246" width="533.8" height="17" fill="#9aa7b8" rx="2"/><text x="389.7" y="259" font-size="11" fill="#111">Socket._writeGeneric node:net:994</text></g>
+<g><title>writevGeneric stream_base_commons:121 — 6768 ms (44.5%)</title><rect x="385.7" y="228" width="533.5" height="17" fill="#c97b5a" rx="2"/><text x="389.7" y="241" font-size="11" fill="#111">writevGeneric stream_base_commons:121</text></g>
+<g><title>writev — 6550 ms (43.0%)</title><rect x="385.7" y="210" width="516.2" height="17" fill="#c97b5a" rx="2"/><text x="389.7" y="223" font-size="11" fill="#111">writev</text></g>
+<g><title>afterWriteDispatched stream_base_commons:154 — 22 ms (0.1%)</title><rect x="902.1" y="210" width="1.7" height="17" fill="#c97b5a" rx="2"/></g>
+<g><title>WritableState.onwrite writable:350 — 22 ms (0.1%)</title><rect x="902.1" y="192" width="1.7" height="17" fill="#c97b5a" rx="2"/></g>
+<g><title>onwrite writable:613 — 19 ms (0.1%)</title><rect x="902.1" y="174" width="1.5" height="17" fill="#c97b5a" rx="2"/></g>
+<g><title>createWriteWrap stream_base_commons:108 — 70 ms (0.5%)</title><rect x="903.8" y="210" width="5.5" height="17" fill="#c97b5a" rx="2"/></g>
+<g><title>frame sender.js:79 — 58 ms (0.4%)</title><rect x="926.9" y="336" width="4.6" height="17" fill="#c97b5a" rx="2"/></g>
+<g><title>allocUnsafe node:buffer:452 — 14 ms (0.1%)</title><rect x="927.6" y="318" width="1.1" height="17" fill="#9aa7b8" rx="2"/></g>
+<g><title>allocate node:buffer:479 — 14 ms (0.1%)</title><rect x="927.6" y="300" width="1.1" height="17" fill="#9aa7b8" rx="2"/></g>
+<g><title>FastBuffer buffer:960 — 14 ms (0.1%)</title><rect x="927.6" y="282" width="1.1" height="17" fill="#c97b5a" rx="2"/></g>
+<g><title>toBuffer buffer-util.js:89 — 39 ms (0.3%)</title><rect x="932.7" y="354" width="3.1" height="17" fill="#c97b5a" rx="2"/></g>
+<g><title>FastBuffer buffer:960 — 7 ms (0.0%)</title><rect x="932.7" y="336" width="0.5" height="17" fill="#c97b5a" rx="2"/></g>
+<g><title>get bufferedAmount websocket.js:141 — 9 ms (0.1%)</title><rect x="944.1" y="390" width="0.7" height="17" fill="#c97b5a" rx="2"/></g>
+<g><title>withSnapshotHeader binary.ts:319 — 1790 ms (11.8%)</title><rect x="959.1" y="462" width="141.1" height="17" fill="#c97b5a" rx="2"/><text x="963.1" y="475" font-size="11" fill="#111">withSnapshotHeader bi</text></g>
+<g><title>encodeSnapshot binary.ts:212 — 167 ms (1.1%)</title><rect x="1100.2" y="462" width="13.2" height="17" fill="#c97b5a" rx="2"/></g>
+<g><title>u32 binary.ts:111 — 13 ms (0.1%)</title><rect x="1100.4" y="444" width="1.0" height="17" fill="#c97b5a" rx="2"/></g>
+<g><title>Writer binary.ts:86 — 42 ms (0.3%)</title><rect x="1102.4" y="444" width="3.3" height="17" fill="#c97b5a" rx="2"/></g>
+<g><title>ackFor match.ts:130 — 53 ms (0.3%)</title><rect x="1113.3" y="462" width="4.2" height="17" fill="#c97b5a" rx="2"/></g>
+<g><title>clientsIn ws.ts:127 — 14 ms (0.1%)</title><rect x="1117.5" y="462" width="1.1" height="17" fill="#c97b5a" rx="2"/></g>
+<g><title>take player-input.ts:48 — 37 ms (0.2%)</title><rect x="1161.8" y="480" width="2.9" height="17" fill="#c97b5a" rx="2"/></g>
+<g><title>now performance:137 — 11 ms (0.1%)</title><rect x="1164.6" y="480" width="0.9" height="17" fill="#c97b5a" rx="2"/></g>
+<g><title>snapshotEntities snapshot.ts:78 — 120 ms (0.8%)</title><rect x="1165.5" y="480" width="9.4" height="17" fill="#c97b5a" rx="2"/></g>
+<g><title>entityToData snapshot.ts:10 — 89 ms (0.6%)</title><rect x="1165.5" y="462" width="7.1" height="17" fill="#c97b5a" rx="2"/></g>
+<g><title>angle vector.ts:66 — 36 ms (0.2%)</title><rect x="1165.5" y="444" width="2.8" height="17" fill="#c97b5a" rx="2"/></g>
+<g><title>(anonymous) world.ts:105 — 12 ms (0.1%)</title><rect x="1172.6" y="462" width="1.0" height="17" fill="#9aa7b8" rx="2"/></g>
+<g><title>setTimeout node:timers:115 — 26 ms (0.2%)</title><rect x="1187.9" y="498" width="2.0" height="17" fill="#9aa7b8" rx="2"/></g>
+<g><title>insert timers:387 — 17 ms (0.1%)</title><rect x="1188.4" y="480" width="1.4" height="17" fill="#c97b5a" rx="2"/></g>
+<g><title>insert timers:387 — 26 ms (0.2%)</title><rect x="1190.0" y="498" width="2.1" height="17" fill="#c97b5a" rx="2"/></g>
+<g><title>getLibuvNow — 7 ms (0.0%)</title><rect x="1190.0" y="480" width="0.6" height="17" fill="#c97b5a" rx="2"/></g>
+<g><title>percolateDown priority_queue:38 — 6 ms (0.0%)</title><rect x="1194.4" y="516" width="0.5" height="17" fill="#c97b5a" rx="2"/></g>
+<g><title>(anonymous) heartbeat.ts:20 — 15 ms (0.1%)</title><rect x="1194.9" y="516" width="1.1" height="17" fill="#9aa7b8" rx="2"/></g>
+<g><title>ping websocket.js:388 — 13 ms (0.1%)</title><rect x="1194.9" y="498" width="1.0" height="17" fill="#c97b5a" rx="2"/></g>
+<g><title>ping sender.js:242 — 13 ms (0.1%)</title><rect x="1194.9" y="480" width="1.0" height="17" fill="#c97b5a" rx="2"/></g>
+<g><title>sendFrame sender.js:566 — 13 ms (0.1%)</title><rect x="1195.0" y="462" width="1.0" height="17" fill="#c97b5a" rx="2"/></g>
+<g><title>Writable.write writable:502 — 12 ms (0.1%)</title><rect x="1195.0" y="444" width="1.0" height="17" fill="#c97b5a" rx="2"/></g>
+<g><title>_write writable:451 — 12 ms (0.1%)</title><rect x="1195.0" y="426" width="1.0" height="17" fill="#c97b5a" rx="2"/></g>
+<g><title>writeOrBuffer writable:546 — 12 ms (0.1%)</title><rect x="1195.0" y="408" width="1.0" height="17" fill="#c97b5a" rx="2"/></g>
+<g><title>Socket._write node:net:1036 — 12 ms (0.1%)</title><rect x="1195.0" y="390" width="1.0" height="17" fill="#9aa7b8" rx="2"/></g>
+<g><title>Socket._writeGeneric node:net:994 — 12 ms (0.1%)</title><rect x="1195.0" y="372" width="1.0" height="17" fill="#9aa7b8" rx="2"/></g>
+<g><title>writeGeneric stream_base_commons:146 — 12 ms (0.1%)</title><rect x="1195.0" y="354" width="1.0" height="17" fill="#c97b5a" rx="2"/></g>
+<g><title>handleWriteReq stream_base_commons:46 — 12 ms (0.1%)</title><rect x="1195.0" y="336" width="1.0" height="17" fill="#c97b5a" rx="2"/></g>
+<g><title>writeBuffer — 12 ms (0.1%)</title><rect x="1195.0" y="318" width="1.0" height="17" fill="#c97b5a" rx="2"/></g>
+<g><title>(anonymous) node:net:348 — 8 ms (0.1%)</title><rect x="1199.3" y="552" width="0.6" height="17" fill="#9aa7b8" rx="2"/></g>
+<g><title>emit node:events:456 — 8 ms (0.1%)</title><rect x="1199.3" y="534" width="0.6" height="17" fill="#9aa7b8" rx="2"/></g>
+<g><title>socketOnClose websocket.js:1385 — 8 ms (0.1%)</title><rect x="1199.3" y="516" width="0.6" height="17" fill="#c97b5a" rx="2"/></g>
+</svg>

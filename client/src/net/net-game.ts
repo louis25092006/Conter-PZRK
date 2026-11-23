@@ -7,25 +7,21 @@ import {
 } from '../../../shared/src/sim/ship-physics.ts'
 import { ARENA_SIZE } from '../../../shared/src/sim/arena.ts'
 import { Asteroid, RADIUS } from '../../../shared/src/sim/asteroid.ts'
-import { Explosion } from '../../../shared/src/sim/explosion.ts'
-import { Vector2 } from '../../../shared/src/sim/vector.ts'
+import type { Explosion } from '../../../shared/src/sim/explosion.ts'
 import { createRng } from '../../../shared/src/sim/random.ts'
 import { codecs, byteSize, type Codec } from '../../../shared/src/codec/index.ts'
 import { Bus } from '../../../shared/src/bus.ts'
-import {
-  toSeq,
-  assertNever,
-  EFFECT_NAMES,
-  type EffectName,
-  type EntityId,
-  type Seq,
-} from '../../../shared/src/types.ts'
+import { reconcile, type PendingInput } from '../../../shared/src/net/reconcile.ts'
+import { createParticles, burst, stepParticles, type ParticleBuffer } from '../fx/particles.ts'
+import { Pool, ShipSlot, BulletSlot, AsteroidSlot, PickupSlot, syncEffects } from './view-pool.ts'
+import { perfStart, perfEnd } from '../perf.ts'
+import { toSeq, assertNever, type EffectName, type EntityId, type Seq } from '../../../shared/src/types.ts'
 import type { EntityData, NetsimConfig, ShipData, Snapshot } from '../../../shared/src/protocol.ts'
 import type { GameEvent, GameEvents } from '../../../shared/src/events.ts'
 import type { ArenaConfig } from '../../../shared/src/arena-config.ts'
 import { Connection, socketUrl } from './connection.ts'
 import { botCommand, type PlayerCommand } from '../game/commands.ts'
-import type { AsteroidView, BulletView, PickupView, Scene, ShipView } from '../render/draw.ts'
+import type { AsteroidView, BulletView, ParticleLayer, PickupView, Scene, ShipView } from '../render/draw.ts'
 import type { HudPlayer, HudWorld } from '../hud.ts'
 
 // Онлайн-гра (Lab 5), Lab 6 — під strict. Сервер — єдина правда; клієнт:
@@ -64,10 +60,6 @@ export interface NetStats {
   starved: number
 }
 
-interface Pending {
-  readonly seq: Seq
-  readonly cmd: PlayerCommand
-}
 interface PredictedBullet {
   readonly spawnSeq: Seq
   x: number
@@ -101,10 +93,10 @@ function lerpAngle(a: number, b: number, t: number): number {
   while (d < -Math.PI) d += Math.PI * 2
   return a + d * t
 }
-function effectsMap(e: ShipData['effects']): Map<EffectName, number> {
-  const m = new Map<EffectName, number>()
-  for (const name of EFFECT_NAMES) if (e[name] > 0) m.set(name, e[name])
-  return m
+
+// HUD-об'єкт, який оновлюємо на місці (-readonly знімає readonly з полів HudPlayer)
+type MutableHudPlayer = { -readonly [K in keyof HudPlayer]: HudPlayer[K] } & {
+  effects: Map<EffectName, number>
 }
 
 // те саме, що Scene, але з масивами, куди можна додавати
@@ -114,6 +106,7 @@ interface SceneItems {
   asteroid: AsteroidView[]
   pickup: PickupView[]
   explosion: Explosion[]
+  particles: ParticleLayer[]
 }
 
 export class NetGame {
@@ -145,7 +138,7 @@ export class NetGame {
   you: EntityId | null = null
   ack: Seq = toSeq(0)
   seq = 0
-  pending: Pending[] = [] // надіслані, але ще не підтверджені сервером
+  pending: PendingInput[] = [] // надіслані, але ще не підтверджені сервером
   predicted: MotionState | null = null
   prevPredicted: MotionState | null = null
   offset = { x: 0, y: 0 } // візуальне згладжування поправки
@@ -153,7 +146,9 @@ export class NetGame {
   snapshots: StoredSnapshot[] = []
   clockOffset: number | null = null // performance.now() - tick*tickMs (згладжено)
   predictedBullets: PredictedBullet[] = []
-  fx: Explosion[] = [] // локальні вибухи (частинки) за подіями
+  // Lab 7: частинки вибухів — Float32Array на колір (fx/particles.ts), а не об'єкти Explosion:
+  // вибух живе ~1 с, і його об'єкти встигали «постаріти» й потрапити в старе покоління GC
+  readonly particleLayers = new Map<string, ParticleLayer & ParticleBuffer>()
   readonly fxRng = createRng(7)
   readonly asteroidCache = new Map<EntityId, Asteroid>()
   names = new Map<EntityId, string>() // shipId -> ім'я (з roster)
@@ -207,7 +202,9 @@ export class NetGame {
       this.#push(this.stats.rtts, this.stats.rtt)
     })
     e.on('binary', (buf) => {
+      const t0 = perfStart()
       const snap = this.codec.decodeSnapshot(buf)
+      perfEnd('decode', t0)
       if (snap.ok) this.#onSnapshot(snap.value, buf.byteLength)
       else console.warn('[net] bad snapshot:', snap.error)
     })
@@ -277,8 +274,8 @@ export class NetGame {
       b.ttl -= SIM_DT
     }
     this.predictedBullets = this.predictedBullets.filter((b) => b.ttl > 0)
-    for (const f of this.fx) f.update(SIM_DT)
-    this.fx = this.fx.filter((f) => f.alive)
+    for (const layer of this.particleLayers.values())
+      if (layer.count > 0) layer.count = stepParticles(layer.data, layer.count, SIM_DT)
 
     // згладжування: залишок поправки тане експоненційно (~100 мс)
     const k = Math.exp(-(SIM_DT * 1000) / SMOOTH_MS)
@@ -309,22 +306,27 @@ export class NetGame {
 
     const map = new Map<EntityId, EntityData>(snap.entities.map((e) => [e.id, e]))
     this.snapshots.push({ tick: snap.tick, map })
-    while (this.snapshots.length > 60) this.snapshots.shift()
+    // Lab 7: 12 знімків (0.4 с) замість 60 (2 с) — інтерполяції треба ≤ 300 мс, а довга історія
+    // «старила» тисячі об'єктів знімків до старого покоління GC (→ major GC під час гри)
+    while (this.snapshots.length > 12) this.snapshots.shift()
     if (snap.you !== null) this.you = snap.you
     this.ack = snap.ack
 
     const my = this.you !== null ? map.get(this.you) : undefined
     if (my?.kind === 'ship') {
       this.myData = my
-      this.pending = this.pending.filter((p) => p.seq > snap.ack)
+      this.#updateHud(my, map.size)
+      const t0 = perfStart()
+      if (this.opts.predict) this.#reconcile(my, snap.ack)
+      else this.pending = this.pending.filter((p) => p.seq > snap.ack)
       this.stats.pending = this.pending.length
-      if (this.opts.predict) this.#reconcile(my)
+      perfEnd('reconcile', t0)
     }
     this.#reconcileBullets(map)
     for (const ev of snap.events) this.#onEvent(ev)
   }
 
-  #reconcile(my: ShipData): void {
+  #reconcile(my: ShipData, ack: Seq): void {
     const server: MotionState = {
       x: my.x,
       y: my.y,
@@ -333,6 +335,9 @@ export class NetGame {
       angle: my.angle,
       cooldown: my.cooldown,
     }
+    // чиста функція з shared/: стан сервера + повтор непідтверджених команд (Lab 7 — під тестами)
+    const { state, pending } = reconcile(server, this.pending, ack, this.#params(), W, H)
+    this.pending = pending
     if (!this.predicted || my.respawnIn > 0) {
       this.predicted = server
       this.prevPredicted = { ...server }
@@ -341,10 +346,6 @@ export class NetGame {
     }
     const shownX = this.predicted.x + this.offset.x
     const shownY = this.predicted.y + this.offset.y
-
-    // стан сервера + повтор непідтверджених команд = де сервер скаже, що ми будемо
-    const state: MotionState = { ...server }
-    for (const p of this.pending) stepShip(state, p.cmd, this.#params(), SIM_DT, W, H)
 
     const correction = Math.hypot(
       wrapDelta(this.predicted.x, state.x, W),
@@ -383,31 +384,12 @@ export class NetGame {
         if (ev.shipId === this.you && this.opts.predict) return // уже зіграли при передбаченні
         return this.events.emit('fired', ev)
       case 'hit':
-        this.fx.push(
-          new Explosion({
-            rng: this.fxRng,
-            x: ev.x,
-            y: ev.y,
-            count: 6,
-            speed: 90,
-            ttl: 0.35,
-            color: ev.target === 'ship' ? '#ffe066' : '#aaa',
-          }),
-        )
+        this.#burst(ev.target === 'ship' ? '#ffe066' : '#aaa', ev.x, ev.y, 6, 90)
         return this.events.emit('hit', ev)
       case 'exploded': {
         const big = ev.kind === 'ship'
         const color = big ? EXPLOSION_COLORS[ev.team] : EXPLOSION_COLORS.asteroid
-        this.fx.push(
-          new Explosion({
-            rng: this.fxRng,
-            x: ev.x,
-            y: ev.y,
-            count: big ? 40 : 10 + ev.size * 8,
-            speed: big ? 220 : 120,
-            color,
-          }),
-        )
+        this.#burst(color, ev.x, ev.y, big ? 40 : 10 + ev.size * 8, big ? 220 : 120)
         return this.events.emit('exploded', ev)
       }
       case 'pickup':
@@ -419,6 +401,15 @@ export class NetGame {
       default:
         return assertNever(ev, 'game event')
     }
+  }
+
+  #burst(color: string, x: number, y: number, n: number, speed: number): void {
+    let layer = this.particleLayers.get(color)
+    if (!layer) {
+      layer = { color, ...createParticles(2048) } // ~48 КБ на колір, виділяємо один раз
+      this.particleLayers.set(color, layer)
+    }
+    burst(layer, x, y, n, speed, () => this.fxRng.next())
   }
 
   #updateBytes(): void {
@@ -435,8 +426,34 @@ export class NetGame {
   }
 
   // ---------- що малювати ----------
+  // Lab 7: сцена й усі її об'єкти — з пулів (view-pool.ts): щокадру ані нових масивів,
+  // ані нових {pos}/Map/Vector2. Масиви шарів живуть усю гру, кадр лише обнуляє їхню довжину.
+  readonly #scene: SceneItems = {
+    ship: [],
+    bullet: [],
+    asteroid: [],
+    pickup: [],
+    explosion: [],
+    particles: [],
+  }
+  readonly #ships = new Pool(() => new ShipSlot())
+  readonly #bullets = new Pool(() => new BulletSlot())
+  readonly #asteroids = new Pool(() => new AsteroidSlot())
+  readonly #pickups = new Pool(() => new PickupSlot())
+
   view(alpha: number, now = performance.now()): Scene {
-    const items: SceneItems = { ship: [], bullet: [], asteroid: [], pickup: [], explosion: this.fx }
+    const items = this.#scene
+    items.ship.length = 0
+    items.bullet.length = 0
+    items.asteroid.length = 0
+    items.pickup.length = 0
+    items.particles.length = 0
+    this.#ships.reset()
+    this.#bullets.reset()
+    this.#asteroids.reset()
+    this.#pickups.reset()
+    for (const layer of this.particleLayers.values()) if (layer.count > 0) items.particles.push(layer)
+
     const first = this.snapshots[0]
     const last = this.snapshots.at(-1)
     if (!first || !last || this.clockOffset === null) return items
@@ -491,56 +508,61 @@ export class NetGame {
       this.#addView(items, this.myData, (x + W) % W, (y + H) % H, lerpAngle(p.angle, cur.angle, alpha))
     }
     for (const pb of this.predictedBullets) {
-      const pos = { x: pb.x, y: pb.y }
-      items.bullet.push({
-        team: 'player',
-        homing: false,
-        radius: 3,
-        pos,
-        prevPos: pos,
-        vel: new Vector2(pb.vx, pb.vy),
-        angle: 0,
-        prevAngle: 0,
-      })
+      const v = this.#bullets.next()
+      v.team = 'player'
+      v.homing = false
+      v.pos.x = pb.x
+      v.pos.y = pb.y
+      v.vel.x = pb.vx
+      v.vel.y = pb.vy
+      items.bullet.push(v)
     }
     return items
   }
 
   #hasPredicted(seq: Seq | null): boolean {
-    return seq !== null && this.predictedBullets.some((b) => b.spawnSeq === seq)
+    if (seq === null) return false
+    for (const b of this.predictedBullets) if (b.spawnSeq === seq) return true // без замикання на кожну кулю
+    return false
   }
 
   #addView(items: SceneItems, e: EntityData, x: number, y: number, angle: number): void {
-    const pos = { x, y }
-    const placed = { pos, prevPos: pos, angle, prevAngle: angle }
     switch (e.kind) {
-      case 'ship':
-        items.ship.push({
-          ...placed,
-          id: e.id,
-          team: e.team,
-          radius: PLAYER_SHIP.radius,
-          thrust: e.thrust,
-          isWaitingRespawn: e.respawnIn > 0,
-          invulnerable: e.invulnerable,
-          effects: effectsMap(e.effects),
-          hp: e.hp,
-          maxHp: e.maxHp,
-          name: this.names.get(e.id),
-          isMe: e.id === this.you,
-        })
+      case 'ship': {
+        const v = this.#ships.next()
+        v.pos.x = x
+        v.pos.y = y
+        v.angle = angle
+        v.prevAngle = angle
+        v.id = e.id
+        v.team = e.team
+        v.radius = PLAYER_SHIP.radius
+        v.thrust = e.thrust
+        v.isWaitingRespawn = e.respawnIn > 0
+        v.invulnerable = e.invulnerable
+        syncEffects(v.effects, e.effects)
+        v.hp = e.hp
+        v.maxHp = e.maxHp
+        v.name = this.names.get(e.id)
+        v.isMe = e.id === this.you
+        items.ship.push(v)
         return
-      case 'bullet':
-        items.bullet.push({
-          ...placed,
-          team: e.team,
-          homing: e.homing,
-          radius: 3,
-          vel: Vector2.fromAngle(angle),
-        })
+      }
+      case 'bullet': {
+        const v = this.#bullets.next()
+        v.pos.x = x
+        v.pos.y = y
+        v.angle = angle
+        v.prevAngle = angle
+        v.team = e.team
+        v.homing = e.homing
+        v.vel.x = Math.cos(angle)
+        v.vel.y = Math.sin(angle)
+        items.bullet.push(v)
         return
+      }
       case 'asteroid': {
-        // Asteroid з тим самим id — щоб запасне векторне малювання мало форму й кратери
+        // форма й кратери — з Asteroid того самого id (seed = id): створюємо один раз на камінь
         let rock = this.asteroidCache.get(e.id)
         if (!rock) {
           rock = new Asteroid({ size: e.size, rng: createRng(e.id) })
@@ -548,57 +570,65 @@ export class NetGame {
           const oldest = this.asteroidCache.keys().next()
           if (this.asteroidCache.size > 200 && !oldest.done) this.asteroidCache.delete(oldest.value)
         }
-        rock.variant = e.variant
-        rock.radius = RADIUS[e.size]
-        rock.pos = new Vector2(x, y)
-        rock.prevPos = rock.pos
-        rock.angle = angle
-        rock.prevAngle = angle
-        items.asteroid.push({
-          ...placed,
-          radius: rock.radius,
-          homing: e.homing,
-          variant: e.variant,
-          shape: rock.shape,
-          craters: rock.craters,
-          specks: rock.specks,
-        })
+        const v = this.#asteroids.next()
+        v.pos.x = x
+        v.pos.y = y
+        v.angle = angle
+        v.prevAngle = angle
+        v.radius = RADIUS[e.size]
+        v.homing = e.homing
+        v.variant = e.variant
+        v.shape = rock.shape
+        v.craters = rock.craters
+        v.specks = rock.specks
+        items.asteroid.push(v)
         return
       }
-      case 'pickup':
-        items.pickup.push({ pos, effect: e.effect, ttl: e.ttl, radius: 13 })
+      case 'pickup': {
+        const v = this.#pickups.next()
+        v.pos.x = x
+        v.pos.y = y
+        v.effect = e.effect
+        v.ttl = e.ttl
+        items.pickup.push(v)
         return
+      }
       default:
         assertNever(e, 'entity kind')
     }
   }
 
-  // HUD: мій літак і "світ"
+  // HUD: мій літак і "світ" — ті самі два об'єкти всю гру, оновлюються зі знімком (а не щокадру)
+  readonly #hudPlayer: MutableHudPlayer = {
+    hp: 0,
+    maxHp: PLAYER_SHIP.maxHp,
+    effects: new Map<EffectName, number>(),
+    isWaitingRespawn: false,
+    respawnIn: 0,
+    score: 0,
+    deaths: 0,
+  }
+  readonly #hudWorld: { size: number; arena: Pick<ArenaConfig, 'name'> } = { size: 0, arena: { name: '' } }
+
+  #updateHud(d: ShipData, size: number): void {
+    const h = this.#hudPlayer
+    h.hp = d.hp
+    h.maxHp = d.maxHp
+    syncEffects(h.effects, d.effects)
+    h.isWaitingRespawn = d.respawnIn > 0
+    h.respawnIn = d.respawnIn
+    h.score = d.score
+    h.deaths = d.deaths
+    this.#hudWorld.size = size
+  }
+
   get me(): HudPlayer {
-    const d = this.myData
-    if (!d)
-      return {
-        hp: 0,
-        maxHp: PLAYER_SHIP.maxHp,
-        effects: new Map(),
-        isWaitingRespawn: false,
-        respawnIn: 0,
-        score: 0,
-        deaths: 0,
-      }
-    return {
-      hp: d.hp,
-      maxHp: d.maxHp,
-      effects: effectsMap(d.effects),
-      isWaitingRespawn: d.respawnIn > 0,
-      respawnIn: d.respawnIn,
-      score: d.score,
-      deaths: d.deaths,
-    }
+    return this.#hudPlayer
   }
 
   get hudWorld(): HudWorld {
-    return { size: this.snapshots.at(-1)?.map.size ?? 0, arena: this.room.arenaConfig }
+    this.#hudWorld.arena = this.room.arenaConfig
+    return this.#hudWorld
   }
 
   close(): void {

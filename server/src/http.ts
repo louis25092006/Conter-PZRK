@@ -8,6 +8,7 @@ import { ARENAS, RoomsLimitError, isArenaId, type RoomManager } from './rooms.ts
 import { listReplays, REPLAY_ID } from './log/replay.ts'
 import type { ServerConfig } from './config.ts'
 import type { Logger } from './logger.ts'
+import type { PlayerInfo } from '@conter/shared/protocol.ts'
 
 const MIME: Readonly<Record<string, string>> = {
   '.html': 'text/html; charset=utf-8',
@@ -64,6 +65,8 @@ const NewRoomSchema = z.object({
   arena: z
     .custom<(typeof ARENAS)[number]>(isArenaId, `arena must be one of: ${ARENAS.join(', ')}`)
     .default('classic'),
+  // Lab 7: для навантажувального тесту — кімната більша за звичайні 8 (стеля — MAX_PLAYERS_PER_ROOM)
+  maxPlayers: z.number().int().min(1).max(512).optional(),
 })
 
 // Статика з client/dist. Захист від path traversal: після resolve шлях
@@ -110,12 +113,26 @@ export interface HttpDeps {
   log: Logger
   stats: () => Readonly<Record<string, number>>
   matchStats?: () => unknown
+  addBots?: (roomId: string, count: number) => readonly PlayerInfo[]
 }
 
 const isPrematureClose = (e: unknown): boolean =>
   e instanceof Error && 'code' in e && e.code === 'ERR_STREAM_PREMATURE_CLOSE'
 
-export function createHttpHandler({ config, manager, log, stats, matchStats = () => [] }: HttpDeps) {
+const BotsSchema = z.object({ count: z.number().int().min(1).max(64).default(1) })
+
+export function createHttpHandler({ config, manager, log, stats, matchStats = () => [], addBots }: HttpDeps) {
+  let lastElu = performance.eventLoopUtilization()
+
+  // Lab 7, M4: POST /api/rooms/:id/bots  { "count": 8 } → додає ботів у кімнату
+  async function postBots(req: IncomingMessage, res: ServerResponse, roomId: string): Promise<void> {
+    if (!addBots) throw new HttpError(404, 'bots are not available')
+    const parsed = BotsSchema.safeParse(await readJsonBody(req, config.maxBodyBytes))
+    if (!parsed.success) throw new HttpError(400, parsed.error.issues[0]?.message ?? 'bad count')
+    if (!manager.get(roomId)) throw new HttpError(404, 'room not found')
+    sendJson(res, 201, { room: roomId, added: addBots(roomId, parsed.data.count) })
+  }
+
   const routes: Readonly<Record<string, Handler>> = {
     'GET /health': (req, res) =>
       sendJson(res, 200, {
@@ -130,14 +147,27 @@ export function createHttpHandler({ config, manager, log, stats, matchStats = ()
     'GET /api/rooms': (req, res) => sendJson(res, 200, { rooms: manager.list() }),
 
     // Lab 5: стан матчів — тривалість і джитер тіку, гравці, трафік кожного клієнта
-    'GET /api/stats': (req, res) => sendJson(res, 200, { matches: matchStats() }),
+    // Lab 7: + стан процесу — пам'ять і завантаженість циклу подій (ELU) з минулого запиту
+    'GET /api/stats': (req, res) => {
+      const elu = performance.eventLoopUtilization(lastElu)
+      lastElu = performance.eventLoopUtilization()
+      const mem = process.memoryUsage()
+      sendJson(res, 200, {
+        matches: matchStats(),
+        process: {
+          rssMB: +(mem.rss / 1048576).toFixed(1),
+          heapUsedMB: +(mem.heapUsed / 1048576).toFixed(1),
+          eventLoopUtilization: +elu.utilization.toFixed(3),
+        },
+      })
+    },
 
     'POST /api/rooms': async (req, res) => {
       const parsed = NewRoomSchema.safeParse(await readJsonBody(req, config.maxBodyBytes))
       if (!parsed.success) throw new HttpError(400, parsed.error.issues[0]?.message ?? 'bad room')
-      const { name, arena } = parsed.data
+      const { name, arena, maxPlayers } = parsed.data
       try {
-        const room = manager.create({ name, arena })
+        const room = manager.create({ name, arena, ...(maxPlayers ? { maxPlayers } : {}) })
         log.info('room created via API', { id: room.id, name, arena })
         sendJson(res, 201, room.toJSON())
       } catch (e: unknown) {
@@ -175,6 +205,9 @@ export function createHttpHandler({ config, manager, log, stats, matchStats = ()
     try {
       const route = routes[key]
       if (route) return await route(req, res)
+
+      const botsRoom = /^\/api\/rooms\/([^/]+)\/bots$/.exec(url.pathname)?.[1]
+      if (botsRoom && req.method === 'POST') return await postBots(req, res, botsRoom)
 
       const replayId = /^\/api\/replays\/([^/]+)$/.exec(url.pathname)?.[1]
       if (replayId && req.method === 'GET') return await streamReplay(res, replayId)

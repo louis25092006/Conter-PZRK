@@ -1,5 +1,5 @@
 // Інтеграційні тести: справжній сервер на випадковому порту, справжні HTTP і WebSocket.
-import { test, before, after } from 'node:test'
+import { test, beforeAll as before, afterAll as after } from 'vitest'
 import assert from 'node:assert/strict'
 import { mkdtemp, mkdir, writeFile, rm, readdir, readFile } from 'node:fs/promises'
 import { tmpdir } from 'node:os'
@@ -207,4 +207,42 @@ test('graceful shutdown: клієнти отримують 1001, лог матч
     .map((l) => z.object({ type: z.string() }).parse(JSON.parse(l)).type)
   assert.deepEqual(types, ['join', 'leave', 'close'])
   await rm(dir, { recursive: true, force: true })
+})
+
+// ---------- Lab 7: боти ----------
+test('POST /api/rooms/:id/bots: боти в ростері; пішла остання людина — боти теж зникають', async () => {
+  const human = connect(wsUrl)
+  await human.open()
+  human.send({ type: 'join', v: 1, roomId: 'r-dogfight', name: 'Ira' })
+  await human.next('welcome')
+
+  const BotsResponse = z.object({ room: z.string(), added: z.array(z.object({ name: z.string() })) })
+  const res = await getJson(`${base}/api/rooms/r-dogfight/bots`, BotsResponse, {
+    method: 'POST',
+    headers: { 'content-type': 'application/json' },
+    body: JSON.stringify({ count: 3 }),
+  })
+  assert.equal(res.status, 201)
+  assert.equal(res.body.added.length, 3)
+  for (;;) {
+    const r = await human.next('roster')
+    if (r.players.length === 4) {
+      assert.equal(r.players.filter((p) => p.name.startsWith('Bot ')).length, 3)
+      break
+    }
+  }
+  // погані дані й неіснуюча кімната
+  const bad = await fetch(`${base}/api/rooms/r-dogfight/bots`, { method: 'POST', body: '{"count": 1000}' })
+  assert.equal(bad.status, 400)
+  const missing = await fetch(`${base}/api/rooms/nope/bots`, { method: 'POST', body: '{}' })
+  assert.equal(missing.status, 404)
+
+  human.ws.close()
+  const Rooms = RoomsResponseSchema
+  for (let i = 0; i < 50; i++) {
+    const { body } = await getJson(`${base}/api/rooms`, Rooms)
+    if (body.rooms.find((r) => r.id === 'r-dogfight')?.players === 0) return
+    await new Promise((r) => setTimeout(r, 20))
+  }
+  assert.fail('bots stayed in the room after the last human left')
 })

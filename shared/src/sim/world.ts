@@ -1,5 +1,6 @@
 import { createRng, type Rng } from './random.ts'
-import { findCollisions, resolveCollisions, type CollisionDetector } from './collision.ts'
+import { resolveCollisions, type CollisionDetector } from './collision.ts'
+import { createSpatialHash } from './spatial-hash.ts'
 import { homingSystem } from './systems.ts'
 import { spawnerSystem, type Director } from './spawner.ts'
 import { Vector2, type Point } from './vector.ts'
@@ -7,7 +8,7 @@ import { Bus } from '../bus.ts'
 import { DEFAULT_ARENA, type ArenaConfig } from '../arena-config.ts'
 import type { GameEvents } from '../events.ts'
 import type { Command } from './ship-physics.ts'
-import type { EntityId } from '../types.ts'
+import { toEntityId, type EntityId } from '../types.ts'
 import type { Ship } from './ship.ts'
 import type { Bullet } from './bullet.ts'
 import type { Asteroid } from './asteroid.ts'
@@ -43,6 +44,7 @@ export class World {
   #entities = new Map<EntityId, AnyEntity>()
   #pending: AnyEntity[] = [] // народжені під час кроку — додамо після нього
   #stepping = false
+  #nextId = 1 // Lab 7: id сутностей — свої в кожному світі (детермінізм)
 
   width: number
   height: number
@@ -61,7 +63,7 @@ export class World {
     height,
     arena = DEFAULT_ARENA,
     seed = arena.seed,
-    detectCollisions = findCollisions,
+    detectCollisions = createSpatialHash(), // Lab 7: сітка замість O(n²); у кожного світу своя
   }: WorldInit) {
     this.width = width
     this.height = height
@@ -81,6 +83,7 @@ export class World {
   // generic: spawn(new Ship(...)) повертає Ship, а не AnyEntity
   spawn<T extends AnyEntity>(entity: T): T {
     // Map при for…of бачить елементи, додані ПІД ЧАС обходу — тому під час кроку відкладаємо
+    entity.bindId(toEntityId(this.#nextId++))
     if (this.#stepping) this.#pending.push(entity)
     else this.#entities.set(entity.id, entity)
     return entity

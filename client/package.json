@@ -8,9 +8,10 @@
     "build": "tsc --noEmit -p . && vite build",
     "preview": "vite preview",
     "assets": "node scripts/make-sprites.ts && node scripts/make-sounds.ts",
-    "test": "node --test --test-timeout=20000 tests/*.test.ts",
+    "test": "vitest run",
     "typecheck": "tsc --noEmit -p .",
-    "build:site": "tsc --noEmit -p . && vite build --base ./ --outDir ../site --emptyOutDir"
+    "build:site": "tsc --noEmit -p . && vite build --base ./ --outDir ../site --emptyOutDir",
+    "test:watch": "vitest"
   },
   "devDependencies": {
     "vite": "^8.3.0"

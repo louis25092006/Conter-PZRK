@@ -1,4 +1,4 @@
-# Lab 6: перевірка типів (і заразом лінт, тести, збірка) на кожен push і pull request
+# Lab 6–7: кожен push і pull request — typecheck → lint → unit → build → e2e
 name: CI
 on:
   push:
@@ -8,14 +8,24 @@ on:
 jobs:
   check:
     runs-on: ubuntu-latest
+    timeout-minutes: 15
     steps:
       - uses: actions/checkout@v4
       - uses: actions/setup-node@v4
         with:
           node-version: 24
-          cache: npm
+          cache: npm # кеш npm за хешем package-lock.json
       - run: npm ci
       - run: npm run typecheck
       - run: npm run lint
       - run: npm test
+      - run: npm run coverage # shared/ ≥ 85 %, інакше крок падає
       - run: npm run build
+      - run: npx playwright install --with-deps chromium
+      - run: npm run e2e
+      - uses: actions/upload-artifact@v4
+        if: failure()
+        with:
+          name: playwright-report
+          path: test-results/
+          retention-days: 7

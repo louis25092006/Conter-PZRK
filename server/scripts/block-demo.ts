@@ -49,7 +49,12 @@ try {
   const t0 = performance.now()
   b.on('message', (data, isBinary) => {
     if (isBinary) return // знімки світу тут не потрібні
-    const m = parseServerMessage(String(data))
+    const text = Array.isArray(data)
+      ? Buffer.concat(data).toString()
+      : data instanceof ArrayBuffer
+        ? Buffer.from(data).toString()
+        : data.toString()
+    const m = parseServerMessage(text)
     if (!m.ok || m.value.type !== 'chat') return
     const sent = sentAt.get(m.value.text)
     if (sent === undefined) return

@@ -19,10 +19,11 @@ export interface EntityInit {
 }
 
 export abstract class Entity {
-  // приватний статичний лічильник: спільний для всіх сутностей,
-  // ззовні його не можна ні прочитати, ні зіпсувати
-  static #nextId = 1
-  readonly #id: EntityId = toEntityId(Entity.#nextId++)
+  // Lab 7: id видає СВІТ у spawn() — свій лічильник у кожного World.
+  // Раніше тут був статичний лічильник, спільний для всіх світів: два однакові матчі
+  // отримували різні id (тест детермінізму зі знімками це впіймав), а матчі на сервері
+  // «з'їдали» id один в одного. 0 = сутність ще не у світі.
+  #id: EntityId = toEntityId(0)
 
   // Lab 6: kind — abstract: кожен підклас зобов'язаний оголосити СВІЙ літерал ('ship', 'bullet'…).
   // Саме на ньому TypeScript потім звужує union сутностей (див. AnyEntity у world.ts).
@@ -51,6 +52,12 @@ export abstract class Entity {
 
   get id(): EntityId {
     return this.#id
+  }
+
+  // викликає лише World.spawn(); вдруге — помилка (одна сутність не живе у двох світах)
+  bindId(id: EntityId): void {
+    if (this.#id !== 0) throw new Error(`entity already has id ${this.#id}`)
+    this.#id = id
   }
 
   savePrevious(): void {

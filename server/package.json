@@ -6,8 +6,9 @@
   "scripts": {
     "dev": "node --watch --env-file-if-exists=.env src/index.ts",
     "start": "node --env-file-if-exists=.env src/index.ts",
-    "test": "node --test --test-timeout=20000 test/*.test.ts",
-    "typecheck": "tsc --noEmit -p . && tsc --noEmit -p scripts"
+    "test": "vitest run",
+    "typecheck": "tsc --noEmit -p . && tsc --noEmit -p scripts",
+    "test:watch": "vitest"
   },
   "dependencies": {
     "ws": "^8.18.0",

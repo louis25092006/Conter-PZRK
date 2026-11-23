@@ -72,6 +72,7 @@ export function createGameServer(
     log,
     stats: () => ({ ...counters }),
     matchStats: () => sockets.stats(),
+    addBots: (roomId, count) => sockets.addBots(roomId, count),
   })
   httpServer.on('request', (req, res) => void handler(req, res))
 

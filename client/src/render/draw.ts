@@ -1,5 +1,5 @@
 import { EFFECTS } from '../../../shared/src/sim/components.ts'
-import type { Point, Vector2 } from '../../../shared/src/sim/vector.ts'
+import type { Point } from '../../../shared/src/sim/vector.ts'
 import type { Crater, Speck } from '../../../shared/src/sim/asteroid.ts'
 import type { Particle } from '../../../shared/src/sim/explosion.ts'
 import type { EffectName, Team } from '../../../shared/src/types.ts'
@@ -32,7 +32,7 @@ export interface BulletView extends Placed {
   readonly team: Team
   readonly homing: unknown // важливо лише "є чи ні"
   readonly radius: number
-  readonly vel: Pick<Vector2, 'normalize'>
+  readonly vel: Point // напрям трасера (довжина не важлива)
 }
 export interface AsteroidView extends Placed {
   readonly radius: number
@@ -54,6 +54,13 @@ export interface ExplosionView {
   readonly color: string
   readonly particles: readonly Particle[]
 }
+// Lab 7: частинки вибухів одного кольору в одному Float32Array (x, y, vx, vy, ttl, maxTtl)
+export interface ParticleLayer {
+  readonly color: string
+  readonly data: Float32Array
+  readonly count: number
+}
+
 // Сцена — що малювати, по шарах. Офлайн це "вікна" у World (getter-и на world.ofKind),
 // онлайн — масиви, які NetGame збирає зі знімків сервера.
 export interface Scene {
@@ -62,6 +69,7 @@ export interface Scene {
   readonly asteroid: Iterable<AsteroidView>
   readonly pickup: Iterable<PickupView>
   readonly explosion: Iterable<ExplosionView>
+  readonly particles?: Iterable<ParticleLayer>
 }
 export type Sprites = Pick<LoadedAssets, 'images' | 'frames'> | null
 
@@ -90,12 +98,14 @@ function lerpAngle(a: number, b: number, t: number): number {
 }
 
 // позиция и угол любой сущности между предыдущим и текущим шагом физики
-function interpolate(e: Placed, alpha: number): { x: number; y: number; angle: number } {
-  return {
-    x: lerp(e.prevPos.x, e.pos.x, alpha),
-    y: lerp(e.prevPos.y, e.pos.y, alpha),
-    angle: lerpAngle(e.prevAngle, e.angle, alpha),
-  }
+// Lab 7: один спільний об'єкт-результат замість нового на кожну сутність щокадру
+// (профіль: interpolate ≈ 4% алокацій). Викликачі одразу розбирають його на x/y/angle.
+const lerped = { x: 0, y: 0, angle: 0 }
+function interpolate(e: Placed, alpha: number): Readonly<typeof lerped> {
+  lerped.x = lerp(e.prevPos.x, e.pos.x, alpha)
+  lerped.y = lerp(e.prevPos.y, e.pos.y, alpha)
+  lerped.angle = lerpAngle(e.prevAngle, e.angle, alpha)
+  return lerped
 }
 
 // ---------- палитры самолётов ----------
@@ -265,10 +275,12 @@ function drawBullet(
   const { x, y } = interpolate(bullet, alpha)
   const color = bullet.homing ? EFFECTS.homing.color : bullet.team === 'enemy' ? '#ff6b6b' : '#fff3b0'
 
-  // короткий "трассер" позади пули
-  const back = bullet.vel.normalize().scale(10)
+  // короткий "трассер" позади пули (Lab 7: нормалізація вручну — без двох нових Vector2 на кулю)
+  const len = Math.hypot(bullet.vel.x, bullet.vel.y) || 1
+  const backX = (bullet.vel.x / len) * 10
+  const backY = (bullet.vel.y / len) * 10
   ctx.beginPath()
-  ctx.moveTo(x - back.x, y - back.y)
+  ctx.moveTo(x - backX, y - backY)
   ctx.lineTo(x, y)
   ctx.strokeStyle = color
   ctx.globalAlpha = 0.5
@@ -535,6 +547,17 @@ function drawExplosion(ctx: CanvasRenderingContext2D, explosion: ExplosionView):
   ctx.globalAlpha = 1
 }
 
+function drawParticles(ctx: CanvasRenderingContext2D, layer: ParticleLayer): void {
+  ctx.fillStyle = layer.color
+  const d = layer.data
+  for (let i = 0; i < layer.count; i++) {
+    const o = i * 6
+    ctx.globalAlpha = Math.max(0, (d[o + 4] ?? 0) / (d[o + 5] ?? 1))
+    ctx.fillRect((d[o] ?? 0) - 1.5, (d[o + 1] ?? 0) - 1.5, 3, 3)
+  }
+  ctx.globalAlpha = 1
+}
+
 // ---------- фон: звёзды ----------
 
 export interface Star {
@@ -552,6 +575,23 @@ export function createStarfield(width: number, height: number, count = 160): Sta
     r: Math.random() < 0.15 ? 1.4 : 0.7,
     a: 0.3 + Math.random() * 0.6,
   }))
+}
+
+// Lab 7: зорі нерухомі — малюємо їх ОДИН раз в окреме полотно, а потім щокадру одним drawImage
+// (замість 260 fillRect і стількох же змін globalAlpha за кадр)
+export function prerenderStarfield(
+  stars: readonly Star[],
+  width: number,
+  height: number,
+): HTMLCanvasElement | null {
+  if (typeof document === 'undefined') return null
+  const layer = document.createElement('canvas')
+  layer.width = width
+  layer.height = height
+  const c = layer.getContext('2d')
+  if (!c) return null
+  drawStarfield(c, stars)
+  return layer
 }
 
 export function drawStarfield(ctx: CanvasRenderingContext2D, stars: readonly Star[]): void {
@@ -579,4 +619,5 @@ export function drawWorld(
   for (const b of world.bullet) drawBullet(ctx, b, alpha, sprites)
   for (const s of world.ship) drawShip(ctx, s, alpha, time, sprites)
   for (const e of world.explosion) drawExplosion(ctx, e)
+  for (const layer of world.particles ?? []) drawParticles(ctx, layer)
 }

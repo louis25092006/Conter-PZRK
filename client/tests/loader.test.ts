@@ -1,7 +1,7 @@
 // Тести конвеєра завантаження. Запуск: npm test  (вбудований node:test, без залежностей)
 // fetch підмінюємо фейком — мережа не потрібна.
 
-import { test, beforeEach } from 'node:test'
+import { test, beforeEach } from 'vitest'
 import assert from 'node:assert/strict'
 import { readFileSync, readdirSync } from 'node:fs'
 import {

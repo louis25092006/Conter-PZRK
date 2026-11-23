@@ -16,7 +16,7 @@ function describe(error: unknown): string {
   if (isTimeout(error)) return 'таймаут'
   if (error instanceof AssetFormatError) return 'зіпсований файл'
   if (isAbort(error)) return 'скасовано'
-  return error instanceof Error ? error.message : String(error)
+  return error instanceof Error ? error.message : typeof error === 'string' ? error : 'невідома помилка'
 }
 
 export type LoadingPhase = 'manifest' | 'loading' | 'done' | 'error' | 'cancelled'

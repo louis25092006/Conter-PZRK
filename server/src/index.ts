@@ -41,3 +41,7 @@ process.on('unhandledRejection', (reason: unknown) => {
   })
   process.exit(1)
 })
+
+// Lab 7: керований вихід з батьківського процесу (load-test --profile) — через IPC,
+// бо на Windows child.kill() обриває процес миттєво і --cpu-prof не встигає записати профіль.
+if (process.send) process.on('message', (m) => m === 'shutdown' && void shutdown('SIGTERM'))

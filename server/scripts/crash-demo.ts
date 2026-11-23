@@ -19,7 +19,9 @@ const bob = new FakeSocket()
 if (mode === 'emitter-with-listener') {
   // ВИПРАВЛЕННЯ: слухач 'error' на кожному сокеті (як у server/src/ws.js)
   for (const s of [alice, bob])
-    s.on('error', (err) => log(`socket error handled: ${err.code} — closing this socket only`))
+    s.on('error', (err: NodeJS.ErrnoException) =>
+      log(`socket error handled: ${err.code} — closing this socket only`),
+    )
 }
 
 process.on('exit', (code) => log(`process exit, code ${code}`))
@@ -36,7 +38,8 @@ const game = setInterval(() => {
     } else {
       log('loading bob replay from a broken file…')
       const p = Promise.reject(new Error('ENOENT: replay file missing'))
-      if (mode === 'rejection-handled') p.catch((err) => log(`handled: ${err.message}`))
+      if (mode === 'rejection-handled')
+        p.catch((err: unknown) => log(`handled: ${err instanceof Error ? err.message : 'unknown'}`))
     }
   }
   if (tick === 4) {

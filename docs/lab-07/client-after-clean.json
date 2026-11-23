@@ -1,0 +1,76 @@
+{
+  "label": "after-clean",
+  "seconds": 30,
+  "throttle": 1,
+  "chromium": "159.0.8154.6",
+  "entitiesAtEnd": 46,
+  "frames": 1939,
+  "frameMs": {
+    "p50": 1.3,
+    "p95": 3.4,
+    "p99": 4.6,
+    "max": 6.2
+  },
+  "intervalMs": {
+    "p50": 16.7,
+    "p95": 16.7,
+    "p99": 16.8,
+    "over20ms": 0
+  },
+  "majorEvents": [
+    {
+      "atSec": 23,
+      "ms": 7.11,
+      "args": {
+        "type": "finalize incremental marking via task",
+        "usedHeapSizeAfter": 3953836,
+        "usedHeapSizeBefore": 6751596
+      }
+    },
+    {
+      "atSec": 29.1,
+      "ms": 3.87,
+      "args": {
+        "type": "finalize incremental marking via task",
+        "usedHeapSizeAfter": 3934768,
+        "usedHeapSizeBefore": 4708608
+      }
+    }
+  ],
+  "gc": {
+    "minor": 27,
+    "minorMs": 16,
+    "major": 2,
+    "majorMs": 11,
+    "maxMs": 7.11
+  },
+  "allocatedMBperSec": 0,
+  "topAllocators": [],
+  "topSelfTime": [],
+  "userTiming": {
+    "simulate": {
+      "count": 0,
+      "p50": 0,
+      "p95": 0,
+      "p99": 0
+    },
+    "render": {
+      "count": 0,
+      "p50": 0,
+      "p95": 0,
+      "p99": 0
+    },
+    "decode": {
+      "count": 0,
+      "p50": 0,
+      "p95": 0,
+      "p99": 0
+    },
+    "reconcile": {
+      "count": 0,
+      "p50": 0,
+      "p95": 0,
+      "p99": 0
+    }
+  }
+}

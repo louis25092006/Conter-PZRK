@@ -8,8 +8,10 @@
     "./*": "./src/*"
   },
   "scripts": {
-    "test": "node --test --test-timeout=20000 test/*.test.ts",
-    "typecheck": "tsc --noEmit -p ."
+    "test": "vitest run",
+    "typecheck": "tsc --noEmit -p .",
+    "test:watch": "vitest",
+    "coverage": "vitest run --coverage"
   },
   "dependencies": {
     "zod": "^4.6.7"

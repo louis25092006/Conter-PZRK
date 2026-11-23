@@ -3,7 +3,7 @@ import { createInput } from './input.ts'
 import { createAudio } from './audio.ts'
 import { createHud } from './hud.ts'
 import { setupCanvas, requireElement } from './render/canvas.ts'
-import { createStarfield, drawStarfield, drawWorld, type Scene } from './render/draw.ts'
+import { createStarfield, drawStarfield, prerenderStarfield, drawWorld, type Scene } from './render/draw.ts'
 import { drawLoadingScreen, type LoadingScreenState } from './render/loading.ts'
 import { createLobbyBackground } from './render/lobby-bg.ts'
 import {
@@ -29,6 +29,7 @@ import { keyboardCommand } from './game/commands.ts'
 import { computeCamera, drawArenaBackground, drawArenaBorder } from './game/camera.ts'
 import { ARENA_SIZE } from '../../shared/src/sim/arena.ts'
 import { debug as simDebug } from '../../shared/src/sim/ship-physics.ts'
+import { perfStart, perfEnd, perfSummary, perfReset } from './perf.ts'
 import { ArenasSchema, type ArenaConfig, type Arenas } from '../../shared/src/arena-config.ts'
 
 // Сценарій гри:  завантаження → лобі → гра → (Esc) → лобі → …
@@ -59,6 +60,7 @@ for (const type of ['pointerdown', 'keydown']) window.addEventListener(type, () 
 
 // зорі — у координатах арени (вона тепер фіксована), камера масштабує їх разом зі світом
 const stars = createStarfield(ARENA_SIZE.width, ARENA_SIZE.height, 260)
+const starLayer = prerenderStarfield(stars, ARENA_SIZE.width, ARENA_SIZE.height)
 
 // що відомо після завантаження: ассети + перевірений (zod) конфіг арен
 interface Loaded {
@@ -320,7 +322,7 @@ function startGame(room: LobbyRoom, name: string): void {
   }
   paused = false
   loop.start()
-  if (DEV) window.game = { session, loop, lobby, loaded, audio }
+  if (DEV) window.game = { session, loop, lobby, loaded, audio, perf: perfSummary, perfReset }
 }
 
 function stopGame(): void {
@@ -332,6 +334,12 @@ function stopGame(): void {
 
 function simulate(): void {
   if (!session) return
+  const t0 = perfStart()
+  simulateStep(session)
+  perfEnd('simulate', t0)
+}
+
+function simulateStep(session: Session): void {
   const { game } = session
   if (input.justPressed('Escape')) {
     input.consume()
@@ -360,6 +368,12 @@ function drawNames(ctx: CanvasRenderingContext2D, scene: Scene): void {
 }
 
 function render(alpha: number): void {
+  const t0 = perfStart()
+  renderFrame(alpha)
+  perfEnd('render', t0)
+}
+
+function renderFrame(alpha: number): void {
   if (!session || !loaded) return
   const { game, arena, name } = session
   const cam = computeCamera(window.innerWidth, window.innerHeight)
@@ -369,7 +383,8 @@ function render(alpha: number): void {
   drawArenaBackground(ctx, cam, arena.sky)
   ctx.save()
   cam.apply(ctx)
-  drawStarfield(ctx, stars)
+  if (starLayer) ctx.drawImage(starLayer, 0, 0)
+  else drawStarfield(ctx, stars)
   // офлайн: сутності мають prevPos/pos — інтерполяція між кроками через alpha;
   // онлайн: NetGame уже порахував позиції на "зараз", тож alpha = 1
   drawWorld(ctx, scene, game.online || paused ? 1 : alpha, now / 1000, loaded.assets)
@@ -384,7 +399,7 @@ function render(alpha: number): void {
     paused,
     playerName: name,
     soundState: audio.state,
-    toScreen: cam.toScreen,
+    toScreen: (x, y) => cam.toScreen(x, y),
   })
   // game.online — дискримінант: тут TypeScript уже знає, що game — NetGame
   if (game.online && showNet) drawNetgraph(ctx, game)

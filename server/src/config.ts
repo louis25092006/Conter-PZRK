@@ -31,7 +31,7 @@ export const ServerConfigSchema = z.object({
   // параметри арен — той самий файл, що вантажить клієнт (одне джерело правди)
   ARENAS_FILE: path('../client/public/assets/arenas.json'),
   MAX_ROOMS: int(20, 1, 1000),
-  MAX_PLAYERS_PER_ROOM: int(8, 1, 100),
+  MAX_PLAYERS_PER_ROOM: int(8, 1, 512),
   MAX_BODY_BYTES: int(4096, 64),
   MAX_PAYLOAD_BYTES: int(4096, 64),
   JOIN_TIMEOUT_MS: int(5000, 50),

@@ -26,3 +26,8 @@ dist-ssr
 # server
 .env
 server/logs
+coverage
+test-results
+playwright-report
+server/scripts/profiles
+client/scripts/profiles

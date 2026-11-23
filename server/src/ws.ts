@@ -1,5 +1,13 @@
 import { randomUUID } from 'node:crypto'
 import type { IncomingMessage } from 'node:http'
+import { startHeartbeat } from './heartbeat.ts'
+import * as binary from '@conter/shared/codec/binary.ts'
+
+const BOT_PREFIX = 'bot-'
+const isBotId = (id: string): boolean => id.startsWith(BOT_PREFIX)
+export class RoomUnavailableError extends Error {
+  override name = 'RoomUnavailableError'
+}
 import { WebSocket, type RawData, type WebSocketServer } from 'ws'
 import {
   parseClientMessage,
@@ -135,12 +143,20 @@ export function attachWebSockets({ wss, manager, config, log, counters, arenas }
     if (!arena) throw new Error('no arenas configured')
     const match = new Match({ arena })
     match.onSnapshot = ({ tick, entities, events }) => {
-      // сутності спільні, а ack і you — свої для кожного клієнта
+      // сутності спільні, а ack і you — свої для кожного клієнта.
+      // Lab 7: бінарне тіло кодуємо один раз на тік, клієнтам — копія з власним заголовком.
+      let binaryTemplate: ArrayBuffer | null = null
       for (const client of clientsIn(room)) {
         const s = state.get(client)
         if (!s) continue
-        const snap = makeSnapshot({ tick, ack: match.ackFor(s.id), you: s.shipId, entities, events })
-        const encoded = s.codec.encodeSnapshot(snap)
+        const ack = match.ackFor(s.id)
+        let encoded: string | ArrayBuffer
+        if (s.codec.name === 'binary') {
+          binaryTemplate ??= binary.encodeSnapshot(makeSnapshot({ tick, ack, you: null, entities, events }))
+          encoded = binary.withSnapshotHeader(binaryTemplate, ack, s.shipId)
+        } else {
+          encoded = s.codec.encodeSnapshot(makeSnapshot({ tick, ack, you: s.shipId, entities, events }))
+        }
         s.bytesOut += byteSize(encoded)
         deliver(client, encoded, { critical: false, droppable: true })
       }
@@ -286,6 +302,13 @@ export function attachWebSockets({ wss, manager, config, log, counters, arenas }
         log.info('player left', { room: room.id, player: s.player.name, code })
         room.match?.removePlayer(s.id)
         room.leave(s.id)
+        // пішла остання людина — боти теж ідуть (літати самим собі немає сенсу, а CPU витрачається)
+        if (![...room.players.keys()].some((id) => !isBotId(id))) {
+          for (const id of [...room.players.keys()]) {
+            room.match?.removePlayer(id)
+            room.leave(id)
+          }
+        }
         if (room.players.size === 0 && room.match) {
           room.match.stop()
           room.match = null
@@ -299,25 +322,39 @@ export function attachWebSockets({ wss, manager, config, log, counters, arenas }
   })
 
   // ---------- heartbeat ----------
-  const heartbeat = setInterval(() => {
-    for (const socket of wss.clients) {
-      const s = state.get(socket)
-      if (!s) continue
-      if (s.missedPongs >= 2) {
-        counters.terminated++
-        log.warn('no pong, terminating', { id: s.id })
-        socket.terminate()
-        continue
-      }
-      s.missedPongs++
-      socket.ping()
+  const heartbeat = startHeartbeat({
+    intervalMs: config.heartbeatMs,
+    clients: () => wss.clients,
+    missed: (socket) => state.get(socket),
+    onTerminate: (socket) => {
+      counters.terminated++
+      log.warn('no pong, terminating', { id: state.get(socket)?.id })
+    },
+  })
+
+  // Lab 7, M4: додати N ботів у кімнату (POST /api/rooms/:id/bots). Боти — звичайні
+  // гравці кімнати (є в ростері з іменем), лише команди літаку дає Bot на сервері.
+  let botCounter = 0
+  function addBots(roomId: string, count: number): PlayerInfo[] {
+    const room = manager.get(roomId)
+    if (!room || room.closed) throw new RoomUnavailableError('no such room')
+    const added: PlayerInfo[] = []
+    const match = ensureMatch(room)
+    wire(room)
+    for (let i = 0; i < count && !room.isFull; i++) {
+      const id = `${BOT_PREFIX}${++botCounter}`
+      const player: PlayerInfo = { id, name: `Bot ${botCounter}`, shipId: match.addBot(id) }
+      room.join(player)
+      added.push(player)
     }
-  }, config.heartbeatMs)
-  heartbeat.unref() // таймер не тримає процес живим сам по собі
+    if (added.length) log.info('bots added', { room: room.id, count: added.length, bots: match.botCount })
+    return added
+  }
 
   return {
+    addBots,
     stop(): void {
-      clearInterval(heartbeat)
+      heartbeat.stop()
       for (const room of manager.rooms()) room.match?.stop()
     },
     // для /api/stats

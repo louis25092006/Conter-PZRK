@@ -1,5 +1,5 @@
 // Lab 5: авторитетний сервер, команди, знімки, кодеки, точний таймер.
-import { test, before, after } from 'node:test'
+import { test, beforeAll as before, afterAll as after } from 'vitest'
 import assert from 'node:assert/strict'
 import { mkdtemp, rm } from 'node:fs/promises'
 import { tmpdir } from 'node:os'

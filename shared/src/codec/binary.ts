@@ -44,6 +44,7 @@ import {
   toTick,
   type EffectName,
   type EntityId,
+  type Seq,
   type Team,
 } from '../types.ts'
 import type { EntityData, InputMsg, Snapshot } from '../protocol.ts'
@@ -308,6 +309,19 @@ export function encodeSnapshot(s: Snapshot): ArrayBuffer {
     }
   }
   return w.buffer
+}
+
+// Lab 7, M3: знімок для N клієнтів відрізняється лише двома полями заголовка — ack і you.
+// Профіль сервера показав, що кодування того самого знімка N разів — гаряча точка (≈19% CPU).
+// Тепер тіло кодуємо ОДИН раз, а кожному клієнту — копія з підставленими ack/you.
+const ACK_OFFSET = 6
+const YOU_OFFSET = 10
+export function withSnapshotHeader(template: ArrayBuffer, ack: Seq, you: EntityId | null): ArrayBuffer {
+  const copy = template.slice(0) // ~1–2 КБ memcpy — у сотні разів дешевше за повторне кодування
+  const view = new DataView(copy)
+  view.setUint32(ACK_OFFSET, ack, true)
+  view.setUint32(YOU_OFFSET, you ?? 0, true)
+  return copy
 }
 
 function readEntity(r: Reader): EntityData {

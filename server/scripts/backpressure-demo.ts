@@ -61,7 +61,7 @@ function throttledDownload(path: string): Promise<{ received: number; seconds: n
     const t0 = performance.now()
     let received = 0
     get({ port: PORT, path }, (res) => {
-      res.on('data', (chunk) => {
+      res.on('data', (chunk: Buffer) => {
         received += chunk.length
         const ahead = received / RATE - (performance.now() - t0) / 1000
         if (ahead > 0) {

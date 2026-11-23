@@ -1,0 +1,167 @@
+{
+  "label": "after",
+  "seconds": 30,
+  "throttle": 1,
+  "chromium": "159.0.8154.6",
+  "entitiesAtEnd": 44,
+  "frames": 1897,
+  "frameMs": {
+    "p50": 0.9,
+    "p95": 2.4,
+    "p99": 3.1,
+    "max": 8.7
+  },
+  "intervalMs": {
+    "p50": 16.7,
+    "p95": 16.7,
+    "p99": 16.8,
+    "over20ms": 0
+  },
+  "majorEvents": [
+    {
+      "atSec": 25.3,
+      "ms": 5.68,
+      "args": {
+        "type": "finalize incremental marking via task",
+        "usedHeapSizeAfter": 4143984,
+        "usedHeapSizeBefore": 6435888
+      }
+    },
+    {
+      "atSec": 30.1,
+      "ms": 2.06,
+      "args": {
+        "type": "finalize incremental marking via task",
+        "usedHeapSizeAfter": 4136132,
+        "usedHeapSizeBefore": 5201488
+      }
+    },
+    {
+      "atSec": 30.1,
+      "ms": 3.82,
+      "args": {
+        "type": "sampling profiler",
+        "usedHeapSizeAfter": 4134404,
+        "usedHeapSizeBefore": 4136132
+      }
+    }
+  ],
+  "gc": {
+    "minor": 24,
+    "minorMs": 11.9,
+    "major": 3,
+    "majorMs": 11.6,
+    "maxMs": 5.68
+  },
+  "allocatedMBperSec": 1.08,
+  "topAllocators": [
+    {
+      "fn": "drawBullet http://localhost:5173/src/render/draw.ts:172",
+      "MB": 4.16,
+      "pct": 12.9
+    },
+    {
+      "fn": "view http://localhost:5173/src/net/net-game.ts:374",
+      "MB": 4.1,
+      "pct": 12.7
+    },
+    {
+      "fn": "readEntity shared/codec/binary.ts:316",
+      "MB": 2.7,
+      "pct": 8.3
+    },
+    {
+      "fn": "drawShip http://localhost:5173/src/render/draw.ts:130",
+      "MB": 2.31,
+      "pct": 7.2
+    },
+    {
+      "fn": "drawWorld http://localhost:5173/src/render/draw.ts:429",
+      "MB": 1.67,
+      "pct": 5.2
+    },
+    {
+      "fn": "#reconcile http://localhost:5173/src/net/net-game.ts:263",
+      "MB": 1.41,
+      "pct": 4.4
+    },
+    {
+      "fn": "step http://localhost:5173/src/net/net-game.ts:173",
+      "MB": 1.08,
+      "pct": 3.3
+    },
+    {
+      "fn": "f32 shared/codec/binary.ts:147",
+      "MB": 1.03,
+      "pct": 3.2
+    }
+  ],
+  "topSelfTime": [
+    {
+      "fn": "drawImage",
+      "ms": 940,
+      "pct": 3.1
+    },
+    {
+      "fn": "fillText",
+      "ms": 170,
+      "pct": 0.6
+    },
+    {
+      "fn": "draw http://localhost:5173/src/hud.ts:33",
+      "ms": 65,
+      "pct": 0.2
+    },
+    {
+      "fn": "renderFrame http://localhost:5173/src/main.ts:339",
+      "ms": 35,
+      "pct": 0.1
+    },
+    {
+      "fn": "drawBullet http://localhost:5173/src/render/draw.ts:172",
+      "ms": 32,
+      "pct": 0.1
+    },
+    {
+      "fn": "requestAnimationFrame",
+      "ms": 31,
+      "pct": 0.1
+    },
+    {
+      "fn": "drawNames http://localhost:5173/src/main.ts:325",
+      "ms": 23,
+      "pct": 0.1
+    },
+    {
+      "fn": "save",
+      "ms": 21,
+      "pct": 0.1
+    }
+  ],
+  "userTiming": {
+    "simulate": {
+      "count": 0,
+      "p50": 0,
+      "p95": 0,
+      "p99": 0
+    },
+    "render": {
+      "count": 0,
+      "p50": 0,
+      "p95": 0,
+      "p99": 0
+    },
+    "decode": {
+      "count": 0,
+      "p50": 0,
+      "p95": 0,
+      "p99": 0
+    },
+    "reconcile": {
+      "count": 0,
+      "p50": 0,
+      "p95": 0,
+      "p99": 0
+    }
+  }
+}

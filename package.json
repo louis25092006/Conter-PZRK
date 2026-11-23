@@ -13,22 +13,28 @@
     "build": "npm run build -w client",
     "start": "npm run start -w server",
     "test": "npm test -w shared && npm test -w client && npm test -w server",
-    "lint": "eslint client/src client/tests client/scripts client/vite.config.ts shared/src shared/test server/src server/test server/scripts scripts",
-    "format": "prettier --write client/src client/index.html client/scripts client/tests client/vite.config.ts shared server scripts eslint.config.js",
+    "lint": "eslint .",
+    "format": "prettier --write client/src client/index.html client/worker-bench.html client/scripts client/tests client/vite.config.ts client/vitest.config.ts shared server/src server/test server/scripts scripts e2e playwright.config.ts eslint.config.js .github",
     "assets": "npm run assets -w client",
-    "typecheck": "npm run typecheck -w shared -w server -w client",
+    "typecheck": "npm run typecheck -w shared -w server -w client && tsc --noEmit -p e2e",
     "check": "npm run typecheck && npm run lint && npm test",
-    "site": "npm run build:site -w client"
+    "site": "npm run build:site -w client",
+    "coverage": "npm run coverage -w shared",
+    "e2e": "playwright test"
   },
   "devDependencies": {
     "@eslint/js": "^10.0.1",
+    "@playwright/test": "^1.65.1",
     "@types/node": "^26.6.6",
     "@types/ws": "^8.18.2",
+    "@vitest/coverage-v8": "^5.1.1",
     "eslint": "^10.10.0",
     "eslint-config-prettier": "^10.1.8",
+    "fast-check": "^4.11.0",
     "globals": "^17.14.0",
     "prettier": "^3.9.7",
     "typescript": "~6.0.0",
-    "typescript-eslint": "^8.73.0"
+    "typescript-eslint": "^8.73.0",
+    "vitest": "^5.1.1"
   }
 }

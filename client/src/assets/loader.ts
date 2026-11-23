@@ -61,17 +61,23 @@ export function isRetryable(e: unknown): boolean {
 
 // ---------- утиліти ----------
 
+// причина скасування — завжди Error (signal.reason має тип any)
+function abortReason(signal: AbortSignal): Error {
+  const r: unknown = signal.reason
+  return r instanceof Error ? r : new DOMException('This operation was aborted', 'AbortError')
+}
+
 // setTimeout у вигляді проміса, який можна перервати сигналом
 export function sleep(ms: number, signal?: AbortSignal): Promise<void> {
   return new Promise<void>((resolve, reject) => {
-    if (signal?.aborted) return reject(signal.reason)
+    if (signal?.aborted) return reject(abortReason(signal))
     const id = setTimeout(() => {
       signal?.removeEventListener('abort', onAbort)
       resolve()
     }, ms)
     function onAbort(): void {
       clearTimeout(id)
-      reject(signal?.reason)
+      if (signal) reject(abortReason(signal))
     }
     signal?.addEventListener('abort', onAbort, { once: true })
   })
