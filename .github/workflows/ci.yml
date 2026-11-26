@@ -46,6 +46,7 @@ jobs:
           bytes=$(docker image inspect conter-pzrk:ci --format '{{.Size}}')
           mb=$((bytes / 1024 / 1024))
           echo "Image size: ${mb} MB" | tee -a "$GITHUB_STEP_SUMMARY"
+          echo "::notice title=Docker image size::${mb} MB"
           test "$mb" -lt 200
       - name: Start container and wait for /ready
         run: |
@@ -63,6 +64,7 @@ jobs:
           took=$(( ($(date +%s%N) - start) / 1000000 ))
           code=$(docker inspect game --format '{{.State.ExitCode}}')
           echo "docker stop took ${took} ms, exit code ${code}" | tee -a "$GITHUB_STEP_SUMMARY"
+          echo "::notice title=Graceful stop::docker stop took ${took} ms, exit code ${code}"
           docker logs game | tail -5
           docker logs game | grep -q '"event":"server.stopped"'
           test "$code" -eq 0

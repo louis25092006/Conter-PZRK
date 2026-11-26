@@ -59,7 +59,8 @@ export const ServerConfigSchema = z.object({
   ALLOWED_ORIGINS: origins(DEV_ORIGINS), // звідки можна відкривати WebSocket (перевірка Origin)
   MAX_CONNECTIONS_PER_IP: int(8, 1, 100_000),
   TRUST_PROXY: bool(false), // за проксі хостингу IP клієнта — у X-Forwarded-For, а не в сокеті
-  GIT_SHA: z.string().min(1).default('dev'), // штамп версії: підставляє збірка Docker
+  GIT_SHA: z.string().min(1).optional(), // штамп версії: підставляє збірка Docker (--build-arg)
+  RENDER_GIT_COMMIT: z.string().min(1).optional(), // …а на Render — сама платформа (коміт, який зібрано)
 })
 
 // зручні імена полів для коду (camelCase)
@@ -126,7 +127,8 @@ export function loadConfig(
     allowedOrigins: c.ALLOWED_ORIGINS,
     maxConnectionsPerIp: c.MAX_CONNECTIONS_PER_IP,
     trustProxy: c.TRUST_PROXY,
-    version: c.GIT_SHA,
+    // GIT_SHA з образу, якщо збирали ми; інакше коміт від Render; інакше 'dev'. Короткий, як у git log
+    version: (c.GIT_SHA && c.GIT_SHA !== 'dev' ? c.GIT_SHA : (c.RENDER_GIT_COMMIT ?? c.GIT_SHA ?? 'dev')).slice(0, 7),
     ...overrides,
   })
 }

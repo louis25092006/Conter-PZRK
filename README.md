@@ -1469,7 +1469,7 @@ http://localhost:5173/?perf=1                       # User Timing у DevTools �
 
 **Пайплайн:**
 - `ci.yml` (кожен push і PR): typecheck → lint → unit → coverage → build → e2e (2 браузери + телефон) і окрема задача `docker`;
-- `deploy.yml` (тег `v*`): викликає той самий CI → `docker/build-push-action` публікує `ghcr.io/louis25092006/conter-pzrk:<тег>` і `:latest` → дергає Render Deploy Hook з цим образом → чекає, доки `LIVE_URL/health` не покаже SHA цього коміту.
+- `deploy.yml` (тег `v*`): викликає той самий CI → `docker/build-push-action` публікує `ghcr.io/louis25092006/conter-pzrk:<тег>` і `:latest` (щоб образ можна було запустити будь-де) → дергає Render Deploy Hook (Render перезбирає `main` з того самого `Dockerfile`) → чекає, доки `LIVE_URL/health` не покаже SHA цього коміту.
 
 ## Milestone M4 — запуск
 
@@ -1485,12 +1485,14 @@ http://localhost:5173/?perf=1                       # User Timing у DevTools �
 
 Цього я не можу зробити сама: потрібні твої акаунти, телефон і живі люди.
 
-1. **Render** (безкоштовний план; умови реєстрації перевір на сайті): *New → Web Service → Deploy an existing image* → `ghcr.io/louis25092006/conter-pzrk:latest`. Образ з'явиться після першого тегу (крок 3); якщо GitHub зробить пакет приватним — *GitHub → Packages → conter-pzrk → Package settings → Change visibility → Public*. Змінні середовища сервісу:
-   - `ALLOWED_ORIGINS=https://<назва>.onrender.com`
+1. **Render** (безкоштовний план; умови реєстрації перевір на сайті): *New → Web Service* → GitHub-репозиторій `Conter-PZRK`, гілка `main`, **Language: Docker** (Render сам збере образ із нашого `Dockerfile`). Змінні середовища (*Environment Variables*):
+   - `ALLOWED_ORIGINS=https://<назва>.onrender.com` (точна адреса сервісу, без `/` у кінці)
    - `TRUST_PROXY=true`
    - `LOG_LEVEL=info`
-   - Health Check Path: `/ready`
-2. **GitHub → Settings → Secrets and variables → Actions:** секрет `RENDER_DEPLOY_HOOK_URL` (Render → сервіс → Settings → Deploy Hook) і змінна `LIVE_URL=https://<назва>.onrender.com`.
+   - `NODE_ENV=production`
+   - `PORT` не задавати — Render ставить його сам; версію (git SHA) сервер бере з `RENDER_GIT_COMMIT`, яку теж підставляє Render.
+   - *Advanced → Health Check Path:* `/ready`; *Auto-Deploy:* **No** — деплоїть лише пайплайн за тегом `v*` (інакше кожен push у `main` одразу йшов би в продакшен, без тегу).
+2. **GitHub → Settings → Secrets and variables → Actions:** секрет `RENDER_DEPLOY_HOOK_URL` (Render → сервіс → Settings → Deploy Hook) і змінна (*Variables*) `LIVE_URL=https://<назва>.onrender.com`.
 3. **Тег:** `git tag v1.0.0 && git push origin v1.0.0` — пайплайн збере, опублікує, задеплоїть і перевірить версію.
 4. **Монітор аптайму:** наприклад, UptimeRobot (безкоштовно, перевірка раз на 5 хв, листи на пошту) на `https://<назва>.onrender.com/health`. Заодно не дає безкоштовному Render заснути.
 5. **Гра з двома людьми з інших мереж:** надішли посилання, грайте одночасно, запиши GIF/відео (наприклад, ScreenToGif), попроси їх натиснути `N` і сфотографувати нетграф (RTT, трафік). Їхні цифри (без імен) — у таблицю нижче.

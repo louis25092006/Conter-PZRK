@@ -18,8 +18,10 @@ COPY shared shared
 COPY client client
 COPY server server
 ARG GIT_SHA=dev
-# tsc --noEmit (перевірка типів) + vite build → client/dist; GIT_SHA потрапляє в HUD
-RUN GIT_SHA=$GIT_SHA npm run build -w client
+# Render збирає образ сам і передає змінні середовища як build-аргументи — серед них RENDER_GIT_COMMIT
+ARG RENDER_GIT_COMMIT=
+# tsc --noEmit (перевірка типів) + vite build → client/dist; SHA потрапляє в HUD
+RUN GIT_SHA=${RENDER_GIT_COMMIT:-$GIT_SHA} npm run build -w client
 
 # ---------- стадія 2: runtime (лише те, що потрібно для роботи) ----------
 FROM node:24-alpine AS runtime

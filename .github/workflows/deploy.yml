@@ -3,6 +3,8 @@
 #
 # Потрібно налаштувати в репозиторії (Settings → Secrets and variables → Actions):
 #   secret   RENDER_DEPLOY_HOOK_URL  — Render → сервіс → Settings → Deploy Hook (це секрет: з ним будь-хто запустить деплой)
+# Сервіс на Render створено з GitHub-репозиторію (runtime Docker, Auto-Deploy: Off): hook перезбирає main з Dockerfile.
+# Образ у GHCR — той самий Dockerfile; він для `docker run` будь-де і як запасний варіант деплою.
 #   variable LIVE_URL                — публічна адреса гри, напр. https://conter-pzrk.onrender.com
 # Без них образ однаково публікується в GHCR, а кроки деплою пропускаються.
 name: Deploy
@@ -54,10 +56,8 @@ jobs:
       - name: Trigger Render deploy
         if: env.HOOK != ''
         run: |
-          # imgURL — який саме образ розгорнути (Render deploy hook для сервісу з образу)
-          img=$(python3 -c "import urllib.parse,sys; print(urllib.parse.quote(sys.argv[1], safe=''))" "${{ needs.publish.outputs.image }}")
-          curl -fsS -X POST "${HOOK}&imgURL=${img}" > /dev/null
-          echo "Render deploy triggered for ${{ needs.publish.outputs.image }}"
+          curl -fsS -X POST "${HOOK}" > /dev/null
+          echo "Render deploy triggered for ${GITHUB_SHA::7} (tag ${GITHUB_REF_NAME})"
       - name: Wait until /health reports this version
         if: env.HOOK != '' && env.LIVE_URL != ''
         run: |
