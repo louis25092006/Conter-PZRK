@@ -41,6 +41,7 @@ const server = spawn(
       PORT: String(PORT),
       QUIET: 'true',
       MAX_PLAYERS_PER_ROOM: '512',
+      MAX_CONNECTIONS_PER_IP: '10000', // усі клієнти генератора — з 127.0.0.1
       LOG_DIR: mkdtempSync(join(tmpdir(), 'conter-load-')),
     },
     stdio: ['inherit', 'inherit', 'inherit', 'ipc'],

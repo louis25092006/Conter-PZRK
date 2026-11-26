@@ -1,17 +1,19 @@
-# Lab 6–7: кожен push і pull request — typecheck → lint → unit → build → e2e
+# Lab 6–8: кожен push і pull request — typecheck → lint → unit → build → e2e, плюс перевірка Docker-образу.
+# Той самий workflow викликає deploy.yml перед публікацією (workflow_call): без зеленого CI деплою немає.
 name: CI
 on:
   push:
     branches: [main]
   pull_request:
+  workflow_call:
 
 jobs:
   check:
     runs-on: ubuntu-latest
     timeout-minutes: 15
     steps:
-      - uses: actions/checkout@v4
-      - uses: actions/setup-node@v4
+      - uses: actions/checkout@v5
+      - uses: actions/setup-node@v5
         with:
           node-version: 24
           cache: npm # кеш npm за хешем package-lock.json
@@ -29,3 +31,39 @@ jobs:
           name: playwright-report
           path: test-results/
           retention-days: 7
+
+  # Lab 8, M3: образ збирається, важить < 200 МБ, стартує, відповідає /health з версією
+  # і вимикається по `docker stop` з кодом 0 менш ніж за 10 с (SIGTERM доходить до node)
+  docker:
+    runs-on: ubuntu-latest
+    timeout-minutes: 15
+    steps:
+      - uses: actions/checkout@v5
+      - name: Build image
+        run: docker build --build-arg GIT_SHA=${GITHUB_SHA::7} -t conter-pzrk:ci .
+      - name: Image size < 200 MB
+        run: |
+          bytes=$(docker image inspect conter-pzrk:ci --format '{{.Size}}')
+          mb=$((bytes / 1024 / 1024))
+          echo "Image size: ${mb} MB" | tee -a "$GITHUB_STEP_SUMMARY"
+          test "$mb" -lt 200
+      - name: Start container and wait for /ready
+        run: |
+          docker run -d --name game -p 3000:3000 -e ALLOWED_ORIGINS=http://localhost:3000 conter-pzrk:ci
+          for i in $(seq 1 30); do curl -fs localhost:3000/ready && break; sleep 1; done
+          curl -fs localhost:3000/health | tee health.json
+          grep -q "\"version\":\"${GITHUB_SHA::7}\"" health.json
+          curl -fs localhost:3000/metrics | grep -E '^conter_(players|rooms|tick_duration_p99_ms)'
+          curl -fs localhost:3000/ | grep -q '<canvas'
+          docker exec game id -u | grep -vq '^0$' # не root
+      - name: Graceful stop (SIGTERM → exit 0 within 10 s)
+        run: |
+          start=$(date +%s%N)
+          docker stop game
+          took=$(( ($(date +%s%N) - start) / 1000000 ))
+          code=$(docker inspect game --format '{{.State.ExitCode}}')
+          echo "docker stop took ${took} ms, exit code ${code}" | tee -a "$GITHUB_STEP_SUMMARY"
+          docker logs game | tail -5
+          docker logs game | grep -q '"event":"server.stopped"'
+          test "$code" -eq 0
+          test "$took" -lt 10000

@@ -1,9 +1,11 @@
 import { randomUUID } from 'node:crypto'
 import type { IncomingMessage } from 'node:http'
 import { startHeartbeat } from './heartbeat.ts'
+import type { Metrics, LiveStats } from './metrics.ts'
 import * as binary from '@conter/shared/codec/binary.ts'
 
 const BOT_PREFIX = 'bot-'
+const BOOT_ID = randomUUID().slice(0, 8) // Lab 8: новий на кожен запуск процесу
 const isBotId = (id: string): boolean => id.startsWith(BOT_PREFIX)
 export class RoomUnavailableError extends Error {
   override name = 'RoomUnavailableError'
@@ -71,14 +73,19 @@ export interface SendTarget {
 export function createSender({
   slowClientBytes,
   counters,
+  onSent,
+  onSlowClose,
 }: {
   slowClientBytes: number
   counters: Pick<Counters, 'dropped' | 'slowClosed'>
+  onSent?: (bytes: number) => void
+  onSlowClose?: () => void
 }) {
   return function send(socket: SendTarget, message: Outgoing, { critical = true } = {}): SendResult {
     if (socket.readyState !== WebSocket.OPEN) return 'skipped'
     if (socket.bufferedAmount > slowClientBytes * 4) {
       counters.slowClosed++
+      onSlowClose?.()
       socket.close(CLOSE.SLOW_CLIENT, 'too slow')
       return 'closed'
     }
@@ -86,9 +93,10 @@ export function createSender({
       counters.dropped++
       return 'dropped'
     }
-    socket.send(
-      typeof message === 'string' || message instanceof ArrayBuffer ? message : JSON.stringify(message),
-    )
+    const data =
+      typeof message === 'string' || message instanceof ArrayBuffer ? message : JSON.stringify(message)
+    socket.send(data)
+    onSent?.(typeof data === 'string' ? Buffer.byteLength(data) : data.byteLength)
     return 'sent'
   }
 }
@@ -106,12 +114,18 @@ export interface WsDeps {
   config: ServerConfig
   log: Logger
   counters: Counters
+  metrics: Metrics
   arenas: Arenas
 }
 
-export function attachWebSockets({ wss, manager, config, log, counters, arenas }: WsDeps) {
+export function attachWebSockets({ wss, manager, config, log, counters, arenas, metrics }: WsDeps) {
   const state = new WeakMap<WebSocket, SocketState>()
-  const send = createSender({ slowClientBytes: config.slowClientBytes, counters })
+  const send = createSender({
+    slowClientBytes: config.slowClientBytes,
+    counters,
+    onSent: (bytes) => metrics.messageOut(bytes),
+    onSlowClose: () => metrics.rejected('slow_client'),
+  })
 
   function deliver(
     socket: WebSocket,
@@ -163,7 +177,7 @@ export function attachWebSockets({ wss, manager, config, log, counters, arenas }
     }
     room.match = match
     match.start()
-    log.info('match started', { room: room.id, arena: room.arena })
+    log.info('match.started', { roomId: room.id, arena: room.arena })
     return match
   }
 
@@ -185,7 +199,13 @@ export function attachWebSockets({ wss, manager, config, log, counters, arenas }
 
   function reject(socket: WebSocket, code: CloseCode, reason: string): void {
     counters.rejected++
-    log.warn('closing socket', { code, reason, id: state.get(socket)?.id })
+    metrics.rejectedByCode(code)
+    log.warn('ws.rejected', {
+      reason,
+      code,
+      playerId: state.get(socket)?.id,
+      roomId: state.get(socket)?.room?.id,
+    })
     socket.close(code, reason.slice(0, 120)) // reason у кадрі close — до 123 байт
   }
 
@@ -216,9 +236,10 @@ export function attachWebSockets({ wss, manager, config, log, counters, arenas }
       tickRate: match.tickRate,
       codec: s.codec.name,
       net: { ...s.link.config },
+      bootId: BOOT_ID,
     })
     room.join(player) // → 'join' → roster усім у кімнаті
-    log.info('player joined', { room: room.id, player: name, ship: shipId, codec: s.codec.name })
+    log.info('player.joined', { roomId: room.id, playerId: s.id, shipId, codec: s.codec.name })
   }
 
   // Кожен варіант ClientMessage обробляється тут; default з never — якщо в протокол додадуть
@@ -250,6 +271,7 @@ export function attachWebSockets({ wss, manager, config, log, counters, arenas }
   function onMessage(socket: WebSocket, s: SocketState, data: RawData, isBinary: boolean): void {
     const bytes = toBuffer(data)
     s.bytesIn += bytes.length
+    metrics.messageIn(bytes.length)
     // вхідні теж проходять через імітатор затримки (порядок зберігається)
     s.link.in(() => {
       if (socket.readyState !== WebSocket.OPEN) return
@@ -286,7 +308,7 @@ export function attachWebSockets({ wss, manager, config, log, counters, arenas }
     counters.connections++
 
     // 'error' БЕЗ слухача = падіння всього процесу. Тому слухач є на КОЖНОМУ сокеті.
-    socket.on('error', (e: Error) => log.warn('socket error', { id: s.id, error: e.message }))
+    socket.on('error', (e: Error) => log.warn('ws.error', { playerId: s.id, error: e.message }))
 
     // хто не представився за joinTimeoutMs — до побачення
     s.joinTimer = setTimeout(() => reject(socket, CLOSE.JOIN_TIMEOUT, 'join timeout'), config.joinTimeoutMs)
@@ -297,9 +319,10 @@ export function attachWebSockets({ wss, manager, config, log, counters, arenas }
 
     socket.on('close', (code) => {
       if (s.joinTimer) clearTimeout(s.joinTimer)
+      if (code === CLOSE.TOO_BIG) metrics.rejected('too_big') // це закриття робить сама бібліотека ws
       const room = s.room
       if (room && s.player) {
-        log.info('player left', { room: room.id, player: s.player.name, code })
+        log.info('player.left', { roomId: room.id, playerId: s.id, code })
         room.match?.removePlayer(s.id)
         room.leave(s.id)
         // пішла остання людина — боти теж ідуть (літати самим собі немає сенсу, а CPU витрачається)
@@ -312,13 +335,13 @@ export function attachWebSockets({ wss, manager, config, log, counters, arenas }
         if (room.players.size === 0 && room.match) {
           room.match.stop()
           room.match = null
-          log.info('match stopped (room empty)', { room: room.id })
+          log.info('match.stopped', { roomId: room.id, reason: 'room empty' })
         }
       }
       s.room = null
     })
 
-    log.info('socket connected', { id: s.id, ip: req.socket.remoteAddress, ...net })
+    log.info('ws.connected', { playerId: s.id, ...net })
   })
 
   // ---------- heartbeat ----------
@@ -328,7 +351,8 @@ export function attachWebSockets({ wss, manager, config, log, counters, arenas }
     missed: (socket) => state.get(socket),
     onTerminate: (socket) => {
       counters.terminated++
-      log.warn('no pong, terminating', { id: state.get(socket)?.id })
+      metrics.rejected('no_pong')
+      log.warn('ws.terminated', { reason: 'no pong', playerId: state.get(socket)?.id })
     },
   })
 
@@ -347,12 +371,31 @@ export function attachWebSockets({ wss, manager, config, log, counters, arenas }
       room.join(player)
       added.push(player)
     }
-    if (added.length) log.info('bots added', { room: room.id, count: added.length, bots: match.botCount })
+    if (added.length) log.info('bots.added', { roomId: room.id, count: added.length, bots: match.botCount })
     return added
+  }
+
+  function liveStats(): LiveStats {
+    let players = 0
+    let bots = 0
+    let matches = 0
+    let tickP99Ms = 0
+    for (const room of manager.rooms()) {
+      for (const id of room.players.keys()) {
+        if (isBotId(id)) bots++
+        else players++
+      }
+      if (room.match) {
+        matches++
+        tickP99Ms = Math.max(tickP99Ms, room.match.tickPercentiles().p99)
+      }
+    }
+    return { players, bots, rooms: manager.size, matches, connections: wss.clients.size, tickP99Ms }
   }
 
   return {
     addBots,
+    liveStats,
     stop(): void {
       heartbeat.stop()
       for (const room of manager.rooms()) room.match?.stop()

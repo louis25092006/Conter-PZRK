@@ -1,25 +1,45 @@
-// Маленький логер: час, рівень, повідомлення, контекст. Без залежностей.
+import { pino, stdTimeFunctions } from 'pino'
+
+// Lab 8: структуровані логи — pino, JSON-рядок на подію в stdout (не у файл).
+// Платформа (Render, Fly, Docker) сама збирає stdout; JSON легко фільтрувати:
+//   {"level":30,"time":"…","event":"player.joined","roomId":"r-classic","playerId":"…"}
+// Інтерфейс Logger лишився той самий (повідомлення + контекст), тож решта коду не змінилась.
+// Правило: жодних секретів і повних повідомлень гравців у логах — лише ідентифікатори й причини.
+
 export type LogContext = Readonly<Record<string, unknown>>
+export type LogLevel = 'fatal' | 'error' | 'warn' | 'info' | 'debug' | 'trace' | 'silent'
+
 export interface Logger {
-  info(msg: string, ctx?: LogContext): void
-  warn(msg: string, ctx?: LogContext): void
-  error(msg: string, ctx?: LogContext): void
+  info(event: string, ctx?: LogContext): void
+  warn(event: string, ctx?: LogContext): void
+  error(event: string, ctx?: LogContext): void
+  debug(event: string, ctx?: LogContext): void
+  // дописати буфер перед виходом (graceful shutdown)
+  flush(): Promise<void>
 }
 
-type Level = 'info' | 'warn' | 'error'
+export interface LoggerOptions {
+  quiet?: boolean
+  logLevel?: LogLevel
+  version?: string
+}
 
-export function createLogger({ quiet = false }: { quiet?: boolean } = {}): Logger {
-  function write(level: Level, msg: string, ctx?: LogContext): void {
-    if (quiet && level !== 'error') return
-    const time = new Date().toISOString().slice(11, 23)
-    const extra = ctx ? ' ' + JSON.stringify(ctx) : ''
-    const line = `${time} ${level.toUpperCase().padEnd(5)} ${msg}${extra}`
-    if (level === 'info') console.log(line)
-    else console.error(line)
-  }
+export function createLogger({
+  quiet = false,
+  logLevel = 'info',
+  version = 'dev',
+}: LoggerOptions = {}): Logger {
+  const log = pino({
+    level: quiet ? 'error' : logLevel,
+    base: { service: 'conter-server', version },
+    messageKey: 'event',
+    timestamp: stdTimeFunctions.isoTime,
+  })
   return {
-    info: (msg, ctx) => write('info', msg, ctx),
-    warn: (msg, ctx) => write('warn', msg, ctx),
-    error: (msg, ctx) => write('error', msg, ctx),
+    info: (event, ctx) => log.info(ctx ?? {}, event),
+    warn: (event, ctx) => log.warn(ctx ?? {}, event),
+    error: (event, ctx) => log.error(ctx ?? {}, event),
+    debug: (event, ctx) => log.debug(ctx ?? {}, event),
+    flush: () => new Promise<void>((resolve) => log.flush(() => resolve())),
   }
 }

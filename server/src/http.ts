@@ -9,6 +9,7 @@ import { listReplays, REPLAY_ID } from './log/replay.ts'
 import type { ServerConfig } from './config.ts'
 import type { Logger } from './logger.ts'
 import type { PlayerInfo } from '@conter/shared/protocol.ts'
+import type { Metrics } from './metrics.ts'
 
 const MIME: Readonly<Record<string, string>> = {
   '.html': 'text/html; charset=utf-8',
@@ -118,6 +119,8 @@ export interface HttpDeps {
   stats: () => Readonly<Record<string, number>>
   matchStats?: () => unknown
   addBots?: (roomId: string, count: number) => readonly PlayerInfo[]
+  metrics?: Metrics
+  ready?: () => boolean
 }
 
 const isPrematureClose = (e: unknown): boolean =>
@@ -125,7 +128,16 @@ const isPrematureClose = (e: unknown): boolean =>
 
 const BotsSchema = z.object({ count: z.number().int().min(1).max(64).default(1) })
 
-export function createHttpHandler({ config, manager, log, stats, matchStats = () => [], addBots }: HttpDeps) {
+export function createHttpHandler({
+  config,
+  manager,
+  log,
+  stats,
+  matchStats = () => [],
+  addBots,
+  metrics,
+  ready = () => true,
+}: HttpDeps) {
   let lastElu = performance.eventLoopUtilization()
 
   // Lab 7, M4: POST /api/rooms/:id/bots  { "count": 8 } → додає ботів у кімнату
@@ -138,15 +150,31 @@ export function createHttpHandler({ config, manager, log, stats, matchStats = ()
   }
 
   const routes: Readonly<Record<string, Handler>> = {
+    // liveness: процес живий і цикл подій відповідає (інакше платформа його перезапустить)
     'GET /health': (req, res) =>
       sendJson(res, 200, {
         ok: true,
+        version: config.version, // Lab 8: git SHA збірки — видно, яка версія задеплоєна
         uptimeSec: Math.round(process.uptime()),
         rooms: manager.size,
         players: manager.playerCount,
         rssMB: +(process.memoryUsage().rss / 1048576).toFixed(1),
         ...stats(),
       }),
+
+    // readiness (Lab 8): чи можна слати сюди гравців. Під час вимкнення — 503, хоча процес ще живий
+    'GET /ready': (req, res) =>
+      ready()
+        ? sendJson(res, 200, { ready: true, version: config.version })
+        : sendJson(res, 503, { ready: false, reason: 'shutting down or not listening yet' }),
+
+    // метрики у форматі Prometheus (Lab 8): гравці, кімнати, повідомлення/байти, p99 тіку, ELU, RSS…
+    'GET /metrics': async (req, res) => {
+      if (!metrics) throw new HttpError(404, 'metrics are not enabled')
+      const body = await metrics.registry.metrics()
+      res.writeHead(200, { 'content-type': metrics.registry.contentType })
+      res.end(body)
+    },
 
     'GET /api/rooms': (req, res) => sendJson(res, 200, { rooms: manager.list() }),
 
@@ -172,7 +200,7 @@ export function createHttpHandler({ config, manager, log, stats, matchStats = ()
       const { name, arena, maxPlayers } = parsed.data
       try {
         const room = manager.create({ name, arena, ...(maxPlayers ? { maxPlayers } : {}) })
-        log.info('room created via API', { id: room.id, name, arena })
+        log.info('room.created', { roomId: room.id, name, arena, via: 'api' })
         sendJson(res, 201, room.toJSON())
       } catch (e: unknown) {
         if (e instanceof RoomsLimitError) throw new HttpError(409, e.message)
@@ -236,8 +264,7 @@ export function createHttpHandler({ config, manager, log, stats, matchStats = ()
     } catch (e: unknown) {
       if (isPrematureClose(e)) return // клієнт сам обірвав завантаження
       const status = e instanceof HttpError ? e.status : 500
-      if (status >= 500)
-        log.error('http handler failed', { key, error: e instanceof Error ? e.message : String(e) })
+      if (status >= 500) log.error('http.failed', { key, error: e instanceof Error ? e.message : String(e) })
       const message = e instanceof HttpError ? e.message : 'internal error'
       if (!res.headersSent) sendJson(res, status, { error: status >= 500 ? 'internal error' : message })
       else res.destroy()

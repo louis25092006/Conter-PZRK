@@ -1,0 +1,19 @@
+# Lab 8: не тягнемо в контекст збірки те, що не потрібне (і секрети)
+**/node_modules
+.git
+.github
+.claude
+**/dist
+site
+docs
+coverage
+**/coverage
+test-results
+playwright-report
+server/logs
+**/*.log
+**/scripts/profiles
+.env
+**/.env
+*.md
+e2e

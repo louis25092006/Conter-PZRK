@@ -1,0 +1,112 @@
+{
+  "clientKill": {
+    "playersBefore": 3,
+    "playersAfter": 2,
+    "serverNoticedAfterMs": 69,
+    "othersStillConnected": true,
+    "tickP99Ms": 2.547
+  },
+  "serverKill": {
+    "soft": {
+      "exitCode": 0,
+      "shutdownTookMs": 46,
+      "clientGotShutdownMessage": true,
+      "backInGameAfterMs": 968
+    },
+    "hard": {
+      "downForMs": 3000,
+      "backInGameAfterMs": 6246
+    },
+    "rejoined": true,
+    "connectionStatuses": [
+      {
+        "t": 2,
+        "state": "open"
+      },
+      {
+        "t": 36,
+        "state": "reconnecting",
+        "code": 1001,
+        "delay": 350
+      },
+      {
+        "t": 390,
+        "state": "reconnecting"
+      },
+      {
+        "t": 392,
+        "state": "reconnecting",
+        "code": 1006,
+        "delay": 560
+      },
+      {
+        "t": 967,
+        "state": "reconnecting"
+      },
+      {
+        "t": 970,
+        "state": "open"
+      },
+      {
+        "t": 1032,
+        "state": "reconnecting",
+        "code": 1006,
+        "delay": 388
+      },
+      {
+        "t": 1434,
+        "state": "reconnecting"
+      },
+      {
+        "t": 1435,
+        "state": "reconnecting",
+        "code": 1006,
+        "delay": 629
+      },
+      {
+        "t": 2075,
+        "state": "reconnecting"
+      },
+      {
+        "t": 2076,
+        "state": "reconnecting",
+        "code": 1006,
+        "delay": 1592
+      },
+      {
+        "t": 3668,
+        "state": "reconnecting"
+      },
+      {
+        "t": 3669,
+        "state": "reconnecting",
+        "code": 1006,
+        "delay": 3543
+      },
+      {
+        "t": 7212,
+        "state": "reconnecting"
+      },
+      {
+        "t": 7216,
+        "state": "open"
+      },
+      {
+        "t": 7245,
+        "state": "closed",
+        "code": 1000
+      }
+    ]
+  },
+  "garbageFlood": {
+    "framesSent": 216861,
+    "framesPerSec": 19711,
+    "attackerConnections": 7224,
+    "rejectedBadShape": 7224,
+    "otherRoomTickP99Ms": {
+      "baseline": 1.472,
+      "duringFlood": 1.113
+    },
+    "otherRoomPlayersStillConnected": "6/6"
+  }
+}

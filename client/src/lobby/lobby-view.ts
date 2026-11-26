@@ -166,6 +166,7 @@ export function mountLobbyView(root: HTMLElement, lobby: Lobby, { arenas }: { ar
 
   const onRooms = (e: LobbyEvents['rooms']): void => {
     const { rooms, at } = e
+
     if (selected && !rooms.some((r) => r.id === selected && r.players < r.maxPlayers)) {
       selected = null
       joinBtn.disabled = true
@@ -176,9 +177,11 @@ export function mountLobbyView(root: HTMLElement, lobby: Lobby, { arenas }: { ar
       return
     }
     const online = rooms.reduce((n, r) => n + r.players, 0)
+    if (Date.now() < noticeUntil) return // список оновили, а пояснення лишаємо
     setStatus(`Сервер на зв'язку · пілотів у небі: ${online} · оновлено ${at.toLocaleTimeString()}`, 'online')
   }
   const onError = ({ error }: LobbyEvents['error']): void => {
+    if (Date.now() < noticeUntil) return // пояснення про перезапуск важливіше за «не відповів за 3 с»
     setStatus(
       isTimeout(error)
         ? `Сервер не відповів за ${lobby.timeoutMs / 1000} с — пробую ще раз…`
@@ -204,6 +207,13 @@ export function mountLobbyView(root: HTMLElement, lobby: Lobby, { arenas }: { ar
 
   const offRooms = lobby.events.on('rooms', onRooms)
   const offError = lobby.events.on('error', onError)
+  // Lab 8: «сервер перезапустився» тощо — повідомлення тримається щонайменше 10 с,
+  // навіть якщо список кімнат уже оновився (інакше його ніхто не встигне прочитати)
+  let noticeUntil = 0
+  const offNotice = lobby.events.on('notice', ({ text }) => {
+    noticeUntil = Date.now() + 10_000
+    setStatus(text, 'error')
+  })
   joinBtn.addEventListener('click', doJoin)
   refreshBtn.addEventListener('click', () => void lobby.refresh())
   nameInput.addEventListener('keydown', (e) => e.key === 'Enter' && doJoin())
@@ -215,6 +225,7 @@ export function mountLobbyView(root: HTMLElement, lobby: Lobby, { arenas }: { ar
   return () => {
     offRooms()
     offError()
+    offNotice()
     root.replaceChildren()
   }
 }

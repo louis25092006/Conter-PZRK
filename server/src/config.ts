@@ -23,6 +23,19 @@ const path = (def: string) =>
     .default(def)
     .transform((p) => resolve(SERVER_ROOT, p))
 
+// Lab 8: список дозволених Origin через кому; '*' — будь-який (лише для дослідів!)
+const origins = (def: string) =>
+  z
+    .string()
+    .default(def)
+    .transform((s) =>
+      s
+        .split(',')
+        .map((o) => o.trim().replace(/\/+$/, ''))
+        .filter(Boolean),
+    )
+const DEV_ORIGINS = 'http://localhost:5173,http://127.0.0.1:5173,http://localhost:3000,http://127.0.0.1:3000'
+
 export const ServerConfigSchema = z.object({
   PORT: int(3000, 0, 65535),
   HOST: z.string().min(1).default('0.0.0.0'),
@@ -41,6 +54,12 @@ export const ServerConfigSchema = z.object({
   SLOW_CLIENT_BYTES: int(256 * 1024, 1024),
   DEMO_ENDPOINTS: bool(false), // /api/slow і буферизований реплей — лише для дослідів
   QUIET: bool(false),
+  // ---- Lab 8: продакшен ----
+  LOG_LEVEL: z.enum(['fatal', 'error', 'warn', 'info', 'debug', 'trace', 'silent']).default('info'),
+  ALLOWED_ORIGINS: origins(DEV_ORIGINS), // звідки можна відкривати WebSocket (перевірка Origin)
+  MAX_CONNECTIONS_PER_IP: int(8, 1, 100_000),
+  TRUST_PROXY: bool(false), // за проксі хостингу IP клієнта — у X-Forwarded-For, а не в сокеті
+  GIT_SHA: z.string().min(1).default('dev'), // штамп версії: підставляє збірка Docker
 })
 
 // зручні імена полів для коду (camelCase)
@@ -61,6 +80,11 @@ export interface ServerConfig {
   readonly slowClientBytes: number
   readonly demoEndpoints: boolean
   readonly quiet: boolean
+  readonly logLevel: z.infer<typeof ServerConfigSchema>['LOG_LEVEL']
+  readonly allowedOrigins: readonly string[]
+  readonly maxConnectionsPerIp: number
+  readonly trustProxy: boolean
+  readonly version: string
 }
 
 // порожні рядки в .env вважаємо "не задано"
@@ -98,6 +122,11 @@ export function loadConfig(
     slowClientBytes: c.SLOW_CLIENT_BYTES,
     demoEndpoints: c.DEMO_ENDPOINTS,
     quiet: c.QUIET,
+    logLevel: c.QUIET ? 'error' : c.LOG_LEVEL,
+    allowedOrigins: c.ALLOWED_ORIGINS,
+    maxConnectionsPerIp: c.MAX_CONNECTIONS_PER_IP,
+    trustProxy: c.TRUST_PROXY,
+    version: c.GIT_SHA,
     ...overrides,
   })
 }

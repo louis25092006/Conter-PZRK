@@ -8,6 +8,8 @@ import { attachWebSockets, type Counters } from './ws.ts'
 import { createMatchLog } from './log/matchlog.ts'
 import { createLogger, type Logger } from './logger.ts'
 import type { ServerConfig } from './config.ts'
+import { createMetrics, type Metrics } from './metrics.ts'
+import { createGuard, clientIp } from './guard.ts'
 
 // Стандартні кімнати, які є завжди (як у rooms.json з Lab 3)
 const DEFAULT_ROOMS: readonly RoomInit[] = [
@@ -29,6 +31,9 @@ export interface GameServer {
   readonly wss: WebSocketServer
   readonly manager: RoomManager
   readonly counters: Counters
+  readonly metrics: Metrics
+  // Lab 8: готовий приймати гравців? (слухає порт і не вимикається)
+  readonly ready: boolean
   listen(): Promise<number>
   close(): Promise<void>
 }
@@ -54,7 +59,7 @@ export function createGameServer(
     void createMatchLog(room, {
       dir: config.logDir,
       onError: (e) =>
-        log.error('match log failed', { room: room.id, error: e instanceof Error ? e.message : String(e) }),
+        log.error('matchlog.failed', { roomId: room.id, error: e instanceof Error ? e.message : String(e) }),
     }).then((matchLog) => {
       logs.add(matchLog.done)
       void matchLog.done.finally(() => logs.delete(matchLog.done))
@@ -62,10 +67,34 @@ export function createGameServer(
   })
 
   const arenas = loadArenas(config.arenasFile)
+  let listening = false
+  let shuttingDown = false
   const httpServer = createServer()
-  const wss = new WebSocketServer({ server: httpServer, path: '/ws', maxPayload: config.maxPayloadBytes })
-  wss.on('error', (e) => log.error('websocket server error', { error: e.message }))
-  const sockets = attachWebSockets({ wss, manager, config, log, counters, arenas })
+  // sockets оголошено нижче — це безпечно: функція викликається лише під час запиту /metrics
+  const metrics = createMetrics(() => sockets.liveStats())
+
+  // Lab 8, M2: Origin і ліміт з'єднань на IP — відмова ще на HTTP-рукостисканні (403/429)
+  const guard = createGuard(config)
+  const wss = new WebSocketServer({
+    server: httpServer,
+    path: '/ws',
+    maxPayload: config.maxPayloadBytes,
+    verifyClient: (info, done) => {
+      const verdict = guard.check(info.req)
+      if (verdict.ok) return done(true)
+      metrics.rejected(verdict.reason)
+      counters.rejected++
+      log.warn('ws.rejected', { reason: verdict.reason, origin: info.origin || undefined, ip: verdict.ip })
+      done(false, verdict.status, verdict.reason === 'origin' ? 'Forbidden origin' : 'Too many connections')
+    },
+  })
+  wss.on('connection', (socket, req) => {
+    const ip = clientIp(req, config.trustProxy)
+    guard.opened(ip)
+    socket.once('close', () => guard.closed(ip))
+  })
+  wss.on('error', (e) => log.error('ws.server_error', { error: e.message }))
+  const sockets = attachWebSockets({ wss, manager, config, log, counters, arenas, metrics })
   const handler = createHttpHandler({
     config,
     manager,
@@ -73,6 +102,8 @@ export function createGameServer(
     stats: () => ({ ...counters }),
     matchStats: () => sockets.stats(),
     addBots: (roomId, count) => sockets.addBots(roomId, count),
+    metrics,
+    ready: () => listening && !shuttingDown,
   })
   httpServer.on('request', (req, res) => void handler(req, res))
 
@@ -81,6 +112,10 @@ export function createGameServer(
     wss,
     manager,
     counters,
+    metrics,
+    get ready() {
+      return listening && !shuttingDown
+    },
 
     async listen() {
       for (const r of DEFAULT_ROOMS) manager.create({ ...r, persistent: true })
@@ -92,19 +127,26 @@ export function createGameServer(
       // address() — string для unix-сокетів, AddressInfo для TCP; у нас завжди TCP
       if (address === null || typeof address === 'string')
         throw new Error('server is not listening on a TCP port')
+      listening = true
       return address.port
     },
 
     // Акуратне вимкнення: не приймати нових → закрити сокети (гравці "виходять" з кімнат)
     // → закрити кімнати (логи дописуються) → дочекатися.
     async close() {
+      shuttingDown = true // /ready → 503: платформа перестає слати сюди нових гравців
       sockets.stop()
       const stopped = new Promise<void>((resolve) => httpServer.close(() => resolve()))
       const clients = [...wss.clients]
       const socketsClosed = Promise.all(
         clients.map((c) => new Promise<void>((r) => c.once('close', () => r()))),
       )
-      for (const client of clients) client.close(1001, 'server shutting down')
+      // Lab 8: спершу пояснюємо, ЧОМУ закриваємо (клієнт покаже це в лобі), потім 1001 Going Away
+      const notice = JSON.stringify({ type: 'shutdown', reason: 'server restarting', retryAfterMs: 5000 })
+      for (const client of clients) {
+        if (client.readyState === client.OPEN) client.send(notice)
+        client.close(1001, 'server shutting down')
+      }
       await Promise.race([socketsClosed, new Promise<void>((r) => setTimeout(r, 2000).unref())])
       for (const client of wss.clients) client.terminate() // хто не встиг — примусово
       wss.close()

@@ -231,12 +231,17 @@ export const ServerMessageSchema = z.discriminatedUnion('type', [
     tickRate: z.number().positive(),
     codec: z.enum(['json', 'binary']),
     net: NetConfigSchema,
+    // Lab 8: id запуску сервера — новий після кожного перезапуску. Клієнт так відрізняє
+    // «обірвалась мережа» (той самий bootId → граємо далі) від «сервер перезапустився» (→ лобі)
+    bootId: z.string(),
   }),
   z.object({ type: z.literal('roster'), players: z.array(PlayerInfoSchema) }),
   z.object({ type: z.literal('chat'), from: PlayerInfoSchema, text: z.string(), t: z.number() }),
   z.object({ type: z.literal('system'), text: z.string() }),
   z.object({ type: z.literal('pong'), t: z.number(), tick: z.number() }),
   NetConfigSchema.extend({ type: z.literal('netsim') }),
+  // Lab 8: сервер вимикається (SIGTERM, новий деплой) — попереджає ПЕРЕД закриттям з кодом 1001
+  z.object({ type: z.literal('shutdown'), reason: z.string(), retryAfterMs: z.number().nonnegative() }),
   SnapshotSchema,
 ])
 export type ServerMessage = z.infer<typeof ServerMessageSchema>

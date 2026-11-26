@@ -30,6 +30,7 @@ import { computeCamera, drawArenaBackground, drawArenaBorder } from './game/came
 import { ARENA_SIZE } from '../../shared/src/sim/arena.ts'
 import { debug as simDebug } from '../../shared/src/sim/ship-physics.ts'
 import { perfStart, perfEnd, perfSummary, perfReset } from './perf.ts'
+import { isTouchDevice, mountTouchControls } from './touch.ts'
 import { ArenasSchema, type ArenaConfig, type Arenas } from '../../shared/src/arena-config.ts'
 
 // Сценарій гри:  завантаження → лобі → гра → (Esc) → лобі → …
@@ -300,13 +301,42 @@ function startGame(room: LobbyRoom, name: string): void {
   } else {
     const net = new NetGame({ room: { ...room, arenaConfig: arena }, name, net: netOptions(), bot })
     unmountRoom = mountRoomView(gameUi, net.conn, { room })
-    detachNet = mountNetControls(gameUi, net)
+    const offControls = mountNetControls(gameUi, net)
+    // Lab 8: сервер вимикається (новий деплой) або зв'язок остаточно втрачено → назад у лобі
+    // з поясненням; лобі саме опитує сервер з backoff і покаже кімнати, щойно він повернеться
+    const backToLobby = (text: string): void =>
+      queueMicrotask(() => {
+        if (session?.game !== net) return // уже вийшли з цієї гри
+        showLobby()
+        lobby.notify(text)
+      })
+    const offShutdown = net.conn.events.on('shutdown', () =>
+      backToLobby('Сервер перезапускається (оновлення) — кімнати з’являться, щойно він повернеться'),
+    )
+    // перепідключились, а bootId інший → сервер перезапустився, матч на ньому скинуто → у лобі
+    let bootId: string | null = null
+    const offWelcome = net.conn.events.on('welcome', (m) => {
+      if (bootId !== null && m.bootId !== bootId)
+        backToLobby('Сервер перезапустився — попередній матч скинуто. Оберіть кімнату, щоб грати далі')
+      bootId = m.bootId
+    })
+    const offStatus = net.conn.events.on('status', ({ state, code }) => {
+      if (state === 'closed' && code !== 1000)
+        backToLobby(`Зв'язок із сервером втрачено${code ? ` (код ${code})` : ''} — пробую знову…`)
+    })
+    detachNet = () => {
+      offControls()
+      offShutdown()
+      offWelcome()
+      offStatus()
+    }
     game = net
   }
 
   // підписники подій гри: звук і HUD (офлайн — сам світ, онлайн — події зі знімків сервера)
   const detachAudio = audio.attach(game.events)
   const detachHud = hud.attach(game.events)
+  const detachTouch = isTouchDevice() ? mountTouchControls(input) : (): void => {} // Lab 8: телефон
   const current = game
   session = {
     game,
@@ -315,6 +345,7 @@ function startGame(room: LobbyRoom, name: string): void {
     detach: () => {
       detachAudio()
       detachHud()
+      detachTouch()
       unmountRoom()
       detachNet()
       current.close()
@@ -418,3 +449,13 @@ if (autojoin !== null) {
 }
 
 void boot(flags)
+
+// Lab 8: PWA — service worker кешує гру, щоб її можна було встановити й швидко відкривати.
+// У dev (Vite) не реєструємо: кеш заважав би гарячому перезавантаженню.
+if (!DEV && 'serviceWorker' in navigator && window.isSecureContext) {
+  window.addEventListener('load', () => {
+    navigator.serviceWorker
+      .register('./sw.js')
+      .catch((e: unknown) => console.warn('[pwa] SW registration failed', e))
+  })
+}

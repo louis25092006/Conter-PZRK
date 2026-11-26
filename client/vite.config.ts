@@ -1,6 +1,17 @@
 import { defineConfig, type Plugin } from 'vite'
 import { existsSync } from 'node:fs'
 import { join } from 'node:path'
+import { execSync } from 'node:child_process'
+
+// Lab 8: штамп версії — короткий git SHA (у Docker його передає збірка через GIT_SHA)
+function gitSha(): string {
+  if (process.env.GIT_SHA) return process.env.GIT_SHA.slice(0, 7)
+  try {
+    return execSync('git rev-parse --short HEAD', { stdio: ['ignore', 'pipe', 'ignore'] }).toString().trim()
+  } catch {
+    return 'dev'
+  }
+}
 
 // Middleware лише для dev-сервера: імітує повільну й ненадійну мережу,
 // щоб перевірити прогрес-бар, таймаути й повтори (див. src/assets/test-flags.js).
@@ -51,6 +62,7 @@ const SERVER = process.env.GAME_SERVER ?? 'http://localhost:3000'
 
 export default defineConfig({
   plugins: [testNetwork()],
+  define: { __APP_VERSION__: JSON.stringify(gitSha()) },
   server: {
     proxy: {
       '/api': SERVER,

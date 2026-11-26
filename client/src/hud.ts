@@ -4,6 +4,7 @@ import type { GameEvents } from '../../shared/src/events.ts'
 import type { ArenaConfig } from '../../shared/src/arena-config.ts'
 import type { EffectName } from '../../shared/src/types.ts'
 import type { LoopStats } from './loop.ts'
+import { APP_VERSION } from './version.ts'
 import type { SoundState } from './audio.ts'
 
 // HUD — теж підписник подій гри, як і звук. Сам світ про HUD не знає.
@@ -132,7 +133,7 @@ export function createHud() {
     ctx.fillStyle = '#6b7280'
     ctx.font = '13px monospace'
     ctx.fillText(
-      `WASD / стрілки — літати · Пробіл — стріляти · P — пауза · M — звук (${sound[soundState] ?? soundState}) · N — нетграф · Esc — лобі`,
+      `WASD / стрілки — літати · Пробіл — стріляти · P — пауза · M — звук (${sound[soundState] ?? soundState}) · N — нетграф · Esc — лобі · v ${APP_VERSION}`, // Lab 8: версія збірки (git SHA), як у /health
       10,
       h - 12,
     )

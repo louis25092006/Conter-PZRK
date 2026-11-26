@@ -1,0 +1,71 @@
+# Lab 8, M3: тег v* → повний CI → образ у GitHub Container Registry → деплой на Render → перевірка версії.
+#   git tag v1.0.0 && git push origin v1.0.0
+#
+# Потрібно налаштувати в репозиторії (Settings → Secrets and variables → Actions):
+#   secret   RENDER_DEPLOY_HOOK_URL  — Render → сервіс → Settings → Deploy Hook (це секрет: з ним будь-хто запустить деплой)
+#   variable LIVE_URL                — публічна адреса гри, напр. https://conter-pzrk.onrender.com
+# Без них образ однаково публікується в GHCR, а кроки деплою пропускаються.
+name: Deploy
+on:
+  push:
+    tags: ['v*']
+
+permissions:
+  contents: read
+  packages: write # публікація образу в ghcr.io
+
+jobs:
+  ci:
+    uses: ./.github/workflows/ci.yml
+
+  publish:
+    needs: ci
+    runs-on: ubuntu-latest
+    outputs:
+      image: ${{ steps.meta.outputs.image }}
+    steps:
+      - uses: actions/checkout@v5
+      - id: meta
+        run: |
+          owner=$(echo "${{ github.repository_owner }}" | tr '[:upper:]' '[:lower:]')
+          echo "image=ghcr.io/${owner}/conter-pzrk:${GITHUB_REF_NAME}" >> "$GITHUB_OUTPUT"
+          echo "latest=ghcr.io/${owner}/conter-pzrk:latest" >> "$GITHUB_OUTPUT"
+      - uses: docker/login-action@v3
+        with:
+          registry: ghcr.io
+          username: ${{ github.actor }}
+          password: ${{ secrets.GITHUB_TOKEN }}
+      - uses: docker/build-push-action@v6
+        with:
+          context: .
+          push: true
+          build-args: GIT_SHA=${{ github.sha }}
+          tags: |
+            ${{ steps.meta.outputs.image }}
+            ${{ steps.meta.outputs.latest }}
+
+  deploy:
+    needs: publish
+    runs-on: ubuntu-latest
+    env:
+      HOOK: ${{ secrets.RENDER_DEPLOY_HOOK_URL }}
+      LIVE_URL: ${{ vars.LIVE_URL }}
+    steps:
+      - name: Trigger Render deploy
+        if: env.HOOK != ''
+        run: |
+          # imgURL — який саме образ розгорнути (Render deploy hook для сервісу з образу)
+          img=$(python3 -c "import urllib.parse,sys; print(urllib.parse.quote(sys.argv[1], safe=''))" "${{ needs.publish.outputs.image }}")
+          curl -fsS -X POST "${HOOK}&imgURL=${img}" > /dev/null
+          echo "Render deploy triggered for ${{ needs.publish.outputs.image }}"
+      - name: Wait until /health reports this version
+        if: env.HOOK != '' && env.LIVE_URL != ''
+        run: |
+          want=${GITHUB_SHA::7}
+          for i in $(seq 1 60); do
+            got=$(curl -fs "${LIVE_URL}/health" | python3 -c "import json,sys; print(json.load(sys.stdin)['version'][:7])" || true)
+            echo "attempt $i: live version '${got}', want '${want}'"
+            if [ "$got" = "$want" ]; then echo "Deployed ${want} to ${LIVE_URL}" >> "$GITHUB_STEP_SUMMARY"; exit 0; fi
+            sleep 10
+          done
+          exit 1

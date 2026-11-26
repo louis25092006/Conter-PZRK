@@ -77,6 +77,8 @@ export class Connection {
         return this.events.emit('pong', m)
       case 'netsim':
         return this.events.emit('netsim', m)
+      case 'shutdown':
+        return this.events.emit('shutdown', m)
       case 'snapshot':
         return this.events.emit('snapshot', m)
       default:

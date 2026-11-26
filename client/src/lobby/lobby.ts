@@ -16,6 +16,7 @@ export interface LobbyEvents {
   join: { readonly room: LobbyRoom; readonly name: string } // гравець заходить у кімнату
   created: { readonly room: RoomInfo } // кімнату створено
   close: undefined // лобі закрилось
+  notice: { readonly text: string } // Lab 8: пояснення, чому гравець опинився в лобі (сервер перезапускається…)
 }
 
 export interface LobbyOptions {
@@ -26,7 +27,8 @@ export interface LobbyOptions {
 
 export class Lobby {
   #controller: AbortController | null = null // живе, поки лобі відкрите; abort() = прибрати все
-  #timer: ReturnType<typeof setInterval> | undefined
+  #timer: ReturnType<typeof setTimeout> | undefined
+  #failures = 0 // Lab 8: поспіль невдалих опитувань — для backoff
 
   readonly events = new Bus<LobbyEvents>()
   readonly url: string
@@ -53,10 +55,23 @@ export class Lobby {
     if (this.isOpen) return
     const controller = new AbortController()
     this.#controller = controller
-    void this.refresh()
-    this.#timer = setInterval(() => void this.refresh(), this.intervalMs)
+    this.#failures = 0
+    // Lab 8: опитування з backoff — сервер перезапускається? Не засипаємо його запитами:
+    // 4 с, 8 с, 16 с… до 30 с; перша вдала відповідь повертає звичайний інтервал.
+    const loop = async (): Promise<void> => {
+      await this.refresh()
+      if (controller.signal.aborted) return
+      const delay = Math.min(30_000, this.intervalMs * 2 ** Math.min(this.#failures, 3))
+      this.#timer = setTimeout(() => void loop(), delay)
+    }
+    void loop()
     // один сигнал прибирає і таймер, і всі запити в польоті
-    controller.signal.addEventListener('abort', () => clearInterval(this.#timer), { once: true })
+    controller.signal.addEventListener('abort', () => clearTimeout(this.#timer), { once: true })
+  }
+
+  // показати гравцю, чому він у лобі (після вимкнення сервера чи втрати зв'язку)
+  notify(text: string): void {
+    this.events.emit('notice', { text })
   }
 
   async refresh(): Promise<void> {
@@ -74,6 +89,7 @@ export class Lobby {
       this.offline = false
       this.everOnline = true
       this.stats.ok++
+      this.#failures = 0
       this.events.emit('rooms', { rooms: this.rooms, at: new Date(), offline: false })
     } catch (error: unknown) {
       if (leave.aborted && isAbort(error)) {
@@ -81,6 +97,7 @@ export class Lobby {
         return
       }
       this.stats.failed++
+      this.#failures++
       // Сервер жодного разу не відповів, і це не "повільно", а "його тут немає" → офлайн
       const noServer =
         error instanceof HttpError || error instanceof AssetFormatError || error instanceof TypeError

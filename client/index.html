@@ -2,7 +2,12 @@
 <html lang="uk">
   <head>
     <meta charset="UTF-8" />
-    <link rel="icon" href="data:," />
+    <link rel="icon" href="./icons/icon-192.png" />
+    <!-- Lab 8: PWA — встановлення на телефон/комп'ютер -->
+    <link rel="manifest" href="./manifest.webmanifest" />
+    <link rel="apple-touch-icon" href="./icons/icon-192.png" />
+    <meta name="theme-color" content="#1a1428" />
+    <meta name="mobile-web-app-capable" content="yes" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
     <title>Conter-PZRK</title>
     <style>
@@ -545,6 +550,51 @@
         display: flex;
         align-items: center;
         gap: 6px;
+      }
+      /* Lab 8: сенсорний пульт (лише на сенсорних екранах) */
+      .touch-controls {
+        position: fixed;
+        inset: 0;
+        pointer-events: none;
+        z-index: 20;
+      }
+      .touch-controls > div {
+        position: absolute;
+        display: flex;
+        gap: 14px;
+        pointer-events: auto;
+      }
+      .touch-left {
+        left: 18px;
+        bottom: 28px;
+      }
+      .touch-right {
+        right: 18px;
+        bottom: 28px;
+      }
+      .touch-top {
+        right: 14px;
+        top: 110px;
+      }
+      .touch-controls button {
+        width: 68px;
+        height: 68px;
+        border-radius: 50%;
+        border: 2px solid rgba(245, 184, 61, 0.6);
+        background: rgba(20, 16, 32, 0.45);
+        color: #f5d38a;
+        font-size: 26px;
+        touch-action: none;
+        user-select: none;
+        -webkit-user-select: none;
+      }
+      .touch-top button {
+        width: 44px;
+        height: 44px;
+        font-size: 18px;
+      }
+      .touch-controls button.down {
+        background: rgba(245, 184, 61, 0.45);
       }
       #game-ui.hide-net .net-controls {
         display: none;

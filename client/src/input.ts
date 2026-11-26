@@ -5,6 +5,9 @@ export interface Input {
   isDown(code: string): boolean
   justPressed(code: string): boolean
   consume(): void
+  // Lab 8: «віртуальні клавіші» для сенсорного пульта (телефон) — та сама модель, що й у клавіатури
+  press(code: string): void
+  release(code: string): void
 }
 
 export function createInput(target: Window): Input {
@@ -34,5 +37,12 @@ export function createInput(target: Window): Input {
     justPressed: (code) => pressed.has(code),
     // викликається в кінці кожного кроку симуляції: "натискання" живе рівно один крок
     consume: () => pressed.clear(),
+    press(code) {
+      if (!down.has(code)) pressed.add(code)
+      down.add(code)
+    },
+    release(code) {
+      down.delete(code)
+    },
   }
 }

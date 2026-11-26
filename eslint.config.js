@@ -52,6 +52,11 @@ export default tseslint.config(
     files: ['client/src/**/*.ts'],
     languageOptions: { globals: globals.browser },
   },
+  // Lab 8: service worker PWA
+  {
+    files: ['client/public/sw.js'],
+    languageOptions: { globals: globals.serviceworker },
+  },
   // спільний пакет — лише те, що є І в браузері, І в Node (URL, TextEncoder…)
   {
     files: ['shared/src/**/*.ts'],

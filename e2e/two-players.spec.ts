@@ -81,3 +81,35 @@ test('двоє гравців: ростер, рух видно в іншому �
   await alice.keyboard.press('Enter')
   await expect(bob.locator('.chat-log')).toContainText('Alice: привіт, Bob!')
 })
+
+// Lab 8: телефон (PWA) — сенсорний пульт керує літаком так само, як клавіатура
+test('телефон: сенсорні кнопки керують літаком, маніфест PWA на місці', async ({ browser }) => {
+  const phone = await (
+    await browser.newContext({ viewport: { width: 740, height: 360 }, hasTouch: true, isMobile: true })
+  ).newPage()
+  await phone.goto('/?autojoin=r-dogfight&name=Phone')
+  await expect(phone.locator('.touch-controls button')).toHaveCount(5)
+  await expect.poll(() => myShipId(phone)).not.toBeNull()
+
+  const speed = (): Promise<number> =>
+    phone.evaluate(() => {
+      const at = (o: unknown, k: string): unknown =>
+        typeof o === 'object' && o !== null ? Reflect.get(o, k) : undefined
+      const p = at(at(at(Reflect.get(window, 'game'), 'session'), 'game'), 'predicted')
+      const vx = at(p, 'vx')
+      const vy = at(p, 'vy')
+      return typeof vx === 'number' && typeof vy === 'number' ? Math.hypot(vx, vy) : 0
+    })
+  const thrust = phone.getByRole('button', { name: 'Газ' })
+  await thrust.dispatchEvent('pointerdown', { pointerId: 1, isPrimary: true })
+  await expect.poll(speed, { timeout: 2000 }).toBeGreaterThan(20)
+  await thrust.dispatchEvent('pointerup', { pointerId: 1, isPrimary: true })
+
+  const manifest = await phone.evaluate(async () => {
+    const href = document.querySelector('link[rel=manifest]')?.getAttribute('href') ?? ''
+    const res = await fetch(href)
+    const json: unknown = await res.json()
+    return json
+  })
+  expect(manifest).toMatchObject({ short_name: 'Conter-PZRK', display: 'fullscreen' })
+})

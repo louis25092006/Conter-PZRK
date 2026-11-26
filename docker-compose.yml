@@ -1,0 +1,20 @@
+# Lab 8: локальний запуск «як у продакшені» — той самий образ, що й на хостингу.
+#   docker compose up --build        → http://localhost:3000
+#   docker compose stop              → перевірка акуратного вимкнення (SIGTERM, ≤ 10 с)
+services:
+  game:
+    build:
+      context: .
+      args:
+        GIT_SHA: ${GIT_SHA:-local}
+    image: conter-pzrk:local
+    ports:
+      - '3000:3000'
+    environment:
+      LOG_LEVEL: info
+      ALLOWED_ORIGINS: http://localhost:3000,http://127.0.0.1:3000
+      MAX_CONNECTIONS_PER_IP: 8
+      MAX_ROOMS: 20
+      MAX_PLAYERS_PER_ROOM: 8
+    stop_grace_period: 10s
+    restart: unless-stopped
